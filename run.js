@@ -144,7 +144,7 @@ const findIssues = async (repo) => {
   return result;
 };
 
-const findStats = async () => {
+const updateLabels = async () => {
   const repos = await findRepos();
   console.log('found GitHub repos:');
   repos.forEach((name) => console.log(name));
@@ -181,4 +181,4 @@ const findStats = async () => {
   await bluebird.mapSeries(notAnsweredIssues, (issue) => addLabel(issue.url, NOT_ANSWERED_LABEL_TEXT));
 };
 
-findStats();
+updateLabels();
