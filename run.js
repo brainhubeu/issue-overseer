@@ -99,29 +99,18 @@ const graphql = ({ query, variables }) => request.post('https://api.github.com/g
     return body;
   });
 
-const findStats = async () => {
-  const repos = await findRepos();
-  console.log('found GitHub repos:');
-  repos.forEach((name) => console.log(name));
-  console.log();
-
-  const allInfo = await bluebird.mapSeries(repos, async (repo) => {
-    console.log({ organization, repo });
-    const allLabels = await findLabels(repo);
-    const labelsToRemove = answeringLabels.filter((label) => allLabels.some((anyLabel) => anyLabel.name === label.name && anyLabel.color !== label.color));
-    const labelsToAdd = answeringLabels.filter(
-      (label) => !allLabels.some((anyLabel) => anyLabel.name === label.name)
-        || allLabels.some((anyLabel) => anyLabel.name === label.name && anyLabel.color !== label.color),
-    );
-    console.log({ labelsToRemove, labelsToAdd });
-    await Promise.all(labelsToRemove.map((label) => deleteLabel(repo, label.name)));
-    await Promise.all(labelsToAdd.map((label) => createLabel(repo, label)));
+const findIssues = async (repo) => {
+  const result = [];
+  let cursor = null;
+  while (true) {
+    console.log({ cursor });
     const info = await graphql({
       query: `
-query ($organization: String!, $repo: String!) {
+  query ($organization: String!, $repo: String!, $cursor: String) {
   repository(owner: $organization, name: $repo) {
-    issues(last:100, states:OPEN) {
+    issues(first:20, after: $cursor, states:OPEN) {
       edges {
+        cursor
         node {
           title
           url
@@ -142,13 +131,41 @@ query ($organization: String!, $repo: String!) {
       }
     }
   }
-}`,
-      variables: { organization, repo },
+  }`,
+      variables: { organization, repo, cursor },
     });
-    console.log(info.data.repository.issues.edges);
-    return info;
+    const issues = info.data.repository.issues.edges;
+    if (!issues.length) {
+      break;
+    }
+    result.push(...issues);
+    cursor = _.last(issues).cursor;
+  }
+  return result;
+};
+
+const findStats = async () => {
+  const repos = await findRepos();
+  console.log('found GitHub repos:');
+  repos.forEach((name) => console.log(name));
+  console.log();
+
+  const allInfo = await bluebird.mapSeries(repos, async (repo) => {
+    console.log({ organization, repo });
+    const allLabels = await findLabels(repo);
+    const labelsToRemove = answeringLabels.filter((label) => allLabels.some((anyLabel) => anyLabel.name === label.name && anyLabel.color !== label.color));
+    const labelsToAdd = answeringLabels.filter(
+      (label) => !allLabels.some((anyLabel) => anyLabel.name === label.name)
+        || allLabels.some((anyLabel) => anyLabel.name === label.name && anyLabel.color !== label.color),
+    );
+    console.log({ labelsToRemove, labelsToAdd });
+    await Promise.all(labelsToRemove.map((label) => deleteLabel(repo, label.name)));
+    await Promise.all(labelsToAdd.map((label) => createLabel(repo, label)));
+    const issues = await findIssues(repo);
+    console.log(issues);
+    return issues;
   });
-  const allIssues = _.flatten(allInfo.map((info) => info.data.repository.issues.edges)).map((edge) => edge.node);
+  const allIssues = _.flatten(allInfo).map((edge) => edge.node);
   const ourIssues = allIssues.filter((issue) => issue.authorAssociation === 'MEMBER');
   const notOurIssues = allIssues.filter((issue) => issue.authorAssociation !== 'MEMBER');
   const notOurIssuesWithNoComments = notOurIssues.filter((issue) => issue.comments.edges.length === 0);
