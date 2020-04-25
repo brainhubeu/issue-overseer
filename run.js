@@ -18,6 +18,10 @@ const answeringLabels = [
   { name: NOT_ANSWERED_LABEL_TEXT, color: 'a00000' },
 ];
 
+const botsList = [
+  'issuehunt-app',
+];
+
 const findRepos = async () => {
   const repoNames = [];
   for (let page = 1; ; page += 1) {
@@ -116,7 +120,7 @@ const findIssues = async (repo) => {
           url
           number
           authorAssociation
-          comments(last:1) {
+          comments(last:100) {
             edges {
               node {
                 bodyText
@@ -170,8 +174,21 @@ const updateLabels = async () => {
   const notOurIssues = allIssues.filter((issue) => issue.authorAssociation !== 'MEMBER');
   const notOurIssuesWithNoComments = notOurIssues.filter((issue) => issue.comments.edges.length === 0);
   const notOurIssuesWithComments = notOurIssues.filter((issue) => issue.comments.edges.length !== 0);
-  const answeredIssues = notOurIssuesWithComments.filter((issue) => issue.comments.edges[0].node.authorAssociation === 'MEMBER');
-  const notAnsweredIssues = [...notOurIssuesWithNoComments, ...notOurIssuesWithComments.filter((issue) => issue.comments.edges[0].node.authorAssociation !== 'MEMBER')];
+  const answeredIssues = notOurIssuesWithComments.filter(
+    (issue) => {
+      const lastComment = _.findLast(issue.comments.edges, (edge) => !botsList.includes(edge.node.author.login));
+      if (!lastComment) {
+        return false;
+      }
+      return lastComment.node.authorAssociation === 'MEMBER';
+    },
+  );
+  const notAnsweredIssues = [
+    ...notOurIssuesWithNoComments,
+    ...notOurIssuesWithComments.filter((issue) => !answeredIssues.some((answeredIssue) => answeredIssue.url === issue.url)),
+  ];
+  console.log('answeredIssues', answeredIssues);
+  console.log('notAnsweredIssues', notAnsweredIssues);
 
   await bluebird.mapSeries(allIssues, (issue) => removeLabel(issue.url, OUR_LABEL_TEXT).catch(() => {}));
   await bluebird.mapSeries(allIssues, (issue) => removeLabel(issue.url, ANSWERED_LABEL_TEXT).catch(() => {}));
