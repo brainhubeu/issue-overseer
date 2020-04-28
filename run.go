@@ -16,6 +16,11 @@ type repository struct {
 	Name     string `json:"name"`
 }
 
+type label struct {
+	Name  string `json:"name"`
+	Color string `json:"color"`
+}
+
 func findRepos(organization string, token string) []string {
 	repoNames := []string{}
 	client := &http.Client{}
@@ -54,6 +59,30 @@ func findRepos(organization string, token string) []string {
 	return repoNames
 }
 
+func findLabels(organization string, repoName string, token string) []label {
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", "https://api.github.com/repos/"+organization+"/"+repoName+"/labels", nil)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	req.Header.Add("Authorization", "token "+token)
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	if resp.StatusCode != 200 {
+		log.Fatalln(resp.Status, string(body))
+	}
+	labels := []label{}
+	json.Unmarshal([]byte(string(body)), &labels)
+	return labels
+}
+
 func main() {
 	organization := os.Args[1]
 	token := os.Getenv("GITHUB_TOKEN")
@@ -64,5 +93,9 @@ func main() {
 	fmt.Println(token, OUR_LABEL_TEXT, ANSWERED_LABEL_TEXT, NOT_ANSWERED_LABEL_TEXT)
 
 	repoNames := findRepos(organization, token)
+	for i := 0; i < len(repoNames); i++ {
+		labels := findLabels(organization, repoNames[i], token)
+		fmt.Println("labels", repoNames[i], labels)
+	}
 	fmt.Println("repoNames", repoNames)
 }
