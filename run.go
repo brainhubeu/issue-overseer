@@ -16,10 +16,16 @@ type repository struct {
 	Name     string `json:"name"`
 }
 
-func findRepos(organization string) []string {
+func findRepos(organization string, token string) []string {
 	repoNames := []string{}
+	client := &http.Client{}
 	for page := 1; ; page += 1 {
-		resp, err := http.Get("https://api.github.com/orgs/" + organization + "/repos?page=" + strconv.Itoa(page))
+		req, err := http.NewRequest("GET", "https://api.github.com/orgs/"+organization+"/repos?page="+strconv.Itoa(page), nil)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		req.Header.Add("Authorization", "token "+token)
+		resp, err := client.Do(req)
 		if err != nil {
 			log.Fatalln(err)
 		}
@@ -28,9 +34,11 @@ func findRepos(organization string) []string {
 		if err != nil {
 			log.Fatalln(err)
 		}
+		if resp.StatusCode != 200 {
+			log.Fatalln(resp.Status, string(body))
+		}
 		repositories := []repository{}
 		json.Unmarshal([]byte(string(body)), &repositories)
-		fmt.Println("repositories", repositories)
 		if len(repositories) == 0 {
 			break
 		}
@@ -38,7 +46,6 @@ func findRepos(organization string) []string {
 			repository := repositories[i]
 			if !repository.Archived {
 				repoNames = append(repoNames, repository.Name)
-				fmt.Println("==repoNames", repoNames)
 			}
 		}
 	}
@@ -56,6 +63,6 @@ func main() {
 
 	fmt.Println(token, OUR_LABEL_TEXT, ANSWERED_LABEL_TEXT, NOT_ANSWERED_LABEL_TEXT)
 
-	repoNames := findRepos(organization)
+	repoNames := findRepos(organization, token)
 	fmt.Println("repoNames", repoNames)
 }
