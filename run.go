@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -11,12 +12,12 @@ import (
 	"strconv"
 )
 
-type repository struct {
+type Repository struct {
 	Archived bool   `json:"archived"`
 	Name     string `json:"name"`
 }
 
-type label struct {
+type Label struct {
 	Name  string `json:"name"`
 	Color string `json:"color"`
 }
@@ -42,7 +43,7 @@ func findRepos(organization string, token string) []string {
 		if resp.StatusCode != 200 {
 			log.Fatalln(resp.Status, string(body))
 		}
-		repositories := []repository{}
+		repositories := []Repository{}
 		json.Unmarshal([]byte(string(body)), &repositories)
 		if len(repositories) == 0 {
 			break
@@ -59,7 +60,7 @@ func findRepos(organization string, token string) []string {
 	return repoNames
 }
 
-func findLabels(organization string, repoName string, token string) []label {
+func findLabels(organization string, repoName string, token string) []Label {
 	client := &http.Client{}
 	req, err := http.NewRequest("GET", "https://api.github.com/repos/"+organization+"/"+repoName+"/labels", nil)
 	if err != nil {
@@ -78,7 +79,7 @@ func findLabels(organization string, repoName string, token string) []label {
 	if resp.StatusCode != 200 {
 		log.Fatalln(resp.Status, string(body))
 	}
-	labels := []label{}
+	labels := []Label{}
 	json.Unmarshal([]byte(string(body)), &labels)
 	return labels
 }
@@ -104,16 +105,41 @@ func deleteLabel(organization string, repoName string, labelName string, token s
 	}
 }
 
+func createLabel(organization string, repoName string, label Label, token string) {
+	client := &http.Client{}
+	jsonValue, err := json.Marshal(label)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	req, err := http.NewRequest("POST", "https://api.github.com/repos/"+organization+"/"+repoName+"/labels", bytes.NewBuffer(jsonValue))
+	if err != nil {
+		log.Fatalln(err)
+	}
+	req.Header.Add("Authorization", "token "+token)
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	if resp.StatusCode != 201 {
+		log.Fatalln(resp.Status, string(body))
+	}
+}
+
 func main() {
 	organization := os.Args[1]
 	token := os.Getenv("GITHUB_TOKEN")
 	OUR_LABEL_TEXT := "answering: reported by " + organization
 	const ANSWERED_LABEL_TEXT = "answering: answered"
 	const NOT_ANSWERED_LABEL_TEXT = "answering: not answered"
-	answeringLabels := []label{
-		label{OUR_LABEL_TEXT, "a0a000"},
-		label{ANSWERED_LABEL_TEXT, "00a000"},
-		label{NOT_ANSWERED_LABEL_TEXT, "a00000"},
+	answeringLabels := []Label{
+		Label{OUR_LABEL_TEXT, "a0a000"},
+		Label{ANSWERED_LABEL_TEXT, "00a000"},
+		Label{NOT_ANSWERED_LABEL_TEXT, "a00000"},
 	}
 
 	fmt.Println(token, OUR_LABEL_TEXT, ANSWERED_LABEL_TEXT, NOT_ANSWERED_LABEL_TEXT)
@@ -122,7 +148,7 @@ func main() {
 	for i := 0; i < len(repoNames); i++ {
 		repoName := repoNames[i]
 		allLabels := findLabels(organization, repoName, token)
-		labelsToDelete := []label{}
+		labelsToDelete := []Label{}
 		for j := 0; j < len(answeringLabels); j++ {
 			label := answeringLabels[j]
 			for k := 0; k < len(allLabels); k++ {
@@ -132,7 +158,7 @@ func main() {
 				}
 			}
 		}
-		labelsToCreate := append([]label{}, labelsToDelete...)
+		labelsToCreate := append([]Label{}, labelsToDelete...)
 		for j := 0; j < len(answeringLabels); j++ {
 			label := answeringLabels[j]
 			k := 0
@@ -152,6 +178,9 @@ func main() {
 		fmt.Println(repoName, "labelsToCreate", labelsToCreate)
 		for j := 0; j < len(labelsToDelete); j++ {
 			deleteLabel(organization, repoName, labelsToDelete[j].Name, token)
+		}
+		for j := 0; j < len(labelsToCreate); j++ {
+			createLabel(organization, repoName, labelsToCreate[j], token)
 		}
 	}
 	fmt.Println("repoNames", repoNames)
