@@ -89,13 +89,30 @@ func main() {
 	OUR_LABEL_TEXT := "answering: reported by " + organization
 	const ANSWERED_LABEL_TEXT = "answering: answered"
 	const NOT_ANSWERED_LABEL_TEXT = "answering: not answered"
+	answeringLabels := []label{
+		label{OUR_LABEL_TEXT, "a0a000"},
+		label{ANSWERED_LABEL_TEXT, "00a000"},
+		label{NOT_ANSWERED_LABEL_TEXT, "a00000"},
+	}
 
 	fmt.Println(token, OUR_LABEL_TEXT, ANSWERED_LABEL_TEXT, NOT_ANSWERED_LABEL_TEXT)
 
 	repoNames := findRepos(organization, token)
 	for i := 0; i < len(repoNames); i++ {
-		labels := findLabels(organization, repoNames[i], token)
-		fmt.Println("labels", repoNames[i], labels)
+		allLabels := findLabels(organization, repoNames[i], token)
+		labelNamesToRemove := []string{}
+		for j := 0; j < len(answeringLabels); j++ {
+			label := answeringLabels[j]
+			for k := 0; k < len(allLabels); k++ {
+				anyLabel := allLabels[k]
+				if label.Name == anyLabel.Name && label.Color != anyLabel.Color {
+					labelNamesToRemove = append(labelNamesToRemove, label.Name)
+				}
+			}
+		}
+		fmt.Println("allLabels", repoNames[i], allLabels)
+		fmt.Println("answeringLabels", answeringLabels)
+		fmt.Println(repoNames[i], "labelNamesToRemove", labelNamesToRemove)
 	}
 	fmt.Println("repoNames", repoNames)
 }
