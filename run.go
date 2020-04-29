@@ -83,6 +83,27 @@ func findLabels(organization string, repoName string, token string) []label {
 	return labels
 }
 
+func deleteLabel(organization string, repoName string, labelName string, token string) {
+	client := &http.Client{}
+	req, err := http.NewRequest("DELETE", "https://api.github.com/repos/"+organization+"/"+repoName+"/labels/"+labelName, nil)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	req.Header.Add("Authorization", "token "+token)
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	if resp.StatusCode != 204 {
+		log.Fatalln(resp.Status, string(body))
+	}
+}
+
 func main() {
 	organization := os.Args[1]
 	token := os.Getenv("GITHUB_TOKEN")
@@ -99,7 +120,8 @@ func main() {
 
 	repoNames := findRepos(organization, token)
 	for i := 0; i < len(repoNames); i++ {
-		allLabels := findLabels(organization, repoNames[i], token)
+		repoName := repoNames[i]
+		allLabels := findLabels(organization, repoName, token)
 		labelsToDelete := []label{}
 		for j := 0; j < len(answeringLabels); j++ {
 			label := answeringLabels[j]
@@ -124,10 +146,13 @@ func main() {
 				labelsToCreate = append(labelsToCreate, label)
 			}
 		}
-		fmt.Println(repoNames[i], "allLabels", repoNames[i], allLabels)
-		fmt.Println(repoNames[i], "answeringLabels", answeringLabels)
-		fmt.Println(repoNames[i], "labelsToDelete", labelsToDelete)
-		fmt.Println(repoNames[i], "labelsToCreate", labelsToCreate)
+		fmt.Println(repoName, "allLabels", repoNames[i], allLabels)
+		fmt.Println(repoName, "answeringLabels", answeringLabels)
+		fmt.Println(repoName, "labelsToDelete", labelsToDelete)
+		fmt.Println(repoName, "labelsToCreate", labelsToCreate)
+		for j := 0; j < len(labelsToDelete); j++ {
+			deleteLabel(organization, repoName, labelsToDelete[j].Name, token)
+		}
 	}
 	fmt.Println("repoNames", repoNames)
 }
