@@ -100,19 +100,34 @@ func main() {
 	repoNames := findRepos(organization, token)
 	for i := 0; i < len(repoNames); i++ {
 		allLabels := findLabels(organization, repoNames[i], token)
-		labelNamesToDelete := []string{}
+		labelsToDelete := []label{}
 		for j := 0; j < len(answeringLabels); j++ {
 			label := answeringLabels[j]
 			for k := 0; k < len(allLabels); k++ {
 				anyLabel := allLabels[k]
 				if label.Name == anyLabel.Name && label.Color != anyLabel.Color {
-					labelNamesToDelete = append(labelNamesToDelete, label.Name)
+					labelsToDelete = append(labelsToDelete, label)
 				}
 			}
 		}
-		fmt.Println("allLabels", repoNames[i], allLabels)
-		fmt.Println("answeringLabels", answeringLabels)
-		fmt.Println(repoNames[i], "labelNamesToDelete", labelNamesToDelete)
+		labelsToCreate := append([]label{}, labelsToDelete...)
+		for j := 0; j < len(answeringLabels); j++ {
+			label := answeringLabels[j]
+			k := 0
+			for ; k < len(allLabels); k++ {
+				anyLabel := allLabels[k]
+				if label.Name == anyLabel.Name {
+					break
+				}
+			}
+			if k == len(allLabels) {
+				labelsToCreate = append(labelsToCreate, label)
+			}
+		}
+		fmt.Println(repoNames[i], "allLabels", repoNames[i], allLabels)
+		fmt.Println(repoNames[i], "answeringLabels", answeringLabels)
+		fmt.Println(repoNames[i], "labelsToDelete", labelsToDelete)
+		fmt.Println(repoNames[i], "labelsToCreate", labelsToCreate)
 	}
 	fmt.Println("repoNames", repoNames)
 }
