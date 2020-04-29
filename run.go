@@ -100,19 +100,19 @@ func main() {
 	repoNames := findRepos(organization, token)
 	for i := 0; i < len(repoNames); i++ {
 		allLabels := findLabels(organization, repoNames[i], token)
-		labelNamesToRemove := []string{}
+		labelNamesToDelete := []string{}
 		for j := 0; j < len(answeringLabels); j++ {
 			label := answeringLabels[j]
 			for k := 0; k < len(allLabels); k++ {
 				anyLabel := allLabels[k]
 				if label.Name == anyLabel.Name && label.Color != anyLabel.Color {
-					labelNamesToRemove = append(labelNamesToRemove, label.Name)
+					labelNamesToDelete = append(labelNamesToDelete, label.Name)
 				}
 			}
 		}
 		fmt.Println("allLabels", repoNames[i], allLabels)
 		fmt.Println("answeringLabels", answeringLabels)
-		fmt.Println(repoNames[i], "labelNamesToRemove", labelNamesToRemove)
+		fmt.Println(repoNames[i], "labelNamesToDelete", labelNamesToDelete)
 	}
 	fmt.Println("repoNames", repoNames)
 }
