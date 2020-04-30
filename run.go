@@ -22,6 +22,39 @@ type Label struct {
 	Color string `json:"color"`
 }
 
+type Issue struct {
+	Title             string `json:"title"`
+	Url               string `json:"url"`
+	Number            string `json:"number"`
+	AuthorAssociation string `json:"authorAssociation"`
+}
+
+type IssueEdge struct {
+	Cursor string `json:"cursor"`
+	Node   Issue  `json:"node"`
+}
+
+type Issues struct {
+	Data struct {
+		Repository struct {
+			Issues struct {
+				Edges []IssueEdge `json:"edges"`
+			} `json:"issues"`
+		} `json:"repository"`
+	} `json:"data"`
+}
+
+type GraphqlVariables struct {
+	Organization string  `json:"organization"`
+	RepoName     string  `json:"repoName"`
+	Cursor       *string `json:"cursor"`
+}
+
+type GraphqlRequestBody struct {
+	Variables GraphqlVariables `json:"variables"`
+	Query     string           `json:"query"`
+}
+
 func findRepos(organization string, token string) []string {
 	repoNames := []string{}
 	client := &http.Client{}
@@ -130,6 +163,75 @@ func createLabel(organization string, repoName string, label Label, token string
 	}
 }
 
+func findIssues(organization string, repoName string, token string) []Issue {
+	client := &http.Client{}
+	cursor := (*string)(nil)
+	result := []Issue{}
+	for {
+		query := `query ($organization: String!, $repoName: String!, $cursor: String) {
+	  repository(owner: $organization, name: $repoName) {
+		issues(first:20, after: $cursor, states:OPEN) {
+		  edges {
+			cursor
+			node {
+			  title
+			  url
+			  number
+			  authorAssociation
+			  comments(last:100) {
+				edges {
+				  node {
+					bodyText
+					authorAssociation
+					author {
+					  login
+					}
+				  }
+				}
+			  }
+			}
+		  }
+		}
+	  }
+	}`
+		graphqlVariables := GraphqlVariables{organization, repoName, cursor}
+		graphqlRequestBody := GraphqlRequestBody{graphqlVariables, query}
+		jsonValue, err := json.Marshal(graphqlRequestBody)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		fmt.Println(bytes.NewBuffer(jsonValue))
+		req, err := http.NewRequest("POST", "https://api.github.com/graphql", bytes.NewBuffer(jsonValue))
+		if err != nil {
+			log.Fatalln(err)
+		}
+		req.Header.Add("Authorization", "token "+token)
+		resp, err := client.Do(req)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		defer resp.Body.Close()
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		if resp.StatusCode != 200 {
+			log.Fatalln(resp.Status, string(body))
+		}
+		issuesData := Issues{}
+		json.Unmarshal([]byte(string(body)), &issuesData)
+		edges := issuesData.Data.Repository.Issues.Edges
+		if len(edges) == 0 {
+			break
+		}
+		cursor = &edges[len(edges)-1].Cursor
+		for i := 0; i < len(edges); i++ {
+			result = append(result, edges[i].Node)
+		}
+	}
+	return result
+}
+
 func main() {
 	organization := os.Args[1]
 	token := os.Getenv("GITHUB_TOKEN")
@@ -182,6 +284,8 @@ func main() {
 		for j := 0; j < len(labelsToCreate); j++ {
 			createLabel(organization, repoName, labelsToCreate[j], token)
 		}
+		issues := findIssues(organization, repoName, token)
+		fmt.Println(repoName, "issues", issues)
 	}
 	fmt.Println("repoNames", repoNames)
 }
