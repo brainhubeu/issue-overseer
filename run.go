@@ -22,11 +22,23 @@ type Label struct {
 	Color string `json:"color"`
 }
 
+type Comment struct {
+	AuthorAssociation string `json:"authorAssociation"`
+	Author            struct {
+		Login string `json:"login"`
+	} `json:"author"`
+}
+
 type Issue struct {
 	Title             string `json:"title"`
 	Url               string `json:"url"`
 	Number            string `json:"number"`
 	AuthorAssociation string `json:"authorAssociation"`
+	Comments          struct {
+		Edges []struct {
+			Node Comment `json:"node"`
+		} `json:"edges"`
+	} `json:"comments"`
 }
 
 type IssueEdge struct {
@@ -200,7 +212,6 @@ func findIssues(organization string, repoName string, token string) []Issue {
 		if err != nil {
 			log.Fatalln(err)
 		}
-		fmt.Println(bytes.NewBuffer(jsonValue))
 		req, err := http.NewRequest("POST", "https://api.github.com/graphql", bytes.NewBuffer(jsonValue))
 		if err != nil {
 			log.Fatalln(err)
@@ -286,6 +297,35 @@ func main() {
 		}
 		issues := findIssues(organization, repoName, token)
 		fmt.Println(repoName, "issues", issues)
+		ourIssues := []Issue{}
+		answeredIssues := []Issue{}
+		notAnsweredIssues := []Issue{}
+		for j := 0; j < len(issues); j++ {
+			issue := issues[j]
+			if issue.AuthorAssociation == "MEMBER" {
+				ourIssues = append(ourIssues, issue)
+			} else {
+				comments := issue.Comments.Edges
+				if len(comments) == 0 {
+					notAnsweredIssues = append(notAnsweredIssues, issue)
+				} else {
+					k := len(comments) - 1
+					for ; k >= 0; k-- {
+						if comments[k].Node.Author.Login != "issuehunt-app" {
+							break
+						}
+					}
+					if comments[k].Node.AuthorAssociation == "MEMBER" {
+						answeredIssues = append(answeredIssues, issue)
+					} else {
+						notAnsweredIssues = append(notAnsweredIssues, issue)
+					}
+				}
+			}
+		}
+		fmt.Println(repoName, "ourIssues", ourIssues)
+		fmt.Println(repoName, "answeredIssues", answeredIssues)
+		fmt.Println(repoName, "notAnsweredIssues", notAnsweredIssues)
 	}
 	fmt.Println("repoNames", repoNames)
 }
