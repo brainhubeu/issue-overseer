@@ -302,6 +302,98 @@ func findIssues(organization string, repoName string, token string) []Issue {
 	return result
 }
 
+func doIssuesTriage(issues []Issue) ([]Issue, []Issue, []Issue) {
+	ourIssues := []Issue{}
+	answeredIssues := []Issue{}
+	notAnsweredIssues := []Issue{}
+	for i := 0; i < len(issues); i++ {
+		issue := issues[i]
+		if issue.AuthorAssociation == "MEMBER" {
+			ourIssues = append(ourIssues, issue)
+		} else {
+			comments := issue.Comments.Edges
+			if len(comments) == 0 {
+				notAnsweredIssues = append(notAnsweredIssues, issue)
+			} else {
+				j := len(comments) - 1
+				for ; j >= 0; j-- {
+					if comments[j].Node.Author.Login != "issuehunt-app" {
+						break
+					}
+				}
+				if comments[j].Node.AuthorAssociation == "MEMBER" {
+					answeredIssues = append(answeredIssues, issue)
+				} else {
+					notAnsweredIssues = append(notAnsweredIssues, issue)
+				}
+			}
+		}
+	}
+	return ourIssues, answeredIssues, notAnsweredIssues
+}
+
+func createOrUpdateRepoLabels(organization string, repoName string, token string, answeringLabels []Label) {
+	allLabels := findLabels(organization, repoName, token)
+	labelsToDelete := []Label{}
+	for i := 0; i < len(answeringLabels); i++ {
+		label := answeringLabels[i]
+		for j := 0; j < len(allLabels); j++ {
+			anyLabel := allLabels[j]
+			if label.Name == anyLabel.Name && label.Color != anyLabel.Color {
+				labelsToDelete = append(labelsToDelete, label)
+			}
+		}
+	}
+	labelsToCreate := append([]Label{}, labelsToDelete...)
+	for i := 0; i < len(answeringLabels); i++ {
+		label := answeringLabels[i]
+		j := 0
+		for ; j < len(allLabels); j++ {
+			anyLabel := allLabels[j]
+			if label.Name == anyLabel.Name {
+				break
+			}
+		}
+		if j == len(allLabels) {
+			labelsToCreate = append(labelsToCreate, label)
+		}
+	}
+	fmt.Println(repoName, "labelsToDelete", labelsToDelete)
+	fmt.Println(repoName, "labelsToCreate", labelsToCreate)
+	for i := 0; i < len(labelsToDelete); i++ {
+		deleteLabel(organization, repoName, labelsToDelete[i].Name, token)
+	}
+	for i := 0; i < len(labelsToCreate); i++ {
+		createLabel(organization, repoName, labelsToCreate[i], token)
+	}
+}
+
+func updateRepos(organization string, repoNames []string, token string, OUR_LABEL_TEXT string, ANSWERED_LABEL_TEXT string, NOT_ANSWERED_LABEL_TEXT string, answeringLabels []Label) {
+	for i := 0; i < len(repoNames); i++ {
+		repoName := repoNames[i]
+		createOrUpdateRepoLabels(organization, repoName, token, answeringLabels)
+		issues := findIssues(organization, repoName, token)
+		ourIssues, answeredIssues, notAnsweredIssues := doIssuesTriage(issues)
+		fmt.Println(repoName, "ourIssues", ourIssues)
+		fmt.Println(repoName, "answeredIssues", answeredIssues)
+		fmt.Println(repoName, "notAnsweredIssues", notAnsweredIssues)
+		for j := 0; j < len(issues); j++ {
+			for k := 0; k < len(answeringLabels); k++ {
+				removeLabel(issues[j].Url, answeringLabels[k].Name, token)
+			}
+		}
+		for j := 0; j < len(ourIssues); j++ {
+			addLabel(ourIssues[j].Url, OUR_LABEL_TEXT, token)
+		}
+		for j := 0; j < len(answeredIssues); j++ {
+			addLabel(answeredIssues[j].Url, ANSWERED_LABEL_TEXT, token)
+		}
+		for j := 0; j < len(notAnsweredIssues); j++ {
+			addLabel(notAnsweredIssues[j].Url, NOT_ANSWERED_LABEL_TEXT, token)
+		}
+	}
+}
+
 func main() {
 	organization := os.Args[1]
 	token := os.Getenv("GITHUB_TOKEN")
@@ -317,86 +409,6 @@ func main() {
 	fmt.Println(token, OUR_LABEL_TEXT, ANSWERED_LABEL_TEXT, NOT_ANSWERED_LABEL_TEXT)
 
 	repoNames := findRepos(organization, token)
-	for i := 0; i < len(repoNames); i++ {
-		repoName := repoNames[i]
-		allLabels := findLabels(organization, repoName, token)
-		labelsToDelete := []Label{}
-		for j := 0; j < len(answeringLabels); j++ {
-			label := answeringLabels[j]
-			for k := 0; k < len(allLabels); k++ {
-				anyLabel := allLabels[k]
-				if label.Name == anyLabel.Name && label.Color != anyLabel.Color {
-					labelsToDelete = append(labelsToDelete, label)
-				}
-			}
-		}
-		labelsToCreate := append([]Label{}, labelsToDelete...)
-		for j := 0; j < len(answeringLabels); j++ {
-			label := answeringLabels[j]
-			k := 0
-			for ; k < len(allLabels); k++ {
-				anyLabel := allLabels[k]
-				if label.Name == anyLabel.Name {
-					break
-				}
-			}
-			if k == len(allLabels) {
-				labelsToCreate = append(labelsToCreate, label)
-			}
-		}
-		fmt.Println(repoName, "allLabels", repoNames[i], allLabels)
-		fmt.Println(repoName, "answeringLabels", answeringLabels)
-		fmt.Println(repoName, "labelsToDelete", labelsToDelete)
-		fmt.Println(repoName, "labelsToCreate", labelsToCreate)
-		for j := 0; j < len(labelsToDelete); j++ {
-			deleteLabel(organization, repoName, labelsToDelete[j].Name, token)
-		}
-		for j := 0; j < len(labelsToCreate); j++ {
-			createLabel(organization, repoName, labelsToCreate[j], token)
-		}
-		issues := findIssues(organization, repoName, token)
-		fmt.Println(repoName, "issues", issues)
-		ourIssues := []Issue{}
-		answeredIssues := []Issue{}
-		notAnsweredIssues := []Issue{}
-		for j := 0; j < len(issues); j++ {
-			issue := issues[j]
-			if issue.AuthorAssociation == "MEMBER" {
-				ourIssues = append(ourIssues, issue)
-			} else {
-				comments := issue.Comments.Edges
-				if len(comments) == 0 {
-					notAnsweredIssues = append(notAnsweredIssues, issue)
-				} else {
-					k := len(comments) - 1
-					for ; k >= 0; k-- {
-						if comments[k].Node.Author.Login != "issuehunt-app" {
-							break
-						}
-					}
-					if comments[k].Node.AuthorAssociation == "MEMBER" {
-						answeredIssues = append(answeredIssues, issue)
-					} else {
-						notAnsweredIssues = append(notAnsweredIssues, issue)
-					}
-				}
-			}
-			for k := 0; k < len(answeringLabels); k++ {
-				removeLabel(issue.Url, answeringLabels[k].Name, token)
-			}
-		}
-		fmt.Println(repoName, "ourIssues", ourIssues)
-		fmt.Println(repoName, "answeredIssues", answeredIssues)
-		fmt.Println(repoName, "notAnsweredIssues", notAnsweredIssues)
-		for j := 0; j < len(ourIssues); j++ {
-			addLabel(ourIssues[j].Url, OUR_LABEL_TEXT, token)
-		}
-		for j := 0; j < len(answeredIssues); j++ {
-			addLabel(answeredIssues[j].Url, ANSWERED_LABEL_TEXT, token)
-		}
-		for j := 0; j < len(notAnsweredIssues); j++ {
-			addLabel(notAnsweredIssues[j].Url, NOT_ANSWERED_LABEL_TEXT, token)
-		}
-	}
 	fmt.Println("repoNames", repoNames)
+	updateRepos(organization, repoNames, token, OUR_LABEL_TEXT, ANSWERED_LABEL_TEXT, NOT_ANSWERED_LABEL_TEXT, answeringLabels)
 }
