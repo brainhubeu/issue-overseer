@@ -10,6 +10,7 @@ import (
 	"os"
 	"sort"
 	"strconv"
+	"strings"
 )
 
 type Repository struct {
@@ -65,6 +66,10 @@ type GraphqlVariables struct {
 type GraphqlRequestBody struct {
 	Variables GraphqlVariables `json:"variables"`
 	Query     string           `json:"query"`
+}
+
+type AddLabelRequestBody struct {
+	Labels []string `json:"labels"`
 }
 
 func findRepos(organization string, token string) []string {
@@ -173,6 +178,60 @@ func createLabel(organization string, repoName string, label Label, token string
 	if resp.StatusCode != 201 {
 		log.Fatalln(resp.Status, string(body))
 	}
+}
+
+func removeLabel(issueUrl string, labelName string, token string) {
+	client := &http.Client{}
+	url := strings.Replace(issueUrl, "https://github.com", "https://api.github.com/repos", 1) + "/labels/" + labelName
+	fmt.Println("to remove", issueUrl, url, labelName)
+	req, err := http.NewRequest("DELETE", url, nil)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	req.Header.Add("Authorization", "token "+token)
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	if resp.StatusCode != 200 && resp.StatusCode != 404 {
+		log.Fatalln(resp.Status, string(body))
+	}
+	fmt.Println("removed", issueUrl, labelName, resp.StatusCode)
+}
+
+func addLabel(issueUrl string, labelName string, token string) {
+	client := &http.Client{}
+	fmt.Println("labelName", labelName)
+	requestBody := AddLabelRequestBody{[]string{labelName}}
+	jsonValue, err := json.Marshal(requestBody)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	url := strings.Replace(issueUrl, "https://github.com", "https://api.github.com/repos", 1) + "/labels"
+	fmt.Println("to add", issueUrl, url, labelName)
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonValue))
+	if err != nil {
+		log.Fatalln(err)
+	}
+	req.Header.Add("Authorization", "token "+token)
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	if resp.StatusCode != 200 {
+		log.Fatalln(resp.Status, string(body))
+	}
+	fmt.Println("added", issueUrl, labelName, resp.StatusCode)
 }
 
 func findIssues(organization string, repoName string, token string) []Issue {
@@ -322,10 +381,22 @@ func main() {
 					}
 				}
 			}
+			for k := 0; k < len(answeringLabels); k++ {
+				removeLabel(issue.Url, answeringLabels[k].Name, token)
+			}
 		}
 		fmt.Println(repoName, "ourIssues", ourIssues)
 		fmt.Println(repoName, "answeredIssues", answeredIssues)
 		fmt.Println(repoName, "notAnsweredIssues", notAnsweredIssues)
+		for j := 0; j < len(ourIssues); j++ {
+			addLabel(ourIssues[j].Url, OUR_LABEL_TEXT, token)
+		}
+		for j := 0; j < len(answeredIssues); j++ {
+			addLabel(answeredIssues[j].Url, ANSWERED_LABEL_TEXT, token)
+		}
+		for j := 0; j < len(notAnsweredIssues); j++ {
+			addLabel(notAnsweredIssues[j].Url, NOT_ANSWERED_LABEL_TEXT, token)
+		}
 	}
 	fmt.Println("repoNames", repoNames)
 }
