@@ -3,5 +3,5 @@ set -e
 
 while true
 do
-  ./run.js $1
+  time go run run.go $1
 done
