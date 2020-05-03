@@ -1,0 +1,7 @@
+version: '2'
+services:
+  issue-label-bot-main:
+    image:  registry.dev.brainhub.pl/issue-label-bot/main:latest
+    environment:
+      - GITHUB_TOKEN
+      - GITHUB_ORGANIZATION
