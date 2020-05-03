@@ -2,7 +2,7 @@
 Bot adding labels to GitHub issues which allows easy finding of issues with a missing answer
 
 [![Last commit](https://img.shields.io/github/last-commit/brainhubeu/issue-label-bot.svg)](https://github.com/brainhubeu/issue-label-bot/commits/master)
-[![license](https://img.shields.io/badge/License-MIT-green)](https://github.com/brainhubeu/issue-label-bot/blob/master/LICENSE)
+[![license](https://img.shields.io/badge/License-MIT-green)](https://github.com/brainhubeu/issue-label-bot/blob/master/LICENSE.md)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
 
 [![Activity](https://img.shields.io/github/commit-activity/m/brainhubeu/issue-label-bot.svg)](https://github.com/brainhubeu/issue-label-bot/commits/master)
