@@ -30,12 +30,19 @@ type Comment struct {
 	} `json:"author"`
 }
 
+type LabelEdge struct {
+	Node Label `json:"node"`
+}
+
 type Issue struct {
 	Title             string `json:"title"`
 	Url               string `json:"url"`
 	Number            string `json:"number"`
 	AuthorAssociation string `json:"authorAssociation"`
-	Comments          struct {
+	Labels            struct {
+		Edges []LabelEdge `json:"edges"`
+	} `json:"labels"`
+	Comments struct {
 		Edges []struct {
 			Node Comment `json:"node"`
 		} `json:"edges"`
@@ -249,6 +256,13 @@ func findIssues(organization string, repoName string, token string) []Issue {
 			  url
 			  number
 			  authorAssociation
+				labels (first:100) {
+				  edges {
+					node {
+					  name
+					}
+				  }
+				}
 			  comments(last:100) {
 				edges {
 				  node {
@@ -387,6 +401,26 @@ func createOrUpdateRepoLabels(organization string, repoName string, token string
 	}
 }
 
+func updateIssueLabels(issueUrl string, allIssueLabels []LabelEdge, answeringLabels []Label, labelNameToAdd string, token string) {
+	labelsToRemove := []Label{}
+	for i := 0; i < len(allIssueLabels)-1; i++ {
+		j := 0
+		for ; j < len(answeringLabels); j++ {
+			if answeringLabels[j].Name == allIssueLabels[i].Node.Name {
+				break
+			}
+		}
+		if j < len(answeringLabels) && allIssueLabels[i].Node.Name != labelNameToAdd {
+			labelsToRemove = append(labelsToRemove, allIssueLabels[i].Node)
+		}
+	}
+	fmt.Println(issueUrl, "labelsToRemove", labelsToRemove)
+	for i := 0; i < len(labelsToRemove); i++ {
+		removeLabel(issueUrl, labelsToRemove[i].Name, token)
+	}
+	addLabel(issueUrl, labelNameToAdd, token)
+}
+
 func updateRepos(organization string, repoNames []string, token string, OUR_LABEL_TEXT string, ANSWERED_LABEL_TEXT string, NOT_ANSWERED_LABEL_TEXT string, answeringLabels []Label) {
 	for i := 0; i < len(repoNames); i++ {
 		repoName := repoNames[i]
@@ -396,19 +430,14 @@ func updateRepos(organization string, repoNames []string, token string, OUR_LABE
 		fmt.Println(repoName, "ourIssues", ourIssues)
 		fmt.Println(repoName, "answeredIssues", answeredIssues)
 		fmt.Println(repoName, "notAnsweredIssues", notAnsweredIssues)
-		for j := 0; j < len(issues); j++ {
-			for k := 0; k < len(answeringLabels); k++ {
-				removeLabel(issues[j].Url, answeringLabels[k].Name, token)
-			}
-		}
 		for j := 0; j < len(ourIssues); j++ {
-			addLabel(ourIssues[j].Url, OUR_LABEL_TEXT, token)
+			updateIssueLabels(ourIssues[j].Url, ourIssues[j].Labels.Edges, answeringLabels, OUR_LABEL_TEXT, token)
 		}
 		for j := 0; j < len(answeredIssues); j++ {
-			addLabel(answeredIssues[j].Url, ANSWERED_LABEL_TEXT, token)
+			updateIssueLabels(answeredIssues[j].Url, answeredIssues[j].Labels.Edges, answeringLabels, ANSWERED_LABEL_TEXT, token)
 		}
 		for j := 0; j < len(notAnsweredIssues); j++ {
-			addLabel(notAnsweredIssues[j].Url, NOT_ANSWERED_LABEL_TEXT, token)
+			updateIssueLabels(notAnsweredIssues[j].Url, notAnsweredIssues[j].Labels.Edges, answeringLabels, NOT_ANSWERED_LABEL_TEXT, token)
 		}
 	}
 }
