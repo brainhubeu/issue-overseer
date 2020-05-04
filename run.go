@@ -101,7 +101,10 @@ func findRepos(organization string, token string) []string {
 			log.Fatalln(resp.Status, string(body))
 		}
 		repositories := []Repository{}
-		json.Unmarshal([]byte(string(body)), &repositories)
+		err = json.Unmarshal([]byte(string(body)), &repositories)
+		if err != nil {
+			log.Fatalln(err)
+		}
 		if len(repositories) == 0 {
 			break
 		}
@@ -137,7 +140,10 @@ func findLabels(organization string, repoName string, token string) []Label {
 		log.Fatalln(resp.Status, string(body))
 	}
 	labels := []Label{}
-	json.Unmarshal([]byte(string(body)), &labels)
+	err = json.Unmarshal([]byte(string(body)), &labels)
+	if err != nil {
+		log.Fatalln(err)
+	}
 	return labels
 }
 
@@ -303,7 +309,10 @@ func findIssues(organization string, repoName string, token string) []Issue {
 			log.Fatalln(resp.Status, string(body))
 		}
 		issuesData := Issues{}
-		json.Unmarshal([]byte(string(body)), &issuesData)
+		err = json.Unmarshal([]byte(string(body)), &issuesData)
+		if err != nil {
+			log.Fatalln(err)
+		}
 		edges := issuesData.Data.Repository.Issues.Edges
 		if len(edges) == 0 {
 			break

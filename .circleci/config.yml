@@ -1,0 +1,20 @@
+version: 2
+jobs:
+  test:
+    docker:
+      - image: golangci/golangci-lint:1.26.0
+    working_directory: ~/app
+    steps:
+      - checkout
+      - run: golangci-lint run
+      - run: |
+          if [ `gofmt -l .` ]; then
+            echo "you must run 'go fmt' to fix formatting"
+            exit 1
+          fi
+
+workflows:
+  version: 2
+  test_and_deploy:
+    jobs:
+      - test
