@@ -6,13 +6,13 @@ jobs:
     working_directory: ~/app
     steps:
       - checkout
+      - run: go get github.com/stretchr/testify
       - run: golangci-lint run
       - run: |
           if [ `gofmt -l .` ]; then
             echo "you must run 'go fmt' to fix formatting"
             exit 1
           fi
-      - run: go get github.com/stretchr/testify
       - run: go test
 
 workflows:
