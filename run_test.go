@@ -32,4 +32,168 @@ func TestDoIssuesTriage(t *testing.T) {
 			Issue{"title", "url", "number", "NONE", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{}}},
 		})
 	})
+
+	t.Run("does triage of issues with comments", func(t *testing.T) {
+		issues := []Issue{
+			Issue{"title", "url", "number", "MEMBER", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
+				CommentEdge{Comment{"MEMBER", CommentAuthor{"user"}}},
+			}}},
+			Issue{"title", "url", "number", "MEMBER", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
+				CommentEdge{Comment{"NONE", CommentAuthor{"user"}}},
+			}}},
+			Issue{"title", "url", "number", "MEMBER", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
+				CommentEdge{Comment{"NONE", CommentAuthor{"user"}}},
+				CommentEdge{Comment{"MEMBER", CommentAuthor{"user"}}},
+			}}},
+			Issue{"title", "url", "number", "MEMBER", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
+				CommentEdge{Comment{"MEMBER", CommentAuthor{"user"}}},
+				CommentEdge{Comment{"NONE", CommentAuthor{"user"}}},
+			}}},
+			Issue{"title", "url", "number", "NONE", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
+				CommentEdge{Comment{"MEMBER", CommentAuthor{"user"}}},
+			}}},
+			Issue{"title", "url", "number", "NONE", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
+				CommentEdge{Comment{"NONE", CommentAuthor{"user"}}},
+			}}},
+			Issue{"title", "url", "number", "NONE", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
+				CommentEdge{Comment{"NONE", CommentAuthor{"user"}}},
+				CommentEdge{Comment{"MEMBER", CommentAuthor{"user"}}},
+			}}},
+			Issue{"title", "url", "number", "NONE", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
+				CommentEdge{Comment{"MEMBER", CommentAuthor{"user"}}},
+				CommentEdge{Comment{"NONE", CommentAuthor{"user"}}},
+			}}},
+		}
+
+		ourIssues, answeredIssues, notAnsweredIssues := doIssuesTriage(issues)
+
+		assert.Equal(t, ourIssues, []Issue{
+			Issue{"title", "url", "number", "MEMBER", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
+				CommentEdge{Comment{"MEMBER", CommentAuthor{"user"}}},
+			}}},
+		})
+		assert.Equal(t, answeredIssues, []Issue{
+			Issue{"title", "url", "number", "MEMBER", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
+				CommentEdge{Comment{"NONE", CommentAuthor{"user"}}},
+				CommentEdge{Comment{"MEMBER", CommentAuthor{"user"}}},
+			}}},
+			Issue{"title", "url", "number", "NONE", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
+				CommentEdge{Comment{"MEMBER", CommentAuthor{"user"}}},
+			}}},
+			Issue{"title", "url", "number", "NONE", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
+				CommentEdge{Comment{"NONE", CommentAuthor{"user"}}},
+				CommentEdge{Comment{"MEMBER", CommentAuthor{"user"}}},
+			}}},
+		})
+		assert.Equal(t, notAnsweredIssues, []Issue{
+			Issue{"title", "url", "number", "MEMBER", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
+				CommentEdge{Comment{"NONE", CommentAuthor{"user"}}},
+			}}},
+			Issue{"title", "url", "number", "MEMBER", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
+				CommentEdge{Comment{"MEMBER", CommentAuthor{"user"}}},
+				CommentEdge{Comment{"NONE", CommentAuthor{"user"}}},
+			}}},
+			Issue{"title", "url", "number", "NONE", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
+				CommentEdge{Comment{"NONE", CommentAuthor{"user"}}},
+			}}},
+			Issue{"title", "url", "number", "NONE", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
+				CommentEdge{Comment{"MEMBER", CommentAuthor{"user"}}},
+				CommentEdge{Comment{"NONE", CommentAuthor{"user"}}},
+			}}},
+		})
+	})
+
+	t.Run("excludes issuehunt-app comments", func(t *testing.T) {
+		issues := []Issue{
+			Issue{"title", "url", "number", "MEMBER", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
+				CommentEdge{Comment{"MEMBER", CommentAuthor{"user"}}},
+				CommentEdge{Comment{"NONE", CommentAuthor{"issuehunt-app"}}},
+			}}},
+			Issue{"title", "url", "number", "MEMBER", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
+				CommentEdge{Comment{"NONE", CommentAuthor{"user"}}},
+				CommentEdge{Comment{"NONE", CommentAuthor{"issuehunt-app"}}},
+			}}},
+			Issue{"title", "url", "number", "MEMBER", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
+				CommentEdge{Comment{"NONE", CommentAuthor{"user"}}},
+				CommentEdge{Comment{"MEMBER", CommentAuthor{"user"}}},
+				CommentEdge{Comment{"NONE", CommentAuthor{"issuehunt-app"}}},
+			}}},
+			Issue{"title", "url", "number", "MEMBER", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
+				CommentEdge{Comment{"MEMBER", CommentAuthor{"user"}}},
+				CommentEdge{Comment{"NONE", CommentAuthor{"user"}}},
+				CommentEdge{Comment{"NONE", CommentAuthor{"issuehunt-app"}}},
+			}}},
+			Issue{"title", "url", "number", "NONE", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
+				CommentEdge{Comment{"MEMBER", CommentAuthor{"user"}}},
+				CommentEdge{Comment{"NONE", CommentAuthor{"issuehunt-app"}}},
+			}}},
+			Issue{"title", "url", "number", "NONE", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
+				CommentEdge{Comment{"NONE", CommentAuthor{"user"}}},
+				CommentEdge{Comment{"NONE", CommentAuthor{"issuehunt-app"}}},
+			}}},
+			Issue{"title", "url", "number", "NONE", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
+				CommentEdge{Comment{"NONE", CommentAuthor{"user"}}},
+				CommentEdge{Comment{"MEMBER", CommentAuthor{"user"}}},
+				CommentEdge{Comment{"NONE", CommentAuthor{"issuehunt-app"}}},
+				CommentEdge{Comment{"NONE", CommentAuthor{"issuehunt-app"}}},
+			}}},
+			Issue{"title", "url", "number", "NONE", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
+				CommentEdge{Comment{"MEMBER", CommentAuthor{"user"}}},
+				CommentEdge{Comment{"NONE", CommentAuthor{"issuehunt-app"}}},
+				CommentEdge{Comment{"NONE", CommentAuthor{"user"}}},
+				CommentEdge{Comment{"NONE", CommentAuthor{"issuehunt-app"}}},
+				CommentEdge{Comment{"NONE", CommentAuthor{"issuehunt-app"}}},
+				CommentEdge{Comment{"NONE", CommentAuthor{"issuehunt-app"}}},
+			}}},
+		}
+
+		ourIssues, answeredIssues, notAnsweredIssues := doIssuesTriage(issues)
+
+		assert.Equal(t, ourIssues, []Issue{
+			Issue{"title", "url", "number", "MEMBER", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
+				CommentEdge{Comment{"MEMBER", CommentAuthor{"user"}}},
+				CommentEdge{Comment{"NONE", CommentAuthor{"issuehunt-app"}}},
+			}}},
+		})
+		assert.Equal(t, answeredIssues, []Issue{
+			Issue{"title", "url", "number", "MEMBER", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
+				CommentEdge{Comment{"NONE", CommentAuthor{"user"}}},
+				CommentEdge{Comment{"MEMBER", CommentAuthor{"user"}}},
+				CommentEdge{Comment{"NONE", CommentAuthor{"issuehunt-app"}}},
+			}}},
+			Issue{"title", "url", "number", "NONE", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
+				CommentEdge{Comment{"MEMBER", CommentAuthor{"user"}}},
+				CommentEdge{Comment{"NONE", CommentAuthor{"issuehunt-app"}}},
+			}}},
+			Issue{"title", "url", "number", "NONE", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
+				CommentEdge{Comment{"NONE", CommentAuthor{"user"}}},
+				CommentEdge{Comment{"MEMBER", CommentAuthor{"user"}}},
+				CommentEdge{Comment{"NONE", CommentAuthor{"issuehunt-app"}}},
+				CommentEdge{Comment{"NONE", CommentAuthor{"issuehunt-app"}}},
+			}}},
+		})
+		assert.Equal(t, notAnsweredIssues, []Issue{
+			Issue{"title", "url", "number", "MEMBER", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
+				CommentEdge{Comment{"NONE", CommentAuthor{"user"}}},
+				CommentEdge{Comment{"NONE", CommentAuthor{"issuehunt-app"}}},
+			}}},
+			Issue{"title", "url", "number", "MEMBER", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
+				CommentEdge{Comment{"MEMBER", CommentAuthor{"user"}}},
+				CommentEdge{Comment{"NONE", CommentAuthor{"user"}}},
+				CommentEdge{Comment{"NONE", CommentAuthor{"issuehunt-app"}}},
+			}}},
+			Issue{"title", "url", "number", "NONE", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
+				CommentEdge{Comment{"NONE", CommentAuthor{"user"}}},
+				CommentEdge{Comment{"NONE", CommentAuthor{"issuehunt-app"}}},
+			}}},
+			Issue{"title", "url", "number", "NONE", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
+				CommentEdge{Comment{"MEMBER", CommentAuthor{"user"}}},
+				CommentEdge{Comment{"NONE", CommentAuthor{"issuehunt-app"}}},
+				CommentEdge{Comment{"NONE", CommentAuthor{"user"}}},
+				CommentEdge{Comment{"NONE", CommentAuthor{"issuehunt-app"}}},
+				CommentEdge{Comment{"NONE", CommentAuthor{"issuehunt-app"}}},
+				CommentEdge{Comment{"NONE", CommentAuthor{"issuehunt-app"}}},
+			}}},
+		})
+	})
 }

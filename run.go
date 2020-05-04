@@ -23,11 +23,13 @@ type Label struct {
 	Color string `json:"color"`
 }
 
+type CommentAuthor struct {
+	Login string `json:"login"`
+}
+
 type Comment struct {
-	AuthorAssociation string `json:"authorAssociation"`
-	Author            struct {
-		Login string `json:"login"`
-	} `json:"author"`
+	AuthorAssociation string        `json:"authorAssociation"`
+	Author            CommentAuthor `json:"author"`
 }
 
 type LabelEdge struct {
