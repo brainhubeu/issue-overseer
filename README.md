@@ -8,6 +8,8 @@ Bot adding labels to GitHub issues which allows easy finding of issues with a mi
 
 [![Activity](https://img.shields.io/github/commit-activity/m/brainhubeu/issue-label-bot.svg)](https://github.com/brainhubeu/issue-label-bot/commits/master)
 
+Let's assume `__organization_name__` is your GitHub organization name.
+
 For each open issue (among the comments, it excludes the ones made by **issuehunt-bot**), it:
 - puts "**answering: reported by \_\_organization_name\_\_**" label if the issue is created by any member of the \_\_organization_name\_\_ organization with no comments by external contributors;
 - otherwise, puts "**answering: answered**" label if the last comment is by a member of the organization;
@@ -17,5 +19,6 @@ For each open issue (among the comments, it excludes the ones made by **issuehun
 ## run
 ```
 export set GITHUB_TOKEN=__your_token__
-go run run.go brainhubeu
+go run run.go __organization_name__
 ```
+
