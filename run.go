@@ -51,7 +51,7 @@ type Comments struct {
 type Issue struct {
 	Title             string   `json:"title"`
 	Url               string   `json:"url"`
-	Number            string   `json:"number"`
+	Number            int      `json:"number"`
 	AuthorAssociation string   `json:"authorAssociation"`
 	Labels            Labels   `json:"labels"`
 	Comments          Comments `json:"comments"`
