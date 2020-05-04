@@ -26,10 +26,10 @@ func TestDoIssuesTriage(t *testing.T) {
 
 		assert.Equal(t, ourIssues, []Issue{
 			Issue{"title", "url", "number", "MEMBER", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{}}},
+			Issue{"title", "url", "number", "NONE", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{}}},
 		})
 		assert.Equal(t, answeredIssues, []Issue{})
 		assert.Equal(t, notAnsweredIssues, []Issue{
-			Issue{"title", "url", "number", "NONE", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{}}},
 		})
 	})
 }
