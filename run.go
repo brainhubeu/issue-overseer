@@ -325,6 +325,9 @@ func findIssues(organization string, repoName string, token string) []Issue {
 	return result
 }
 
+func foo() {
+}
+
 func doIssuesTriage(issues []Issue) ([]Issue, []Issue, []Issue) {
 	ourIssues := []Issue{}
 	answeredIssues := []Issue{}
