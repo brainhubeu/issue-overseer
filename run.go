@@ -311,7 +311,7 @@ func findIssues(organization string, repoName string, token string) []Issue {
 		issuesData := Issues{}
 		err = json.Unmarshal([]byte(string(body)), &issuesData)
 		if err != nil {
-				log.Fatalln(err)
+			log.Fatalln(err)
 		}
 		edges := issuesData.Data.Repository.Issues.Edges
 		if len(edges) == 0 {
