@@ -12,6 +12,7 @@ jobs:
             echo "you must run 'go fmt' to fix formatting"
             exit 1
           fi
+      - run: go test
 
 workflows:
   version: 2

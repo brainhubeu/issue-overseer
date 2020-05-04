@@ -34,19 +34,25 @@ type LabelEdge struct {
 	Node Label `json:"node"`
 }
 
+type Labels struct {
+	Edges []LabelEdge `json:"edges"`
+}
+
+type CommentEdge struct {
+	Node Comment `json:"node"`
+}
+
+type Comments struct {
+	Edges []CommentEdge `json:"edges"`
+}
+
 type Issue struct {
-	Title             string `json:"title"`
-	Url               string `json:"url"`
-	Number            string `json:"number"`
-	AuthorAssociation string `json:"authorAssociation"`
-	Labels            struct {
-		Edges []LabelEdge `json:"edges"`
-	} `json:"labels"`
-	Comments struct {
-		Edges []struct {
-			Node Comment `json:"node"`
-		} `json:"edges"`
-	} `json:"comments"`
+	Title             string   `json:"title"`
+	Url               string   `json:"url"`
+	Number            string   `json:"number"`
+	AuthorAssociation string   `json:"authorAssociation"`
+	Labels            Labels   `json:"labels"`
+	Comments          Comments `json:"comments"`
 }
 
 type IssueEdge struct {
