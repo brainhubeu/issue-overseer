@@ -29,7 +29,6 @@ func TestDoIssuesTriage(t *testing.T) {
 			Issue{"title", "url", "number", "NONE", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{}}},
 		})
 		assert.Equal(t, answeredIssues, []Issue{})
-		assert.Equal(t, notAnsweredIssues, []Issue{
-		})
+		assert.Equal(t, notAnsweredIssues, []Issue{})
 	})
 }
