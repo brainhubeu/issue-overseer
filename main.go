@@ -19,7 +19,7 @@ func main() {
 
 	fmt.Println(token, OUR_LABEL_TEXT, ANSWERED_LABEL_TEXT, NOT_ANSWERED_LABEL_TEXT)
 
-	githubClient := GithubClient{organization, token}
+	githubClient := InitGithubClient(organization, token)
 	githubOperator := GithubOperator{githubClient, answeringLabels, OUR_LABEL_TEXT, ANSWERED_LABEL_TEXT, NOT_ANSWERED_LABEL_TEXT}
 	repoNames := githubClient.findRepos()
 	fmt.Println("repoNames", repoNames)

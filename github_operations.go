@@ -5,7 +5,7 @@ import (
 )
 
 type GithubOperator struct {
-	GithubClient            GithubClient
+	GithubClient            *GithubClient
 	AnsweringLabels         []Label
 	OUR_LABEL_TEXT          string
 	ANSWERED_LABEL_TEXT     string
