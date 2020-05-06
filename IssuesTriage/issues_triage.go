@@ -7,7 +7,7 @@ import (
 type IssuesTriage struct {
 }
 
-func InitIssuesTriage() *IssuesTriage{
+func InitIssuesTriage() *IssuesTriage {
 	issuesTriage := &IssuesTriage{}
 	return issuesTriage
 }

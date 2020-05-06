@@ -9,8 +9,8 @@ jobs:
       - run: go get github.com/stretchr/testify
       - run: golangci-lint run ./...
       - run: |
-          if [ `gofmt -l .` ]; then
-            echo "you must run 'go fmt' to fix formatting"
+          if [ `gofmt -l . | head -1` ]; then
+            echo "you must run 'go fmt ./...' to fix formatting"
             exit 1
           fi
       - run: go test ./...

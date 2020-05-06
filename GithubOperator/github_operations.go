@@ -1,13 +1,13 @@
 package GithubOperator
 
 import (
-	"fmt"
 	"../Types"
+	"fmt"
 )
 
 type GithubOperator struct {
 	GithubClient            Types.GithubClient
-	IssuesTriage			Types.IssuesTriage
+	IssuesTriage            Types.IssuesTriage
 	AnsweringLabels         []Types.Label
 	OUR_LABEL_TEXT          string
 	ANSWERED_LABEL_TEXT     string

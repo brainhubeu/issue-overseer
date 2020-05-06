@@ -1,6 +1,7 @@
 package GithubClient
 
 import (
+	"../Types"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -10,7 +11,6 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-	"../Types"
 )
 
 type GithubClient struct {
