@@ -13,7 +13,7 @@ jobs:
             echo "you must run 'go fmt' to fix formatting"
             exit 1
           fi
-      - run: go test
+      - run: go test ./...
   deploy:
     docker:
       - image: docker:17.05.0-ce-git

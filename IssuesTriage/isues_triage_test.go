@@ -1,8 +1,7 @@
-package main
+package IssuesTriage
 
 import (
-	"./IssuesTriage"
-	"./Types"
+	"../Types"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -11,7 +10,7 @@ func TestDoIssuesTriage(t *testing.T) {
 	t.Run("does triage of an empty list", func(t *testing.T) {
 		issues := []Types.Issue{}
 
-		issuesTriage := IssuesTriage.InitIssuesTriage()
+		issuesTriage := InitIssuesTriage()
 		ourIssues, answeredIssues, notAnsweredIssues := issuesTriage.DoIssuesTriage(issues)
 
 		assert.Equal(t, ourIssues, []Types.Issue{})
@@ -25,7 +24,7 @@ func TestDoIssuesTriage(t *testing.T) {
 			Types.Issue{Title: "title", Url: "url", Number: 123, AuthorAssociation: "NONE", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{}}},
 		}
 
-		issuesTriage := IssuesTriage.InitIssuesTriage()
+		issuesTriage := InitIssuesTriage()
 		ourIssues, answeredIssues, notAnsweredIssues := issuesTriage.DoIssuesTriage(issues)
 
 		assert.Equal(t, ourIssues, []Types.Issue{
@@ -69,7 +68,7 @@ func TestDoIssuesTriage(t *testing.T) {
 			}}},
 		}
 
-		issuesTriage := IssuesTriage.InitIssuesTriage()
+		issuesTriage := InitIssuesTriage()
 		ourIssues, answeredIssues, notAnsweredIssues := issuesTriage.DoIssuesTriage(issues)
 
 		assert.Equal(t, ourIssues, []Types.Issue{
@@ -152,7 +151,7 @@ func TestDoIssuesTriage(t *testing.T) {
 			}}},
 		}
 
-		issuesTriage := IssuesTriage.InitIssuesTriage()
+		issuesTriage := InitIssuesTriage()
 		ourIssues, answeredIssues, notAnsweredIssues := issuesTriage.DoIssuesTriage(issues)
 
 		assert.Equal(t, ourIssues, []Types.Issue{
