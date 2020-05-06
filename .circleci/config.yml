@@ -14,9 +14,23 @@ jobs:
             exit 1
           fi
       - run: go test
+  deploy:
+    docker:
+      - image: docker:19.03.8
+    working_directory: ~/app
+    steps:
+      - checkout
+      - run: docker build -t registry.dev.brainhub.pl/issue-label-bot/main .
+      - run: docker login --username $REGISTRY_USER --password $REGISTRY_PASSWORD https://registry.dev.brainhub.pl
+      - run: docker push registry.dev.brainhub.pl/issue-label-bot/main
 
 workflows:
   version: 2
   test_and_deploy:
     jobs:
       - test
+      - deploy:
+          filters:
+            branches:
+              only:
+                - master
