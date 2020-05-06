@@ -80,7 +80,7 @@ func (githubOperator GithubOperator) UpdateRepos(repoNames []string) {
 		repoName := repoNames[i]
 		githubOperator.createOrUpdateRepoLabels(repoName)
 		issues := githubOperator.GithubClient.FindIssues(repoName)
-		ourIssues, answeredIssues, notAnsweredIssues := githubOperator.IssuesTriage.DoIssuesTriage(issues)
+		ourIssues, answeredIssues, notAnsweredIssues := githubOperator.IssuesTriage.TriageManyIssues(issues)
 		fmt.Println(repoName, "ourIssues", ourIssues)
 		fmt.Println(repoName, "answeredIssues", answeredIssues)
 		fmt.Println(repoName, "notAnsweredIssues", notAnsweredIssues)

@@ -6,12 +6,12 @@ import (
 	"testing"
 )
 
-func TestDoIssuesTriage(t *testing.T) {
+func TestTriageManyIssues(t *testing.T) {
 	t.Run("does triage of an empty list", func(t *testing.T) {
 		issues := []Types.Issue{}
 
 		issuesTriage := InitIssuesTriage()
-		ourIssues, answeredIssues, notAnsweredIssues := issuesTriage.DoIssuesTriage(issues)
+		ourIssues, answeredIssues, notAnsweredIssues := issuesTriage.TriageManyIssues(issues)
 
 		assert.Equal(t, ourIssues, []Types.Issue{})
 		assert.Equal(t, answeredIssues, []Types.Issue{})
@@ -25,7 +25,7 @@ func TestDoIssuesTriage(t *testing.T) {
 		}
 
 		issuesTriage := InitIssuesTriage()
-		ourIssues, answeredIssues, notAnsweredIssues := issuesTriage.DoIssuesTriage(issues)
+		ourIssues, answeredIssues, notAnsweredIssues := issuesTriage.TriageManyIssues(issues)
 
 		assert.Equal(t, ourIssues, []Types.Issue{
 			Types.Issue{Title: "title", Url: "url", Number: 123, AuthorAssociation: "MEMBER", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{}}},
@@ -69,7 +69,7 @@ func TestDoIssuesTriage(t *testing.T) {
 		}
 
 		issuesTriage := InitIssuesTriage()
-		ourIssues, answeredIssues, notAnsweredIssues := issuesTriage.DoIssuesTriage(issues)
+		ourIssues, answeredIssues, notAnsweredIssues := issuesTriage.TriageManyIssues(issues)
 
 		assert.Equal(t, ourIssues, []Types.Issue{
 			Types.Issue{Title: "title", Url: "url", Number: 123, AuthorAssociation: "MEMBER", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{
@@ -152,7 +152,7 @@ func TestDoIssuesTriage(t *testing.T) {
 		}
 
 		issuesTriage := InitIssuesTriage()
-		ourIssues, answeredIssues, notAnsweredIssues := issuesTriage.DoIssuesTriage(issues)
+		ourIssues, answeredIssues, notAnsweredIssues := issuesTriage.TriageManyIssues(issues)
 
 		assert.Equal(t, ourIssues, []Types.Issue{
 			Types.Issue{Title: "title", Url: "url", Number: 123, AuthorAssociation: "MEMBER", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{

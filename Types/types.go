@@ -11,7 +11,19 @@ type GithubClient interface {
 }
 
 type IssuesTriage interface {
-	DoIssuesTriage(issues []Issue) ([]Issue, []Issue, []Issue)
+	TriageManyIssues(issues []Issue) ([]Issue, []Issue, []Issue)
+}
+
+type issueTypeEnum struct {
+	OURS         int
+	ANSWERED     int
+	NOT_ANSWERED int
+}
+
+var IssueTypeEnum = &issueTypeEnum{
+	OURS:         1,
+	ANSWERED:     2,
+	NOT_ANSWERED: 3,
 }
 
 type Repository struct {
