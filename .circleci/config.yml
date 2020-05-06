@@ -20,9 +20,9 @@ jobs:
     working_directory: ~/app
     steps:
       - checkout
-      - run: docker build -t registry.dev.brainhub.pl/issue-label-bot/main .
-      - run: docker login --username $REGISTRY_USER --password $REGISTRY_PASSWORD https://registry.dev.brainhub.pl
-      - run: docker push registry.dev.brainhub.pl/issue-label-bot/main
+      - run: sudo docker build -t registry.dev.brainhub.pl/issue-label-bot/main .
+      - run: sudo docker login --username $REGISTRY_USER --password $REGISTRY_PASSWORD https://registry.dev.brainhub.pl
+      - run: sudo docker push registry.dev.brainhub.pl/issue-label-bot/main
 
 workflows:
   version: 2
