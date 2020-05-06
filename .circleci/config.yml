@@ -16,13 +16,13 @@ jobs:
       - run: go test
   deploy:
     docker:
-      - image: docker:19.03.8
+      - image: docker:17.05.0-ce-git
     working_directory: ~/app
     steps:
       - checkout
-      - run: sudo docker build -t registry.dev.brainhub.pl/issue-label-bot/main .
-      - run: sudo docker login --username $REGISTRY_USER --password $REGISTRY_PASSWORD https://registry.dev.brainhub.pl
-      - run: sudo docker push registry.dev.brainhub.pl/issue-label-bot/main
+      - run: docker build -t registry.dev.brainhub.pl/issue-label-bot/main .
+      - run: docker login --username $REGISTRY_USER --password $REGISTRY_PASSWORD https://registry.dev.brainhub.pl
+      - run: docker push registry.dev.brainhub.pl/issue-label-bot/main
 
 workflows:
   version: 2
