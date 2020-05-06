@@ -19,6 +19,5 @@ For each open issue (among the comments, it excludes the ones made by **issuehun
 ## run
 ```
 export set GITHUB_TOKEN=__your_token__
-go run run.go __organization_name__
+go run . __organization_name__
 ```
-
