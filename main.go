@@ -1,6 +1,10 @@
 package main
 
 import (
+	"./GithubClient"
+	"./GithubOperator"
+	"./IssuesTriage"
+	"./Types"
 	"fmt"
 	"os"
 )
@@ -11,17 +15,18 @@ func main() {
 	OUR_LABEL_TEXT := "answering: reported by " + organization
 	const ANSWERED_LABEL_TEXT = "answering: answered"
 	const NOT_ANSWERED_LABEL_TEXT = "answering: not answered"
-	answeringLabels := []Label{
-		Label{OUR_LABEL_TEXT, "a0a000"},
-		Label{ANSWERED_LABEL_TEXT, "00a000"},
-		Label{NOT_ANSWERED_LABEL_TEXT, "a00000"},
+	answeringLabels := []Types.Label{
+		Types.Label{Name: OUR_LABEL_TEXT, Color: "a0a000"},
+		Types.Label{Name: ANSWERED_LABEL_TEXT, Color: "00a000"},
+		Types.Label{Name: NOT_ANSWERED_LABEL_TEXT, Color: "a00000"},
 	}
 
 	fmt.Println(token, OUR_LABEL_TEXT, ANSWERED_LABEL_TEXT, NOT_ANSWERED_LABEL_TEXT)
 
-	githubClient := InitGithubClient(organization, token)
-	githubOperator := GithubOperator{githubClient, answeringLabels, OUR_LABEL_TEXT, ANSWERED_LABEL_TEXT, NOT_ANSWERED_LABEL_TEXT}
-	repoNames := githubClient.findRepos()
+	githubClient := GithubClient.InitGithubClient(organization, token)
+	issuesTriage := IssuesTriage.InitIssuesTriage()
+	githubOperator := GithubOperator.InitGithubOperator(githubClient, issuesTriage, answeringLabels, OUR_LABEL_TEXT, ANSWERED_LABEL_TEXT, NOT_ANSWERED_LABEL_TEXT)
+	repoNames := githubClient.FindRepos()
 	fmt.Println("repoNames", repoNames)
-	githubOperator.updateRepos(repoNames)
+	githubOperator.UpdateRepos(repoNames)
 }

@@ -1,198 +1,204 @@
 package main
 
 import (
+	"./IssuesTriage"
+	"./Types"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
 func TestDoIssuesTriage(t *testing.T) {
 	t.Run("does triage of an empty list", func(t *testing.T) {
-		issues := []Issue{}
+		issues := []Types.Issue{}
 
-		ourIssues, answeredIssues, notAnsweredIssues := doIssuesTriage(issues)
+		issuesTriage := IssuesTriage.InitIssuesTriage()
+		ourIssues, answeredIssues, notAnsweredIssues := issuesTriage.DoIssuesTriage(issues)
 
-		assert.Equal(t, ourIssues, []Issue{})
-		assert.Equal(t, answeredIssues, []Issue{})
-		assert.Equal(t, notAnsweredIssues, []Issue{})
+		assert.Equal(t, ourIssues, []Types.Issue{})
+		assert.Equal(t, answeredIssues, []Types.Issue{})
+		assert.Equal(t, notAnsweredIssues, []Types.Issue{})
 	})
 
 	t.Run("does triage of issues with no comments", func(t *testing.T) {
-		issues := []Issue{
-			Issue{"title", "url", 123, "MEMBER", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{}}},
-			Issue{"title", "url", 123, "NONE", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{}}},
+		issues := []Types.Issue{
+			Types.Issue{Title: "title", Url: "url", Number: 123, AuthorAssociation: "MEMBER", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{}}},
+			Types.Issue{Title: "title", Url: "url", Number: 123, AuthorAssociation: "NONE", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{}}},
 		}
 
-		ourIssues, answeredIssues, notAnsweredIssues := doIssuesTriage(issues)
+		issuesTriage := IssuesTriage.InitIssuesTriage()
+		ourIssues, answeredIssues, notAnsweredIssues := issuesTriage.DoIssuesTriage(issues)
 
-		assert.Equal(t, ourIssues, []Issue{
-			Issue{"title", "url", 123, "MEMBER", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{}}},
+		assert.Equal(t, ourIssues, []Types.Issue{
+			Types.Issue{Title: "title", Url: "url", Number: 123, AuthorAssociation: "MEMBER", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{}}},
 		})
-		assert.Equal(t, answeredIssues, []Issue{})
-		assert.Equal(t, notAnsweredIssues, []Issue{
-			Issue{"title", "url", 123, "NONE", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{}}},
+		assert.Equal(t, answeredIssues, []Types.Issue{})
+		assert.Equal(t, notAnsweredIssues, []Types.Issue{
+			Types.Issue{Title: "title", Url: "url", Number: 123, AuthorAssociation: "NONE", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{}}},
 		})
 	})
 
 	t.Run("does triage of issues with comments", func(t *testing.T) {
-		issues := []Issue{
-			Issue{"title", "url", 123, "MEMBER", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
-				CommentEdge{Comment{"MEMBER", CommentAuthor{"user"}}},
+		issues := []Types.Issue{
+			Types.Issue{Title: "title", Url: "url", Number: 123, AuthorAssociation: "MEMBER", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "MEMBER", Author: Types.CommentAuthor{Login: "user"}}},
 			}}},
-			Issue{"title", "url", 123, "MEMBER", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
-				CommentEdge{Comment{"NONE", CommentAuthor{"user"}}},
+			Types.Issue{Title: "title", Url: "url", Number: 123, AuthorAssociation: "MEMBER", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "user"}}},
 			}}},
-			Issue{"title", "url", 123, "MEMBER", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
-				CommentEdge{Comment{"NONE", CommentAuthor{"user"}}},
-				CommentEdge{Comment{"MEMBER", CommentAuthor{"user"}}},
+			Types.Issue{Title: "title", Url: "url", Number: 123, AuthorAssociation: "MEMBER", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "user"}}},
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "MEMBER", Author: Types.CommentAuthor{Login: "user"}}},
 			}}},
-			Issue{"title", "url", 123, "MEMBER", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
-				CommentEdge{Comment{"MEMBER", CommentAuthor{"user"}}},
-				CommentEdge{Comment{"NONE", CommentAuthor{"user"}}},
+			Types.Issue{Title: "title", Url: "url", Number: 123, AuthorAssociation: "MEMBER", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "MEMBER", Author: Types.CommentAuthor{Login: "user"}}},
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "user"}}},
 			}}},
-			Issue{"title", "url", 123, "NONE", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
-				CommentEdge{Comment{"MEMBER", CommentAuthor{"user"}}},
+			Types.Issue{Title: "title", Url: "url", Number: 123, AuthorAssociation: "NONE", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "MEMBER", Author: Types.CommentAuthor{Login: "user"}}},
 			}}},
-			Issue{"title", "url", 123, "NONE", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
-				CommentEdge{Comment{"NONE", CommentAuthor{"user"}}},
+			Types.Issue{Title: "title", Url: "url", Number: 123, AuthorAssociation: "NONE", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "user"}}},
 			}}},
-			Issue{"title", "url", 123, "NONE", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
-				CommentEdge{Comment{"NONE", CommentAuthor{"user"}}},
-				CommentEdge{Comment{"MEMBER", CommentAuthor{"user"}}},
+			Types.Issue{Title: "title", Url: "url", Number: 123, AuthorAssociation: "NONE", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "user"}}},
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "MEMBER", Author: Types.CommentAuthor{Login: "user"}}},
 			}}},
-			Issue{"title", "url", 123, "NONE", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
-				CommentEdge{Comment{"MEMBER", CommentAuthor{"user"}}},
-				CommentEdge{Comment{"NONE", CommentAuthor{"user"}}},
+			Types.Issue{Title: "title", Url: "url", Number: 123, AuthorAssociation: "NONE", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "MEMBER", Author: Types.CommentAuthor{Login: "user"}}},
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "user"}}},
 			}}},
 		}
 
-		ourIssues, answeredIssues, notAnsweredIssues := doIssuesTriage(issues)
+		issuesTriage := IssuesTriage.InitIssuesTriage()
+		ourIssues, answeredIssues, notAnsweredIssues := issuesTriage.DoIssuesTriage(issues)
 
-		assert.Equal(t, ourIssues, []Issue{
-			Issue{"title", "url", 123, "MEMBER", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
-				CommentEdge{Comment{"MEMBER", CommentAuthor{"user"}}},
+		assert.Equal(t, ourIssues, []Types.Issue{
+			Types.Issue{Title: "title", Url: "url", Number: 123, AuthorAssociation: "MEMBER", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "MEMBER", Author: Types.CommentAuthor{Login: "user"}}},
 			}}},
 		})
-		assert.Equal(t, answeredIssues, []Issue{
-			Issue{"title", "url", 123, "MEMBER", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
-				CommentEdge{Comment{"NONE", CommentAuthor{"user"}}},
-				CommentEdge{Comment{"MEMBER", CommentAuthor{"user"}}},
+		assert.Equal(t, answeredIssues, []Types.Issue{
+			Types.Issue{Title: "title", Url: "url", Number: 123, AuthorAssociation: "MEMBER", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "user"}}},
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "MEMBER", Author: Types.CommentAuthor{Login: "user"}}},
 			}}},
-			Issue{"title", "url", 123, "NONE", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
-				CommentEdge{Comment{"MEMBER", CommentAuthor{"user"}}},
+			Types.Issue{Title: "title", Url: "url", Number: 123, AuthorAssociation: "NONE", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "MEMBER", Author: Types.CommentAuthor{Login: "user"}}},
 			}}},
-			Issue{"title", "url", 123, "NONE", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
-				CommentEdge{Comment{"NONE", CommentAuthor{"user"}}},
-				CommentEdge{Comment{"MEMBER", CommentAuthor{"user"}}},
+			Types.Issue{Title: "title", Url: "url", Number: 123, AuthorAssociation: "NONE", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "user"}}},
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "MEMBER", Author: Types.CommentAuthor{Login: "user"}}},
 			}}},
 		})
-		assert.Equal(t, notAnsweredIssues, []Issue{
-			Issue{"title", "url", 123, "MEMBER", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
-				CommentEdge{Comment{"NONE", CommentAuthor{"user"}}},
+		assert.Equal(t, notAnsweredIssues, []Types.Issue{
+			Types.Issue{Title: "title", Url: "url", Number: 123, AuthorAssociation: "MEMBER", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "user"}}},
 			}}},
-			Issue{"title", "url", 123, "MEMBER", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
-				CommentEdge{Comment{"MEMBER", CommentAuthor{"user"}}},
-				CommentEdge{Comment{"NONE", CommentAuthor{"user"}}},
+			Types.Issue{Title: "title", Url: "url", Number: 123, AuthorAssociation: "MEMBER", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "MEMBER", Author: Types.CommentAuthor{Login: "user"}}},
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "user"}}},
 			}}},
-			Issue{"title", "url", 123, "NONE", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
-				CommentEdge{Comment{"NONE", CommentAuthor{"user"}}},
+			Types.Issue{Title: "title", Url: "url", Number: 123, AuthorAssociation: "NONE", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "user"}}},
 			}}},
-			Issue{"title", "url", 123, "NONE", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
-				CommentEdge{Comment{"MEMBER", CommentAuthor{"user"}}},
-				CommentEdge{Comment{"NONE", CommentAuthor{"user"}}},
+			Types.Issue{Title: "title", Url: "url", Number: 123, AuthorAssociation: "NONE", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "MEMBER", Author: Types.CommentAuthor{Login: "user"}}},
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "user"}}},
 			}}},
 		})
 	})
 
 	t.Run("excludes issuehunt-app comments", func(t *testing.T) {
-		issues := []Issue{
-			Issue{"title", "url", 123, "MEMBER", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
-				CommentEdge{Comment{"MEMBER", CommentAuthor{"user"}}},
-				CommentEdge{Comment{"NONE", CommentAuthor{"issuehunt-app"}}},
+		issues := []Types.Issue{
+			Types.Issue{Title: "title", Url: "url", Number: 123, AuthorAssociation: "MEMBER", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "MEMBER", Author: Types.CommentAuthor{Login: "user"}}},
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "issuehunt-app"}}},
 			}}},
-			Issue{"title", "url", 123, "MEMBER", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
-				CommentEdge{Comment{"NONE", CommentAuthor{"user"}}},
-				CommentEdge{Comment{"NONE", CommentAuthor{"issuehunt-app"}}},
+			Types.Issue{Title: "title", Url: "url", Number: 123, AuthorAssociation: "MEMBER", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "user"}}},
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "issuehunt-app"}}},
 			}}},
-			Issue{"title", "url", 123, "MEMBER", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
-				CommentEdge{Comment{"NONE", CommentAuthor{"user"}}},
-				CommentEdge{Comment{"MEMBER", CommentAuthor{"user"}}},
-				CommentEdge{Comment{"NONE", CommentAuthor{"issuehunt-app"}}},
+			Types.Issue{Title: "title", Url: "url", Number: 123, AuthorAssociation: "MEMBER", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "user"}}},
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "MEMBER", Author: Types.CommentAuthor{Login: "user"}}},
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "issuehunt-app"}}},
 			}}},
-			Issue{"title", "url", 123, "MEMBER", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
-				CommentEdge{Comment{"MEMBER", CommentAuthor{"user"}}},
-				CommentEdge{Comment{"NONE", CommentAuthor{"user"}}},
-				CommentEdge{Comment{"NONE", CommentAuthor{"issuehunt-app"}}},
+			Types.Issue{Title: "title", Url: "url", Number: 123, AuthorAssociation: "MEMBER", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "MEMBER", Author: Types.CommentAuthor{Login: "user"}}},
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "user"}}},
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "issuehunt-app"}}},
 			}}},
-			Issue{"title", "url", 123, "NONE", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
-				CommentEdge{Comment{"MEMBER", CommentAuthor{"user"}}},
-				CommentEdge{Comment{"NONE", CommentAuthor{"issuehunt-app"}}},
+			Types.Issue{Title: "title", Url: "url", Number: 123, AuthorAssociation: "NONE", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "MEMBER", Author: Types.CommentAuthor{Login: "user"}}},
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "issuehunt-app"}}},
 			}}},
-			Issue{"title", "url", 123, "NONE", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
-				CommentEdge{Comment{"NONE", CommentAuthor{"user"}}},
-				CommentEdge{Comment{"NONE", CommentAuthor{"issuehunt-app"}}},
+			Types.Issue{Title: "title", Url: "url", Number: 123, AuthorAssociation: "NONE", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "user"}}},
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "issuehunt-app"}}},
 			}}},
-			Issue{"title", "url", 123, "NONE", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
-				CommentEdge{Comment{"NONE", CommentAuthor{"user"}}},
-				CommentEdge{Comment{"MEMBER", CommentAuthor{"user"}}},
-				CommentEdge{Comment{"NONE", CommentAuthor{"issuehunt-app"}}},
-				CommentEdge{Comment{"NONE", CommentAuthor{"issuehunt-app"}}},
+			Types.Issue{Title: "title", Url: "url", Number: 123, AuthorAssociation: "NONE", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "user"}}},
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "MEMBER", Author: Types.CommentAuthor{Login: "user"}}},
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "issuehunt-app"}}},
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "issuehunt-app"}}},
 			}}},
-			Issue{"title", "url", 123, "NONE", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
-				CommentEdge{Comment{"MEMBER", CommentAuthor{"user"}}},
-				CommentEdge{Comment{"NONE", CommentAuthor{"issuehunt-app"}}},
-				CommentEdge{Comment{"NONE", CommentAuthor{"user"}}},
-				CommentEdge{Comment{"NONE", CommentAuthor{"issuehunt-app"}}},
-				CommentEdge{Comment{"NONE", CommentAuthor{"issuehunt-app"}}},
-				CommentEdge{Comment{"NONE", CommentAuthor{"issuehunt-app"}}},
+			Types.Issue{Title: "title", Url: "url", Number: 123, AuthorAssociation: "NONE", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "MEMBER", Author: Types.CommentAuthor{Login: "user"}}},
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "issuehunt-app"}}},
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "user"}}},
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "issuehunt-app"}}},
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "issuehunt-app"}}},
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "issuehunt-app"}}},
 			}}},
 		}
 
-		ourIssues, answeredIssues, notAnsweredIssues := doIssuesTriage(issues)
+		issuesTriage := IssuesTriage.InitIssuesTriage()
+		ourIssues, answeredIssues, notAnsweredIssues := issuesTriage.DoIssuesTriage(issues)
 
-		assert.Equal(t, ourIssues, []Issue{
-			Issue{"title", "url", 123, "MEMBER", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
-				CommentEdge{Comment{"MEMBER", CommentAuthor{"user"}}},
-				CommentEdge{Comment{"NONE", CommentAuthor{"issuehunt-app"}}},
+		assert.Equal(t, ourIssues, []Types.Issue{
+			Types.Issue{Title: "title", Url: "url", Number: 123, AuthorAssociation: "MEMBER", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "MEMBER", Author: Types.CommentAuthor{Login: "user"}}},
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "issuehunt-app"}}},
 			}}},
 		})
-		assert.Equal(t, answeredIssues, []Issue{
-			Issue{"title", "url", 123, "MEMBER", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
-				CommentEdge{Comment{"NONE", CommentAuthor{"user"}}},
-				CommentEdge{Comment{"MEMBER", CommentAuthor{"user"}}},
-				CommentEdge{Comment{"NONE", CommentAuthor{"issuehunt-app"}}},
+		assert.Equal(t, answeredIssues, []Types.Issue{
+			Types.Issue{Title: "title", Url: "url", Number: 123, AuthorAssociation: "MEMBER", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "user"}}},
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "MEMBER", Author: Types.CommentAuthor{Login: "user"}}},
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "issuehunt-app"}}},
 			}}},
-			Issue{"title", "url", 123, "NONE", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
-				CommentEdge{Comment{"MEMBER", CommentAuthor{"user"}}},
-				CommentEdge{Comment{"NONE", CommentAuthor{"issuehunt-app"}}},
+			Types.Issue{Title: "title", Url: "url", Number: 123, AuthorAssociation: "NONE", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "MEMBER", Author: Types.CommentAuthor{Login: "user"}}},
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "issuehunt-app"}}},
 			}}},
-			Issue{"title", "url", 123, "NONE", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
-				CommentEdge{Comment{"NONE", CommentAuthor{"user"}}},
-				CommentEdge{Comment{"MEMBER", CommentAuthor{"user"}}},
-				CommentEdge{Comment{"NONE", CommentAuthor{"issuehunt-app"}}},
-				CommentEdge{Comment{"NONE", CommentAuthor{"issuehunt-app"}}},
+			Types.Issue{Title: "title", Url: "url", Number: 123, AuthorAssociation: "NONE", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "user"}}},
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "MEMBER", Author: Types.CommentAuthor{Login: "user"}}},
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "issuehunt-app"}}},
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "issuehunt-app"}}},
 			}}},
 		})
-		assert.Equal(t, notAnsweredIssues, []Issue{
-			Issue{"title", "url", 123, "MEMBER", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
-				CommentEdge{Comment{"NONE", CommentAuthor{"user"}}},
-				CommentEdge{Comment{"NONE", CommentAuthor{"issuehunt-app"}}},
+		assert.Equal(t, notAnsweredIssues, []Types.Issue{
+			Types.Issue{Title: "title", Url: "url", Number: 123, AuthorAssociation: "MEMBER", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "user"}}},
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "issuehunt-app"}}},
 			}}},
-			Issue{"title", "url", 123, "MEMBER", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
-				CommentEdge{Comment{"MEMBER", CommentAuthor{"user"}}},
-				CommentEdge{Comment{"NONE", CommentAuthor{"user"}}},
-				CommentEdge{Comment{"NONE", CommentAuthor{"issuehunt-app"}}},
+			Types.Issue{Title: "title", Url: "url", Number: 123, AuthorAssociation: "MEMBER", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "MEMBER", Author: Types.CommentAuthor{Login: "user"}}},
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "user"}}},
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "issuehunt-app"}}},
 			}}},
-			Issue{"title", "url", 123, "NONE", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
-				CommentEdge{Comment{"NONE", CommentAuthor{"user"}}},
-				CommentEdge{Comment{"NONE", CommentAuthor{"issuehunt-app"}}},
+			Types.Issue{Title: "title", Url: "url", Number: 123, AuthorAssociation: "NONE", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "user"}}},
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "issuehunt-app"}}},
 			}}},
-			Issue{"title", "url", 123, "NONE", Labels{[]LabelEdge{}}, Comments{[]CommentEdge{
-				CommentEdge{Comment{"MEMBER", CommentAuthor{"user"}}},
-				CommentEdge{Comment{"NONE", CommentAuthor{"issuehunt-app"}}},
-				CommentEdge{Comment{"NONE", CommentAuthor{"user"}}},
-				CommentEdge{Comment{"NONE", CommentAuthor{"issuehunt-app"}}},
-				CommentEdge{Comment{"NONE", CommentAuthor{"issuehunt-app"}}},
-				CommentEdge{Comment{"NONE", CommentAuthor{"issuehunt-app"}}},
+			Types.Issue{Title: "title", Url: "url", Number: 123, AuthorAssociation: "NONE", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "MEMBER", Author: Types.CommentAuthor{Login: "user"}}},
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "issuehunt-app"}}},
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "user"}}},
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "issuehunt-app"}}},
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "issuehunt-app"}}},
+				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "issuehunt-app"}}},
 			}}},
 		})
 	})

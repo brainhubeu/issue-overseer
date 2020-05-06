@@ -1,4 +1,4 @@
-package main
+package GithubClient
 
 import (
 	"bytes"
@@ -10,6 +10,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"../Types"
 )
 
 type GithubClient struct {
@@ -28,7 +29,7 @@ func (githubClient *GithubClient) incrementRequestNumber() {
 	fmt.Println("request to GitHub #", githubClient.RequestsNumber)
 }
 
-func (githubClient *GithubClient) findRepos() []string {
+func (githubClient *GithubClient) FindRepos() []string {
 	repoNames := []string{}
 	client := &http.Client{}
 	for page := 1; ; page += 1 {
@@ -50,7 +51,7 @@ func (githubClient *GithubClient) findRepos() []string {
 		if resp.StatusCode != 200 {
 			log.Fatalln(resp.Status, string(body))
 		}
-		repositories := []Repository{}
+		repositories := []Types.Repository{}
 		err = json.Unmarshal([]byte(string(body)), &repositories)
 		if err != nil {
 			log.Fatalln(err)
@@ -70,7 +71,7 @@ func (githubClient *GithubClient) findRepos() []string {
 	return repoNames
 }
 
-func (githubClient *GithubClient) findLabels(repoName string) []Label {
+func (githubClient *GithubClient) FindLabels(repoName string) []Types.Label {
 	client := &http.Client{}
 	githubClient.incrementRequestNumber()
 	req, err := http.NewRequest("GET", "https://api.github.com/repos/"+githubClient.Organization+"/"+repoName+"/labels", nil)
@@ -90,7 +91,7 @@ func (githubClient *GithubClient) findLabels(repoName string) []Label {
 	if resp.StatusCode != 200 {
 		log.Fatalln(resp.Status, string(body))
 	}
-	labels := []Label{}
+	labels := []Types.Label{}
 	err = json.Unmarshal([]byte(string(body)), &labels)
 	if err != nil {
 		log.Fatalln(err)
@@ -98,7 +99,7 @@ func (githubClient *GithubClient) findLabels(repoName string) []Label {
 	return labels
 }
 
-func (githubClient *GithubClient) deleteLabel(repoName string, labelName string) {
+func (githubClient *GithubClient) DeleteLabel(repoName string, labelName string) {
 	client := &http.Client{}
 	githubClient.incrementRequestNumber()
 	req, err := http.NewRequest("DELETE", "https://api.github.com/repos/"+githubClient.Organization+"/"+repoName+"/labels/"+labelName, nil)
@@ -120,7 +121,7 @@ func (githubClient *GithubClient) deleteLabel(repoName string, labelName string)
 	}
 }
 
-func (githubClient *GithubClient) createLabel(repoName string, label Label) {
+func (githubClient *GithubClient) CreateLabel(repoName string, label Types.Label) {
 	client := &http.Client{}
 	jsonValue, err := json.Marshal(label)
 	if err != nil {
@@ -146,7 +147,7 @@ func (githubClient *GithubClient) createLabel(repoName string, label Label) {
 	}
 }
 
-func (githubClient *GithubClient) removeLabel(issueUrl string, labelName string) {
+func (githubClient *GithubClient) RemoveLabel(issueUrl string, labelName string) {
 	client := &http.Client{}
 	url := strings.Replace(issueUrl, "https://github.com", "https://api.github.com/repos", 1) + "/labels/" + labelName
 	fmt.Println("to remove", issueUrl, url, labelName)
@@ -171,10 +172,10 @@ func (githubClient *GithubClient) removeLabel(issueUrl string, labelName string)
 	fmt.Println("removed", issueUrl, labelName, resp.StatusCode)
 }
 
-func (githubClient *GithubClient) addLabel(issueUrl string, labelName string) {
+func (githubClient *GithubClient) AddLabel(issueUrl string, labelName string) {
 	client := &http.Client{}
 	fmt.Println("labelName", labelName)
-	requestBody := AddLabelRequestBody{[]string{labelName}}
+	requestBody := Types.AddLabelRequestBody{Labels: []string{labelName}}
 	jsonValue, err := json.Marshal(requestBody)
 	if err != nil {
 		log.Fatalln(err)
@@ -202,10 +203,10 @@ func (githubClient *GithubClient) addLabel(issueUrl string, labelName string) {
 	fmt.Println("added", issueUrl, labelName, resp.StatusCode)
 }
 
-func (githubClient *GithubClient) findIssues(repoName string) []Issue {
+func (githubClient *GithubClient) FindIssues(repoName string) []Types.Issue {
 	client := &http.Client{}
 	cursor := (*string)(nil)
-	result := []Issue{}
+	result := []Types.Issue{}
 	for {
 		query := `query ($organization: String!, $repoName: String!, $cursor: String) {
 	  repository(owner: $organization, name: $repoName) {
@@ -240,8 +241,8 @@ func (githubClient *GithubClient) findIssues(repoName string) []Issue {
 		}
 	  }
 	}`
-		graphqlVariables := GraphqlVariables{githubClient.Organization, repoName, cursor}
-		graphqlRequestBody := GraphqlRequestBody{graphqlVariables, query}
+		graphqlVariables := Types.GraphqlVariables{Organization: githubClient.Organization, RepoName: repoName, Cursor: cursor}
+		graphqlRequestBody := Types.GraphqlRequestBody{Variables: graphqlVariables, Query: query}
 		jsonValue, err := json.Marshal(graphqlRequestBody)
 		if err != nil {
 			log.Fatalln(err)
@@ -264,7 +265,7 @@ func (githubClient *GithubClient) findIssues(repoName string) []Issue {
 		if resp.StatusCode != 200 {
 			log.Fatalln(resp.Status, string(body))
 		}
-		issuesData := Issues{}
+		issuesData := Types.Issues{}
 		err = json.Unmarshal([]byte(string(body)), &issuesData)
 		if err != nil {
 			log.Fatalln(err)

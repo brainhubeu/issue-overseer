@@ -1,4 +1,18 @@
-package main
+package Types
+
+type GithubClient interface {
+	FindRepos() []string
+	FindLabels(repoName string) []Label
+	DeleteLabel(repoName string, labelName string)
+	CreateLabel(repoName string, label Label)
+	RemoveLabel(issueUrl string, labelName string)
+	AddLabel(issueUrl string, labelName string)
+	FindIssues(repoName string) []Issue
+}
+
+type IssuesTriage interface {
+	DoIssuesTriage(issues []Issue) ([]Issue, []Issue, []Issue)
+}
 
 type Repository struct {
 	Archived bool   `json:"archived"`

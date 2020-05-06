@@ -1,9 +1,21 @@
-package main
+package IssuesTriage
 
-func doIssuesTriage(issues []Issue) ([]Issue, []Issue, []Issue) {
-	ourIssues := []Issue{}
-	answeredIssues := []Issue{}
-	notAnsweredIssues := []Issue{}
+import (
+	"../Types"
+)
+
+type IssuesTriage struct {
+}
+
+func InitIssuesTriage() *IssuesTriage{
+	issuesTriage := &IssuesTriage{}
+	return issuesTriage
+}
+
+func (issuesTriage IssuesTriage) DoIssuesTriage(issues []Types.Issue) ([]Types.Issue, []Types.Issue, []Types.Issue) {
+	ourIssues := []Types.Issue{}
+	answeredIssues := []Types.Issue{}
+	notAnsweredIssues := []Types.Issue{}
 	for i := 0; i < len(issues); i++ {
 		issue := issues[i]
 		comments := issue.Comments.Edges
