@@ -20,8 +20,7 @@ func TestTriageManyIssues(t *testing.T) {
 
 	t.Run("triages a non-empty list", func(t *testing.T) {
 		issues := []Types.Issue{
-			Types.Issue{Title: "title", Url: "url", Number: 122, AuthorAssociation: "MEMBER", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{
-			}}},
+			Types.Issue{Title: "title", Url: "url", Number: 122, AuthorAssociation: "MEMBER", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{}}},
 			Types.Issue{Title: "title", Url: "url", Number: 123, AuthorAssociation: "MEMBER", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{
 				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "MEMBER", Author: Types.CommentAuthor{Login: "user"}}},
 			}}},
@@ -35,16 +34,14 @@ func TestTriageManyIssues(t *testing.T) {
 			Types.Issue{Title: "title", Url: "url", Number: 126, AuthorAssociation: "NONE", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{
 				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "MEMBER", Author: Types.CommentAuthor{Login: "user"}}},
 			}}},
-			Types.Issue{Title: "title", Url: "url", Number: 127, AuthorAssociation: "NONE", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{
-			}}},
+			Types.Issue{Title: "title", Url: "url", Number: 127, AuthorAssociation: "NONE", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{}}},
 		}
 
 		issuesTriage := InitIssuesTriage()
 		ourIssues, answeredIssues, notAnsweredIssues := issuesTriage.TriageManyIssues(issues)
 
 		assert.Equal(t, ourIssues, []Types.Issue{
-			Types.Issue{Title: "title", Url: "url", Number: 122, AuthorAssociation: "MEMBER", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{
-			}}},
+			Types.Issue{Title: "title", Url: "url", Number: 122, AuthorAssociation: "MEMBER", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{}}},
 			Types.Issue{Title: "title", Url: "url", Number: 123, AuthorAssociation: "MEMBER", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{
 				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "MEMBER", Author: Types.CommentAuthor{Login: "user"}}},
 			}}},
@@ -62,14 +59,12 @@ func TestTriageManyIssues(t *testing.T) {
 			Types.Issue{Title: "title", Url: "url", Number: 124, AuthorAssociation: "MEMBER", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{
 				Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "user"}}},
 			}}},
-			Types.Issue{Title: "title", Url: "url", Number: 127, AuthorAssociation: "NONE", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{
-			}}},
+			Types.Issue{Title: "title", Url: "url", Number: 127, AuthorAssociation: "NONE", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{}}},
 		})
 	})
 
 	t.Run("returns OURS for an issue created by a member with no comments", func(t *testing.T) {
-		issue := Types.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "MEMBER", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{
-		}}}
+		issue := Types.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "MEMBER", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{}}}
 
 		issuesTriage := InitIssuesTriage()
 		issueType := issuesTriage.TriageOneIssue(issue)
@@ -124,8 +119,7 @@ func TestTriageManyIssues(t *testing.T) {
 	})
 
 	t.Run("returns NOT_ANSWERED for an issue created by a non-member with no comments", func(t *testing.T) {
-		issue := Types.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "NONE", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{
-		}}}
+		issue := Types.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "NONE", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{}}}
 
 		issuesTriage := InitIssuesTriage()
 		issueType := issuesTriage.TriageOneIssue(issue)
@@ -179,6 +173,28 @@ func TestTriageManyIssues(t *testing.T) {
 		assert.Equal(t, issueType, Types.IssueTypeEnum.NOT_ANSWERED)
 	})
 
+	t.Run("excludes an issuehunt-app comment for our issue when there are no other comments", func(t *testing.T) {
+		issue := Types.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "MEMBER", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{
+			Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "issuehunt-app"}}},
+		}}}
+
+		issuesTriage := InitIssuesTriage()
+		issueType := issuesTriage.TriageOneIssue(issue)
+
+		assert.Equal(t, issueType, Types.IssueTypeEnum.OURS)
+	})
+
+	t.Run("excludes an issuehunt-app comment for an external issue when there are no other comments", func(t *testing.T) {
+		issue := Types.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "NONE", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{
+			Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "issuehunt-app"}}},
+		}}}
+
+		issuesTriage := InitIssuesTriage()
+		issueType := issuesTriage.TriageOneIssue(issue)
+
+		assert.Equal(t, issueType, Types.IssueTypeEnum.NOT_ANSWERED)
+	})
+
 	t.Run("excludes an issuehunt-app comment when the last comment is ours", func(t *testing.T) {
 		issue := Types.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "NONE", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{
 			Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "MEMBER", Author: Types.CommentAuthor{Login: "user"}}},
@@ -193,6 +209,70 @@ func TestTriageManyIssues(t *testing.T) {
 
 	t.Run("excludes an issuehunt-app comment when the last comment isn't ours", func(t *testing.T) {
 		issue := Types.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "NONE", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{
+			Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "user"}}},
+			Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "issuehunt-app"}}},
+		}}}
+
+		issuesTriage := InitIssuesTriage()
+		issueType := issuesTriage.TriageOneIssue(issue)
+
+		assert.Equal(t, issueType, Types.IssueTypeEnum.NOT_ANSWERED)
+	})
+
+	t.Run("works correctly with many comments when the last comment is ours", func(t *testing.T) {
+		issue := Types.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "NONE", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{
+			Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "user"}}},
+			Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "MEMBER", Author: Types.CommentAuthor{Login: "user"}}},
+			Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "user"}}},
+			Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "user"}}},
+			Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "MEMBER", Author: Types.CommentAuthor{Login: "user"}}},
+		}}}
+
+		issuesTriage := InitIssuesTriage()
+		issueType := issuesTriage.TriageOneIssue(issue)
+
+		assert.Equal(t, issueType, Types.IssueTypeEnum.ANSWERED)
+	})
+
+	t.Run("works correctly with many comments when the last comment isn't ours", func(t *testing.T) {
+		issue := Types.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "NONE", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{
+			Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "user"}}},
+			Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "MEMBER", Author: Types.CommentAuthor{Login: "user"}}},
+			Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "user"}}},
+			Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "user"}}},
+			Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "MEMBER", Author: Types.CommentAuthor{Login: "user"}}},
+			Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "user"}}},
+		}}}
+
+		issuesTriage := InitIssuesTriage()
+		issueType := issuesTriage.TriageOneIssue(issue)
+
+		assert.Equal(t, issueType, Types.IssueTypeEnum.NOT_ANSWERED)
+	})
+
+	t.Run("works correctly with many comments when the last comment is by issuehunt-app and before it there's our comment", func(t *testing.T) {
+		issue := Types.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "NONE", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{
+			Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "user"}}},
+			Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "MEMBER", Author: Types.CommentAuthor{Login: "user"}}},
+			Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "user"}}},
+			Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "user"}}},
+			Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "MEMBER", Author: Types.CommentAuthor{Login: "user"}}},
+			Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "issuehunt-app"}}},
+		}}}
+
+		issuesTriage := InitIssuesTriage()
+		issueType := issuesTriage.TriageOneIssue(issue)
+
+		assert.Equal(t, issueType, Types.IssueTypeEnum.ANSWERED)
+	})
+
+	t.Run("works correctly with many comments when the last comment is by issuehunt-app and before it there's an external comment", func(t *testing.T) {
+		issue := Types.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "NONE", Labels: Types.Labels{Edges: []Types.LabelEdge{}}, Comments: Types.Comments{Edges: []Types.CommentEdge{
+			Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "user"}}},
+			Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "MEMBER", Author: Types.CommentAuthor{Login: "user"}}},
+			Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "user"}}},
+			Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "user"}}},
+			Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "MEMBER", Author: Types.CommentAuthor{Login: "user"}}},
 			Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "user"}}},
 			Types.CommentEdge{Node: Types.Comment{AuthorAssociation: "NONE", Author: Types.CommentAuthor{Login: "issuehunt-app"}}},
 		}}}

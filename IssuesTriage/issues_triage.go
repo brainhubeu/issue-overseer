@@ -45,7 +45,9 @@ func (issuesTriage IssuesTriage) TriageOneIssue(issue Types.Issue) int {
 					break
 				}
 			}
-			if comments[j].Node.AuthorAssociation == "MEMBER" {
+			if j == -1 {
+				return Types.IssueTypeEnum.NOT_ANSWERED
+			} else if comments[j].Node.AuthorAssociation == "MEMBER" {
 				return Types.IssueTypeEnum.ANSWERED
 			} else {
 				return Types.IssueTypeEnum.NOT_ANSWERED
