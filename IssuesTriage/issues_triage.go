@@ -36,22 +36,18 @@ func (issuesTriage IssuesTriage) TriageOneIssue(issue Types.Issue) int {
 			}
 		}
 	} else {
-		if len(comments) == 0 {
+		j := len(comments) - 1
+		for ; j >= 0; j-- {
+			if comments[j].Node.Author.Login != "issuehunt-app" {
+				break
+			}
+		}
+		if j == -1 {
 			return Types.IssueTypeEnum.NOT_ANSWERED
+		} else if comments[j].Node.AuthorAssociation == "MEMBER" {
+			return Types.IssueTypeEnum.ANSWERED
 		} else {
-			j := len(comments) - 1
-			for ; j >= 0; j-- {
-				if comments[j].Node.Author.Login != "issuehunt-app" {
-					break
-				}
-			}
-			if j == -1 {
-				return Types.IssueTypeEnum.NOT_ANSWERED
-			} else if comments[j].Node.AuthorAssociation == "MEMBER" {
-				return Types.IssueTypeEnum.ANSWERED
-			} else {
-				return Types.IssueTypeEnum.NOT_ANSWERED
-			}
+			return Types.IssueTypeEnum.NOT_ANSWERED
 		}
 	}
 }
