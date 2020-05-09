@@ -2,6 +2,6 @@
 
 while true
 do
-  time go run . $1
+  time ./issue-label-bot $1
   sleep 120
 done
