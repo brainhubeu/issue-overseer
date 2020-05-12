@@ -14,7 +14,7 @@ jobs:
             exit 1
           fi
       - run: go test ./...
-  deploy:
+  deploy_docker:
     docker:
       - image: docker:17.05.0-ce-git
     working_directory: ~/app
@@ -24,16 +24,24 @@ jobs:
       - run: docker build -t brainhubeu/issue-label-bot .
       - run: docker login --username $DOCKER_HUB_USER --password $DOCKER_HUB_TOKEN
       - run: docker push brainhubeu/issue-label-bot
+  deploy_rancher:
+    docker:
+      - image: kiwicom/crane:3.2.1
+    steps:
+      - crane --stack issue-label-bot --service issue-label-bot-main --url $RANCHER_URL --access-key $RANCHER_ACCESS_KEY --secret-key $RANCHER_SECRET_KEY
 
 workflows:
   version: 2
   test_and_deploy:
     jobs:
       - test
-      - deploy:
+      - deploy_docker:
           requires:
             - test
           filters:
             branches:
               only:
                 - master
+      - deploy_rancher:
+          requires:
+            - deploy_docker
