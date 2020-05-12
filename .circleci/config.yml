@@ -28,7 +28,7 @@ jobs:
     docker:
       - image: kiwicom/crane:3.2.1
     steps:
-      - run: crane --stack issue-label-bot --service issue-label-bot-main --url $RANCHER_URL --access-key $RANCHER_ACCESS_KEY --secret-key $RANCHER_SECRET_KEY
+      - run: crane --stack issue-label-bot --service issue-label-bot-main --url $RANCHER_URL --access-key $RANCHER_ACCESS_KEY --secret-key $RANCHER_SECRET_KEY --env production
 
 workflows:
   version: 2
