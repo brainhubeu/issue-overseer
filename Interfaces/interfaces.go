@@ -84,18 +84,3 @@ type Issues struct {
 		} `json:"repository"`
 	} `json:"data"`
 }
-
-type GraphqlVariables struct {
-	Organization string  `json:"organization"`
-	RepoName     string  `json:"repoName"`
-	Cursor       *string `json:"cursor"`
-}
-
-type GraphqlRequestBody struct {
-	Variables GraphqlVariables `json:"variables"`
-	Query     string           `json:"query"`
-}
-
-type AddLabelRequestBody struct {
-	Labels []string `json:"labels"`
-}

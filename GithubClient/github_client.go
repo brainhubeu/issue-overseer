@@ -19,6 +19,21 @@ type GithubClient struct {
 	RequestsNumber int
 }
 
+type GraphqlVariables struct {
+	Organization string  `json:"organization"`
+	RepoName     string  `json:"repoName"`
+	Cursor       *string `json:"cursor"`
+}
+
+type GraphqlRequestBody struct {
+	Variables GraphqlVariables `json:"variables"`
+	Query     string           `json:"query"`
+}
+
+type AddLabelRequestBody struct {
+	Labels []string `json:"labels"`
+}
+
 func InitGithubClient(organization string, token string) *GithubClient {
 	githubClient := &GithubClient{organization, token, 0}
 	return githubClient
@@ -175,7 +190,7 @@ func (githubClient *GithubClient) RemoveLabel(issueUrl string, labelName string)
 func (githubClient *GithubClient) AddLabel(issueUrl string, labelName string) {
 	client := &http.Client{}
 	fmt.Println("labelName", labelName)
-	requestBody := Interfaces.AddLabelRequestBody{Labels: []string{labelName}}
+	requestBody := AddLabelRequestBody{Labels: []string{labelName}}
 	jsonValue, err := json.Marshal(requestBody)
 	if err != nil {
 		log.Fatalln(err)
@@ -241,8 +256,8 @@ func (githubClient *GithubClient) FindIssues(repoName string) []Interfaces.Issue
 		}
 	  }
 	}`
-		graphqlVariables := Interfaces.GraphqlVariables{Organization: githubClient.Organization, RepoName: repoName, Cursor: cursor}
-		graphqlRequestBody := Interfaces.GraphqlRequestBody{Variables: graphqlVariables, Query: query}
+		graphqlVariables := GraphqlVariables{Organization: githubClient.Organization, RepoName: repoName, Cursor: cursor}
+		graphqlRequestBody := GraphqlRequestBody{Variables: graphqlVariables, Query: query}
 		jsonValue, err := json.Marshal(graphqlRequestBody)
 		if err != nil {
 			log.Fatalln(err)
