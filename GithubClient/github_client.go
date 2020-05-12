@@ -1,7 +1,7 @@
 package GithubClient
 
 import (
-	"../Types"
+	"../Interfaces"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -51,7 +51,7 @@ func (githubClient *GithubClient) FindRepos() []string {
 		if resp.StatusCode != 200 {
 			log.Fatalln(resp.Status, string(body))
 		}
-		repositories := []Types.Repository{}
+		repositories := []Interfaces.Repository{}
 		err = json.Unmarshal([]byte(string(body)), &repositories)
 		if err != nil {
 			log.Fatalln(err)
@@ -71,7 +71,7 @@ func (githubClient *GithubClient) FindRepos() []string {
 	return repoNames
 }
 
-func (githubClient *GithubClient) FindLabels(repoName string) []Types.Label {
+func (githubClient *GithubClient) FindLabels(repoName string) []Interfaces.Label {
 	client := &http.Client{}
 	githubClient.incrementRequestNumber()
 	req, err := http.NewRequest("GET", "https://api.github.com/repos/"+githubClient.Organization+"/"+repoName+"/labels", nil)
@@ -91,7 +91,7 @@ func (githubClient *GithubClient) FindLabels(repoName string) []Types.Label {
 	if resp.StatusCode != 200 {
 		log.Fatalln(resp.Status, string(body))
 	}
-	labels := []Types.Label{}
+	labels := []Interfaces.Label{}
 	err = json.Unmarshal([]byte(string(body)), &labels)
 	if err != nil {
 		log.Fatalln(err)
@@ -121,7 +121,7 @@ func (githubClient *GithubClient) DeleteLabel(repoName string, labelName string)
 	}
 }
 
-func (githubClient *GithubClient) CreateLabel(repoName string, label Types.Label) {
+func (githubClient *GithubClient) CreateLabel(repoName string, label Interfaces.Label) {
 	client := &http.Client{}
 	jsonValue, err := json.Marshal(label)
 	if err != nil {
@@ -175,7 +175,7 @@ func (githubClient *GithubClient) RemoveLabel(issueUrl string, labelName string)
 func (githubClient *GithubClient) AddLabel(issueUrl string, labelName string) {
 	client := &http.Client{}
 	fmt.Println("labelName", labelName)
-	requestBody := Types.AddLabelRequestBody{Labels: []string{labelName}}
+	requestBody := Interfaces.AddLabelRequestBody{Labels: []string{labelName}}
 	jsonValue, err := json.Marshal(requestBody)
 	if err != nil {
 		log.Fatalln(err)
@@ -203,10 +203,10 @@ func (githubClient *GithubClient) AddLabel(issueUrl string, labelName string) {
 	fmt.Println("added", issueUrl, labelName, resp.StatusCode)
 }
 
-func (githubClient *GithubClient) FindIssues(repoName string) []Types.Issue {
+func (githubClient *GithubClient) FindIssues(repoName string) []Interfaces.Issue {
 	client := &http.Client{}
 	cursor := (*string)(nil)
-	result := []Types.Issue{}
+	result := []Interfaces.Issue{}
 	for {
 		query := `query ($organization: String!, $repoName: String!, $cursor: String) {
 	  repository(owner: $organization, name: $repoName) {
@@ -241,8 +241,8 @@ func (githubClient *GithubClient) FindIssues(repoName string) []Types.Issue {
 		}
 	  }
 	}`
-		graphqlVariables := Types.GraphqlVariables{Organization: githubClient.Organization, RepoName: repoName, Cursor: cursor}
-		graphqlRequestBody := Types.GraphqlRequestBody{Variables: graphqlVariables, Query: query}
+		graphqlVariables := Interfaces.GraphqlVariables{Organization: githubClient.Organization, RepoName: repoName, Cursor: cursor}
+		graphqlRequestBody := Interfaces.GraphqlRequestBody{Variables: graphqlVariables, Query: query}
 		jsonValue, err := json.Marshal(graphqlRequestBody)
 		if err != nil {
 			log.Fatalln(err)
@@ -265,7 +265,7 @@ func (githubClient *GithubClient) FindIssues(repoName string) []Types.Issue {
 		if resp.StatusCode != 200 {
 			log.Fatalln(resp.Status, string(body))
 		}
-		issuesData := Types.Issues{}
+		issuesData := Interfaces.Issues{}
 		err = json.Unmarshal([]byte(string(body)), &issuesData)
 		if err != nil {
 			log.Fatalln(err)

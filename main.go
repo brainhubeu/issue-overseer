@@ -4,7 +4,7 @@ import (
 	"./GithubClient"
 	"./GithubOperator"
 	"./IssuesTriage"
-	"./Types"
+	"./Interfaces"
 	"fmt"
 	"os"
 )
@@ -15,10 +15,10 @@ func main() {
 	OUR_LABEL_TEXT := "answering: reported by " + organization
 	const ANSWERED_LABEL_TEXT = "answering: answered"
 	const NOT_ANSWERED_LABEL_TEXT = "answering: not answered"
-	answeringLabels := []Types.Label{
-		Types.Label{Name: OUR_LABEL_TEXT, Color: "a0a000"},
-		Types.Label{Name: ANSWERED_LABEL_TEXT, Color: "00a000"},
-		Types.Label{Name: NOT_ANSWERED_LABEL_TEXT, Color: "a00000"},
+	answeringLabels := []Interfaces.Label{
+		Interfaces.Label{Name: OUR_LABEL_TEXT, Color: "a0a000"},
+		Interfaces.Label{Name: ANSWERED_LABEL_TEXT, Color: "00a000"},
+		Interfaces.Label{Name: NOT_ANSWERED_LABEL_TEXT, Color: "a00000"},
 	}
 
 	fmt.Println(token, OUR_LABEL_TEXT, ANSWERED_LABEL_TEXT, NOT_ANSWERED_LABEL_TEXT)

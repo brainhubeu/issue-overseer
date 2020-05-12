@@ -1,7 +1,7 @@
 package IssuesTriage
 
 import (
-	"../Types"
+	"../Interfaces"
 )
 
 type IssuesTriage struct {
@@ -12,7 +12,7 @@ func InitIssuesTriage() *IssuesTriage {
 	return issuesTriage
 }
 
-func (issuesTriage IssuesTriage) TriageOneIssue(issue Types.Issue) int {
+func (issuesTriage IssuesTriage) TriageOneIssue(issue Interfaces.Issue) int {
 	comments := issue.Comments.Edges
 	if issue.AuthorAssociation == "MEMBER" {
 		j := len(comments) - 1
@@ -27,12 +27,12 @@ func (issuesTriage IssuesTriage) TriageOneIssue(issue Types.Issue) int {
 			}
 		}
 		if j == -1 {
-			return Types.IssueTypeEnum.OURS
+			return Interfaces.IssueTypeEnum.OURS
 		} else {
 			if lastAuthorAssociation == "MEMBER" {
-				return Types.IssueTypeEnum.ANSWERED
+				return Interfaces.IssueTypeEnum.ANSWERED
 			} else {
-				return Types.IssueTypeEnum.NOT_ANSWERED
+				return Interfaces.IssueTypeEnum.NOT_ANSWERED
 			}
 		}
 	} else {
@@ -43,25 +43,25 @@ func (issuesTriage IssuesTriage) TriageOneIssue(issue Types.Issue) int {
 			}
 		}
 		if j == -1 {
-			return Types.IssueTypeEnum.NOT_ANSWERED
+			return Interfaces.IssueTypeEnum.NOT_ANSWERED
 		} else if comments[j].Node.AuthorAssociation == "MEMBER" {
-			return Types.IssueTypeEnum.ANSWERED
+			return Interfaces.IssueTypeEnum.ANSWERED
 		} else {
-			return Types.IssueTypeEnum.NOT_ANSWERED
+			return Interfaces.IssueTypeEnum.NOT_ANSWERED
 		}
 	}
 }
 
-func (issuesTriage IssuesTriage) TriageManyIssues(issues []Types.Issue) ([]Types.Issue, []Types.Issue, []Types.Issue) {
-	ourIssues := []Types.Issue{}
-	answeredIssues := []Types.Issue{}
-	notAnsweredIssues := []Types.Issue{}
+func (issuesTriage IssuesTriage) TriageManyIssues(issues []Interfaces.Issue) ([]Interfaces.Issue, []Interfaces.Issue, []Interfaces.Issue) {
+	ourIssues := []Interfaces.Issue{}
+	answeredIssues := []Interfaces.Issue{}
+	notAnsweredIssues := []Interfaces.Issue{}
 	for i := 0; i < len(issues); i++ {
 		issue := issues[i]
 		issueType := issuesTriage.TriageOneIssue(issue)
-		if issueType == Types.IssueTypeEnum.OURS {
+		if issueType == Interfaces.IssueTypeEnum.OURS {
 			ourIssues = append(ourIssues, issue)
-		} else if issueType == Types.IssueTypeEnum.ANSWERED {
+		} else if issueType == Interfaces.IssueTypeEnum.ANSWERED {
 			answeredIssues = append(answeredIssues, issue)
 		} else {
 			notAnsweredIssues = append(notAnsweredIssues, issue)

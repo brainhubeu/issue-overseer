@@ -1,27 +1,27 @@
 package GithubOperator
 
 import (
-	"../Types"
+	"../Interfaces"
 	"fmt"
 )
 
 type GithubOperator struct {
-	GithubClient            Types.GithubClient
-	IssuesTriage            Types.IssuesTriage
-	AnsweringLabels         []Types.Label
+	GithubClient            Interfaces.GithubClient
+	IssuesTriage            Interfaces.IssuesTriage
+	AnsweringLabels         []Interfaces.Label
 	OUR_LABEL_TEXT          string
 	ANSWERED_LABEL_TEXT     string
 	NOT_ANSWERED_LABEL_TEXT string
 }
 
-func InitGithubOperator(githubClient Types.GithubClient, issuesTriage Types.IssuesTriage, answeringLabels []Types.Label, OUR_LABEL_TEXT string, ANSWERED_LABEL_TEXT string, NOT_ANSWERED_LABEL_TEXT string) *GithubOperator {
+func InitGithubOperator(githubClient Interfaces.GithubClient, issuesTriage Interfaces.IssuesTriage, answeringLabels []Interfaces.Label, OUR_LABEL_TEXT string, ANSWERED_LABEL_TEXT string, NOT_ANSWERED_LABEL_TEXT string) *GithubOperator {
 	githubOperator := &GithubOperator{githubClient, issuesTriage, answeringLabels, OUR_LABEL_TEXT, ANSWERED_LABEL_TEXT, NOT_ANSWERED_LABEL_TEXT}
 	return githubOperator
 }
 
 func (githubOperator GithubOperator) createOrUpdateRepoLabels(repoName string) {
 	allLabels := githubOperator.GithubClient.FindLabels(repoName)
-	labelsToDelete := []Types.Label{}
+	labelsToDelete := []Interfaces.Label{}
 	for i := 0; i < len(githubOperator.AnsweringLabels); i++ {
 		label := githubOperator.AnsweringLabels[i]
 		for j := 0; j < len(allLabels); j++ {
@@ -31,7 +31,7 @@ func (githubOperator GithubOperator) createOrUpdateRepoLabels(repoName string) {
 			}
 		}
 	}
-	labelsToCreate := append([]Types.Label{}, labelsToDelete...)
+	labelsToCreate := append([]Interfaces.Label{}, labelsToDelete...)
 	for i := 0; i < len(githubOperator.AnsweringLabels); i++ {
 		label := githubOperator.AnsweringLabels[i]
 		j := 0
@@ -55,8 +55,8 @@ func (githubOperator GithubOperator) createOrUpdateRepoLabels(repoName string) {
 	}
 }
 
-func (githubOperator GithubOperator) updateIssueLabels(issueUrl string, allIssueLabels []Types.LabelEdge, labelNameToAdd string) {
-	labelsToRemove := []Types.Label{}
+func (githubOperator GithubOperator) updateIssueLabels(issueUrl string, allIssueLabels []Interfaces.LabelEdge, labelNameToAdd string) {
+	labelsToRemove := []Interfaces.Label{}
 	for i := 0; i < len(allIssueLabels)-1; i++ {
 		j := 0
 		for ; j < len(githubOperator.AnsweringLabels); j++ {

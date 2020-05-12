@@ -1,4 +1,4 @@
-package Types
+package Interfaces
 
 type GithubClient interface {
 	FindRepos() []string
