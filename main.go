@@ -3,8 +3,8 @@ package main
 import (
 	"./GithubClient"
 	"./GithubOperator"
-	"./IssuesTriage"
 	"./Interfaces"
+	"./IssuesTriage"
 	"fmt"
 	"os"
 )
