@@ -21,9 +21,9 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - run: docker build -t brainhubeu/issue-label-bot .
+      - run: docker build -t brainhubeu/issue-label-bot@1.0.0 .
       - run: docker login --username $DOCKER_HUB_USER --password $DOCKER_HUB_TOKEN
-      - run: docker push brainhubeu/issue-label-bot
+      - run: docker push brainhubeu/issue-label-bot@1.0.0
   deploy_rancher:
     docker:
       - image: kiwicom/crane:3.2.1
