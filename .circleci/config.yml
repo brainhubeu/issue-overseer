@@ -25,6 +25,7 @@ jobs:
       - run: docker login --username $DOCKER_HUB_USER --password $DOCKER_HUB_TOKEN
       - run: docker push brainhubeu/issue-label-bot:1.0.0
   deploy_rancher:
+    working_directory: ~/app
     docker:
       - image: kiwicom/crane:3.2.1
     steps:
