@@ -57,7 +57,7 @@ func (githubOperator GithubOperator) createOrUpdateRepoLabels(repoName string) {
 
 func (githubOperator GithubOperator) updateIssueLabels(issueUrl string, allIssueLabels []Interfaces.LabelEdge, labelNameToAdd string) {
 	labelsToRemove := []Interfaces.Label{}
-	for i := 0; i < len(allIssueLabels)-1; i++ {
+	for i := 0; i < len(allIssueLabels); i++ {
 		j := 0
 		for ; j < len(githubOperator.AnsweringLabels); j++ {
 			if githubOperator.AnsweringLabels[j].Name == allIssueLabels[i].Node.Name {
