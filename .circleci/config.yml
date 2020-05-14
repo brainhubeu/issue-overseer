@@ -21,9 +21,9 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - run: docker build -t brainhubeu/issue-label-bot:1.0.0 .
+      - run: docker build -t brainhubeu/issue-label-bot:latest .
       - run: docker login --username $DOCKER_HUB_USER --password $DOCKER_HUB_TOKEN
-      - run: docker push brainhubeu/issue-label-bot:1.0.0
+      - run: docker push brainhubeu/issue-label-bot:latest
   deploy_rancher:
     working_directory: ~/app
     docker:
