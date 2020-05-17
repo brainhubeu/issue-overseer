@@ -30,17 +30,17 @@ jobs:
       - image: curlimages/curl:7.70.0
     steps:
       - run: |
-          curl -i "$RANCHER_URL/v1/projects/$RANCHER_PROJECT_ID/services/$RANCHER_SERVICE_ID/?action=upgrade" \
+          curl -i --fail "$RANCHER_URL/v1/projects/$RANCHER_PROJECT_ID/services/$RANCHER_SERVICE_ID/?action=upgrade" \
             -H 'content-type: application/json' \
-            -u '$RANCHER_ACCESS_KEY:$RANCHER_SECRET_KEY' \
+            -u "$RANCHER_ACCESS_KEY:$RANCHER_SECRET_KEY" \
             --data-binary '{"inServiceStrategy":{"launchConfig":{"environment":{"GITHUB_TOKEN":"'"$GITHUB_TOKEN"'","GITHUB_ORGANIZATION":"'"$GITHUB_ORGANIZATION"'"},"imageUuid":"docker:brainhubeu/issue-label-bot:latest","labels":{"io.rancher.container.pull_image":"always"}}}}' \
             --compressed
           sleep 60
-          curl -i "$RANCHER_URL/v1/projects/$RANCHER_PROJECT_ID/services/$RANCHER_SERVICE_ID/?action=finishupgrade" \
+          curl -i --fail "$RANCHER_URL/v1/projects/$RANCHER_PROJECT_ID/services/$RANCHER_SERVICE_ID/?action=finishupgrade" \
             -X 'POST' \
             -H 'content-type: application/json' \
             -H 'sec-fetch-dest: empty' \
-            -u '$RANCHER_ACCESS_KEY:$RANCHER_SECRET_KEY' \
+            -u "$RANCHER_ACCESS_KEY:$RANCHER_SECRET_KEY" \
             --compressed
 
 workflows:
