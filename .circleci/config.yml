@@ -29,7 +29,7 @@ jobs:
     docker:
       - image: kiwicom/crane:3.2.1
     steps:
-      - run: >
+      - run: |-
 curl -i "$RANCHER_URL/v1/projects/$RANCHER_PROJECT_ID/services/$RANCHER_SERVICE_ID/?action=upgrade" \
   -H 'content-type: application/json' \
   -u '$RANCHER_ACCESS_KEY:$RANCHER_SECRET_KEY' \
