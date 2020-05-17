@@ -41,7 +41,7 @@ func InitGithubClient(organization string, token string) *GithubClient {
 
 func (githubClient *GithubClient) incrementRequestNumber() {
 	githubClient.RequestsNumber++
-	fmt.Println("(v 1.0.4) request to GitHub #", githubClient.RequestsNumber)
+	fmt.Println("(v 1.0.5) request to GitHub #", githubClient.RequestsNumber)
 }
 
 func (githubClient *GithubClient) FindRepos() []string {
