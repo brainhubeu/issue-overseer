@@ -35,9 +35,7 @@ curl -i "$RANCHER_URL/v1/projects/$RANCHER_PROJECT_ID/services/$RANCHER_SERVICE_
   -u '$RANCHER_ACCESS_KEY:$RANCHER_SECRET_KEY' \
   --data-binary '{"inServiceStrategy":{"launchConfig":{"environment":{"GITHUB_TOKEN":"'"$GITHUB_TOKEN"'","GITHUB_ORGANIZATION":"'"$GITHUB_ORGANIZATION"'"},"imageUuid":"docker:brainhubeu/issue-label-bot:latest","labels":{"io.rancher.container.pull_image":"always"}}}}' \
   --compressed
-
 sleep 60
-
 curl -i "$RANCHER_URL/v1/projects/$RANCHER_PROJECT_ID/services/$RANCHER_SERVICE_ID/?action=finishupgrade" \
   -X 'POST' \
   -H 'content-type: application/json' \
