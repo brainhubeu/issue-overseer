@@ -27,60 +27,29 @@ var IssueTypeEnum = &issueTypeEnum{
 }
 
 type Repository struct {
-	Archived bool   `json:"archived"`
-	Name     string `json:"name"`
+	Archived bool
+	Name     string
 }
 
 type Label struct {
-	Name  string `json:"name"`
-	Color string `json:"color"`
+	Name  string
+	Color string
 }
 
 type CommentAuthor struct {
-	Login string `json:"login"`
+	Login string
 }
 
 type Comment struct {
-	AuthorAssociation string        `json:"authorAssociation"`
-	Author            CommentAuthor `json:"author"`
-}
-
-type LabelEdge struct {
-	Node Label `json:"node"`
-}
-
-type Labels struct {
-	Edges []LabelEdge `json:"edges"`
-}
-
-type CommentEdge struct {
-	Node Comment `json:"node"`
-}
-
-type Comments struct {
-	Edges []CommentEdge `json:"edges"`
+	AuthorAssociation string
+	AuthorLogin       string
 }
 
 type Issue struct {
-	Title             string   `json:"title"`
-	Url               string   `json:"url"`
-	Number            int      `json:"number"`
-	AuthorAssociation string   `json:"authorAssociation"`
-	Labels            Labels   `json:"labels"`
-	Comments          Comments `json:"comments"`
-}
-
-type IssueEdge struct {
-	Cursor string `json:"cursor"`
-	Node   Issue  `json:"node"`
-}
-
-type Issues struct {
-	Data struct {
-		Repository struct {
-			Issues struct {
-				Edges []IssueEdge `json:"edges"`
-			} `json:"issues"`
-		} `json:"repository"`
-	} `json:"data"`
+	Title             string
+	Url               string
+	Number            int
+	AuthorAssociation string
+	Labels            []Label
+	Comments          []Comment
 }

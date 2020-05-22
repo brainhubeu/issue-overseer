@@ -19,6 +19,65 @@ type GithubClient struct {
 	RequestsNumber int
 }
 
+type Repository struct {
+	Archived bool   `json:"archived"`
+	Name     string `json:"name"`
+}
+
+type Label struct {
+	Name  string `json:"name"`
+	Color string `json:"color"`
+}
+
+type CommentAuthor struct {
+	Login string `json:"login"`
+}
+
+type Comment struct {
+	AuthorAssociation string        `json:"authorAssociation"`
+	Author            CommentAuthor `json:"author"`
+}
+
+type LabelEdge struct {
+	Node Label `json:"node"`
+}
+
+type Labels struct {
+	Edges []LabelEdge `json:"edges"`
+}
+
+type CommentEdge struct {
+	Node Comment `json:"node"`
+}
+
+type Comments struct {
+	Edges []CommentEdge `json:"edges"`
+}
+
+type Issue struct {
+	Title             string   `json:"title"`
+	Url               string   `json:"url"`
+	Number            int      `json:"number"`
+	AuthorAssociation string   `json:"authorAssociation"`
+	Labels            Labels   `json:"labels"`
+	Comments          Comments `json:"comments"`
+}
+
+type IssueEdge struct {
+	Cursor string `json:"cursor"`
+	Node   Issue  `json:"node"`
+}
+
+type Issues struct {
+	Data struct {
+		Repository struct {
+			Issues struct {
+				Edges []IssueEdge `json:"edges"`
+			} `json:"issues"`
+		} `json:"repository"`
+	} `json:"data"`
+}
+
 type GraphqlVariables struct {
 	Organization string  `json:"organization"`
 	RepoName     string  `json:"repoName"`
@@ -218,6 +277,36 @@ func (githubClient *GithubClient) AddLabel(issueUrl string, labelName string) {
 	fmt.Println("added", issueUrl, labelName, resp.StatusCode)
 }
 
+func transformDataIntoIssue(issueData Issue) Interfaces.Issue {
+	labelsCount := len(issueData.Labels.Edges)
+	commentsCount := len(issueData.Comments.Edges)
+	labels := make([]Interfaces.Label, 0, labelsCount)
+	comments := make([]Interfaces.Comment, 0, commentsCount)
+	for i := 0; i < labelsCount; i++ {
+		labelData := issueData.Labels.Edges[i].Node
+		labels[i] = Interfaces.Label{
+			Name:  labelData.Name,
+			Color: labelData.Color,
+		}
+	}
+	for i := 0; i < commentsCount; i++ {
+		commentData := issueData.Comments.Edges[i].Node
+		comments[i] = Interfaces.Comment{
+			AuthorAssociation: commentData.AuthorAssociation,
+			AuthorLogin:       commentData.Author.Login,
+		}
+	}
+
+	return Interfaces.Issue{
+		Title:             issueData.Title,
+		Url:               issueData.Url,
+		Number:            issueData.Number,
+		AuthorAssociation: issueData.AuthorAssociation,
+		Labels:            labels,
+		Comments:          comments,
+	}
+}
+
 func (githubClient *GithubClient) FindIssues(repoName string) []Interfaces.Issue {
 	client := &http.Client{}
 	cursor := (*string)(nil)
@@ -280,7 +369,7 @@ func (githubClient *GithubClient) FindIssues(repoName string) []Interfaces.Issue
 		if resp.StatusCode != 200 {
 			log.Fatalln(resp.Status, string(body))
 		}
-		issuesData := Interfaces.Issues{}
+		issuesData := Issues{}
 		err = json.Unmarshal([]byte(string(body)), &issuesData)
 		if err != nil {
 			log.Fatalln(err)
@@ -291,7 +380,8 @@ func (githubClient *GithubClient) FindIssues(repoName string) []Interfaces.Issue
 		}
 		cursor = &edges[len(edges)-1].Cursor
 		for i := 0; i < len(edges); i++ {
-			result = append(result, edges[i].Node)
+			issueData := edges[i].Node
+			result = append(result, transformDataIntoIssue(issueData))
 		}
 	}
 	return result

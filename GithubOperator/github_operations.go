@@ -55,17 +55,17 @@ func (githubOperator GithubOperator) createOrUpdateRepoLabels(repoName string) {
 	}
 }
 
-func (githubOperator GithubOperator) updateIssueLabels(issueUrl string, allIssueLabels []Interfaces.LabelEdge, labelNameToAdd string) {
+func (githubOperator GithubOperator) updateIssueLabels(issueUrl string, allIssueLabels []Interfaces.Label, labelNameToAdd string) {
 	labelsToRemove := []Interfaces.Label{}
 	for i := 0; i < len(allIssueLabels); i++ {
 		j := 0
 		for ; j < len(githubOperator.AnsweringLabels); j++ {
-			if githubOperator.AnsweringLabels[j].Name == allIssueLabels[i].Node.Name {
+			if githubOperator.AnsweringLabels[j].Name == allIssueLabels[i].Name {
 				break
 			}
 		}
-		if j < len(githubOperator.AnsweringLabels) && allIssueLabels[i].Node.Name != labelNameToAdd {
-			labelsToRemove = append(labelsToRemove, allIssueLabels[i].Node)
+		if j < len(githubOperator.AnsweringLabels) && allIssueLabels[i].Name != labelNameToAdd {
+			labelsToRemove = append(labelsToRemove, allIssueLabels[i])
 		}
 	}
 	fmt.Println(issueUrl, "labelsToRemove", labelsToRemove)
@@ -85,13 +85,13 @@ func (githubOperator GithubOperator) UpdateRepos(repoNames []string) {
 		fmt.Println(repoName, "answeredIssues", answeredIssues)
 		fmt.Println(repoName, "notAnsweredIssues", notAnsweredIssues)
 		for j := 0; j < len(ourIssues); j++ {
-			githubOperator.updateIssueLabels(ourIssues[j].Url, ourIssues[j].Labels.Edges, githubOperator.OUR_LABEL_TEXT)
+			githubOperator.updateIssueLabels(ourIssues[j].Url, ourIssues[j].Labels, githubOperator.OUR_LABEL_TEXT)
 		}
 		for j := 0; j < len(answeredIssues); j++ {
-			githubOperator.updateIssueLabels(answeredIssues[j].Url, answeredIssues[j].Labels.Edges, githubOperator.ANSWERED_LABEL_TEXT)
+			githubOperator.updateIssueLabels(answeredIssues[j].Url, answeredIssues[j].Labels, githubOperator.ANSWERED_LABEL_TEXT)
 		}
 		for j := 0; j < len(notAnsweredIssues); j++ {
-			githubOperator.updateIssueLabels(notAnsweredIssues[j].Url, notAnsweredIssues[j].Labels.Edges, githubOperator.NOT_ANSWERED_LABEL_TEXT)
+			githubOperator.updateIssueLabels(notAnsweredIssues[j].Url, notAnsweredIssues[j].Labels, githubOperator.NOT_ANSWERED_LABEL_TEXT)
 		}
 	}
 }

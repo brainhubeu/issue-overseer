@@ -13,16 +13,16 @@ func InitIssuesTriage() *IssuesTriage {
 }
 
 func (issuesTriage IssuesTriage) TriageOneIssue(issue Interfaces.Issue) int {
-	comments := issue.Comments.Edges
+	comments := issue.Comments
 	if issue.AuthorAssociation == "MEMBER" {
 		j := len(comments) - 1
 		lastAuthorAssociation := ""
 		for ; j >= 0; j-- {
-			comment := comments[j].Node
-			if comment.Author.Login != "issuehunt-app" && lastAuthorAssociation == "" {
+			comment := comments[j]
+			if comment.AuthorLogin != "issuehunt-app" && lastAuthorAssociation == "" {
 				lastAuthorAssociation = comment.AuthorAssociation
 			}
-			if comment.Author.Login != "issuehunt-app" && comment.AuthorAssociation != "MEMBER" {
+			if comment.AuthorLogin != "issuehunt-app" && comment.AuthorAssociation != "MEMBER" {
 				break
 			}
 		}
@@ -38,13 +38,13 @@ func (issuesTriage IssuesTriage) TriageOneIssue(issue Interfaces.Issue) int {
 	} else {
 		j := len(comments) - 1
 		for ; j >= 0; j-- {
-			if comments[j].Node.Author.Login != "issuehunt-app" {
+			if comments[j].AuthorLogin != "issuehunt-app" {
 				break
 			}
 		}
 		if j == -1 {
 			return Interfaces.IssueTypeEnum.NOT_ANSWERED
-		} else if comments[j].Node.AuthorAssociation == "MEMBER" {
+		} else if comments[j].AuthorAssociation == "MEMBER" {
 			return Interfaces.IssueTypeEnum.ANSWERED
 		} else {
 			return Interfaces.IssueTypeEnum.NOT_ANSWERED
