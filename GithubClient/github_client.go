@@ -280,8 +280,8 @@ func (githubClient *GithubClient) AddLabel(issueUrl string, labelName string) {
 func transformDataIntoIssue(issueData Issue) Interfaces.Issue {
 	labelsCount := len(issueData.Labels.Edges)
 	commentsCount := len(issueData.Comments.Edges)
-	labels := make([]Interfaces.Label, 0, labelsCount)
-	comments := make([]Interfaces.Comment, 0, commentsCount)
+	labels := make([]Interfaces.Label, labelsCount)
+	comments := make([]Interfaces.Comment, commentsCount)
 	for i := 0; i < labelsCount; i++ {
 		labelData := issueData.Labels.Edges[i].Node
 		labels[i] = Interfaces.Label{
