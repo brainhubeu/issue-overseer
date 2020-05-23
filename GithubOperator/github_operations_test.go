@@ -2,6 +2,7 @@ package GithubOperator
 
 import (
 	"../Interfaces"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
@@ -45,34 +46,42 @@ func (githubClient MockGithubClient) FindIssues(repoName string) []Interfaces.Is
 	return mockFindIssues(repoName)
 }
 
-func TestTriageManyIssues(t *testing.T) {
+func TestGithubOperator(t *testing.T) {
 	t.Run("triages an empty list", func(t *testing.T) {
 		repoNames := []string{}
-		OUR_LABEL_TEXT := "answering: reported by brainhubeu"
-		const ANSWERED_LABEL_TEXT = "answering: answered"
-		const NOT_ANSWERED_LABEL_TEXT = "answering: not answered"
 		answeringLabels := []Interfaces.Label{
-			Interfaces.Label{Name: OUR_LABEL_TEXT, Color: "a0a000"},
-			Interfaces.Label{Name: ANSWERED_LABEL_TEXT, Color: "00a000"},
-			Interfaces.Label{Name: NOT_ANSWERED_LABEL_TEXT, Color: "a00000"},
+			Interfaces.Label{Name: "label-1", Color: "color-1"},
+			Interfaces.Label{Name: "label-2", Color: "color-2"},
+			Interfaces.Label{Name: "label-3", Color: "color-3"},
+		}
+
+		githubClient := MockGithubClient{}
+		issuesTriage := MockIssuesTriage{}
+		githubOperator := InitGithubOperator(githubClient, issuesTriage, answeringLabels, "label-1", "label-2", "label-3")
+		githubOperator.UpdateRepos(repoNames)
+	})
+
+	t.Run("creates labels", func(t *testing.T) {
+		mockCreateLabelsParams := []interface{}{}
+		repoNames := []string{
+			"repo-1",
+			"repo-2",
+			"repo-3",
+		}
+		answeringLabels := []Interfaces.Label{
+			Interfaces.Label{Name: "label-1", Color: "color-1"},
+			Interfaces.Label{Name: "label-2", Color: "color-2"},
+			Interfaces.Label{Name: "label-3", Color: "color-3"},
 		}
 
 		mockTriageManyIssues = func(issues []Interfaces.Issue) ([]Interfaces.Issue, []Interfaces.Issue, []Interfaces.Issue) {
 			return []Interfaces.Issue{}, []Interfaces.Issue{}, []Interfaces.Issue{}
 		}
-		mockFindRepos = func() []string {
-			return []string{}
-		}
 		mockFindLabels = func(repoName string) []Interfaces.Label {
 			return []Interfaces.Label{}
 		}
-		mockDeleteLabel = func(repoName string, labelName string) {
-		}
 		mockCreateLabel = func(repoName string, label Interfaces.Label) {
-		}
-		mockRemoveLabel = func(issueUrl string, labelName string) {
-		}
-		mockAddLabel = func(issueUrl string, labelName string) {
+			mockCreateLabelsParams = append(mockCreateLabelsParams, []interface{}{repoName, label})
 		}
 		mockFindIssues = func(repoName string) []Interfaces.Issue {
 			return []Interfaces.Issue{}
@@ -80,7 +89,19 @@ func TestTriageManyIssues(t *testing.T) {
 
 		githubClient := MockGithubClient{}
 		issuesTriage := MockIssuesTriage{}
-		githubOperator := InitGithubOperator(githubClient, issuesTriage, answeringLabels, OUR_LABEL_TEXT, ANSWERED_LABEL_TEXT, NOT_ANSWERED_LABEL_TEXT)
+		githubOperator := InitGithubOperator(githubClient, issuesTriage, answeringLabels, "label-1", "label-2", "label-3")
 		githubOperator.UpdateRepos(repoNames)
+
+		assert.Equal(t, mockCreateLabelsParams, []interface{}{
+			[]interface{}{"repo-1", Interfaces.Label{Name: "label-1", Color: "color-1"}},
+			[]interface{}{"repo-1", Interfaces.Label{Name: "label-2", Color: "color-2"}},
+			[]interface{}{"repo-1", Interfaces.Label{Name: "label-3", Color: "color-3"}},
+			[]interface{}{"repo-2", Interfaces.Label{Name: "label-1", Color: "color-1"}},
+			[]interface{}{"repo-2", Interfaces.Label{Name: "label-2", Color: "color-2"}},
+			[]interface{}{"repo-2", Interfaces.Label{Name: "label-3", Color: "color-3"}},
+			[]interface{}{"repo-3", Interfaces.Label{Name: "label-1", Color: "color-1"}},
+			[]interface{}{"repo-3", Interfaces.Label{Name: "label-2", Color: "color-2"}},
+			[]interface{}{"repo-3", Interfaces.Label{Name: "label-3", Color: "color-3"}},
+		})
 	})
 }
