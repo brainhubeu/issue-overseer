@@ -86,10 +86,10 @@ func TestGithubOperator(t *testing.T) {
 		mockFindIssues = func(repoName string) []Interfaces.Issue {
 			return []Interfaces.Issue{}
 		}
-
 		githubClient := MockGithubClient{}
 		issuesTriage := MockIssuesTriage{}
 		githubOperator := InitGithubOperator(githubClient, issuesTriage, answeringLabels, "label-1", "label-2", "label-3")
+
 		githubOperator.UpdateRepos(repoNames)
 
 		assert.Equal(t, mockCreateLabelsParams, []interface{}{
@@ -148,10 +148,10 @@ func TestGithubOperator(t *testing.T) {
 		mockFindIssues = func(repoName string) []Interfaces.Issue {
 			return []Interfaces.Issue{}
 		}
-
 		githubClient := MockGithubClient{}
 		issuesTriage := MockIssuesTriage{}
 		githubOperator := InitGithubOperator(githubClient, issuesTriage, answeringLabels, "label-1", "label-2", "label-3")
+
 		githubOperator.UpdateRepos(repoNames)
 
 		assert.Equal(t, mockCreateLabelsParams, []interface{}{
@@ -207,10 +207,10 @@ func TestGithubOperator(t *testing.T) {
 		mockFindIssues = func(repoName string) []Interfaces.Issue {
 			return []Interfaces.Issue{}
 		}
-
 		githubClient := MockGithubClient{}
 		issuesTriage := MockIssuesTriage{}
 		githubOperator := InitGithubOperator(githubClient, issuesTriage, answeringLabels, "label-1", "label-2", "label-3")
+
 		githubOperator.UpdateRepos(repoNames)
 
 		assert.Equal(t, mockDeleteLabelsParams, []interface{}{
