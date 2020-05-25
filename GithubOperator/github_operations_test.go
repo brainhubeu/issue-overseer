@@ -2,9 +2,9 @@ package GithubOperator
 
 import (
 	"../Interfaces"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"log"
-    . "github.com/onsi/ginkgo"
-    . "github.com/onsi/gomega"
 	"testing"
 )
 
@@ -49,8 +49,8 @@ func (githubClient MockGithubClient) FindIssues(repoName string) []Interfaces.Is
 }
 
 func TestGithubOperator(t *testing.T) {
-    RegisterFailHandler(Fail)
-    RunSpecs(t, "GithubOperator")
+	RegisterFailHandler(Fail)
+	RunSpecs(t, "GithubOperator")
 }
 
 var _ = Describe("GithubOperator", func() {

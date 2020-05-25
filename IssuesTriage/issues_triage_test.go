@@ -2,14 +2,14 @@ package IssuesTriage
 
 import (
 	"../Interfaces"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 	"testing"
-    . "github.com/onsi/ginkgo"
-    . "github.com/onsi/gomega"
 )
 
 func TestTriageManyIssues(t *testing.T) {
-    RegisterFailHandler(Fail)
-    RunSpecs(t, "IssuesTriage")
+	RegisterFailHandler(Fail)
+	RunSpecs(t, "IssuesTriage")
 }
 
 var _ = Describe("IssuesTriage", func() {
