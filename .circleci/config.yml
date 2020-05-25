@@ -6,14 +6,16 @@ jobs:
     working_directory: ~/app
     steps:
       - checkout
-      - run: go get github.com/stretchr/testify
+      - run: go get github.com/onsi/ginkgo/ginkgo
+      - run: go get github.com/onsi/gomega/...
+      - run: go get golang.org/x/tools/cmd/cover
       - run: golangci-lint run ./...
       - run: |
           if [ `gofmt -l . | head -1` ]; then
             echo "you must run 'go fmt ./...' to fix formatting"
             exit 1
           fi
-      - run: go test ./...
+      - run: go test -v -coverprofile cover.html ./...
   deploy_docker:
     docker:
       - image: docker:17.05.0-ce-git

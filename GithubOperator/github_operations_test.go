@@ -2,8 +2,9 @@ package GithubOperator
 
 import (
 	"../Interfaces"
-	"github.com/stretchr/testify/assert"
 	"log"
+    . "github.com/onsi/ginkgo"
+    . "github.com/onsi/gomega"
 	"testing"
 )
 
@@ -47,36 +48,40 @@ func (githubClient MockGithubClient) FindIssues(repoName string) []Interfaces.Is
 	return mockFindIssues(repoName)
 }
 
-func beforeEach() {
-	mockFindRepos = func() []string {
-		log.Fatalln("mockFindRepos not implemented")
-		return nil
-	}
-	mockFindLabels = func(repoName string) []Interfaces.Label {
-		log.Fatalln("mockFindLabels not implemented")
-		return nil
-	}
-	mockDeleteLabel = func(repoName string, labelName string) {
-		log.Fatalln("mockDeleteLabel not implemented")
-	}
-	mockCreateLabel = func(repoName string, label Interfaces.Label) {
-		log.Fatalln("mockCreateLabel not implemented")
-	}
-	mockRemoveLabel = func(issueUrl string, labelName string) {
-		log.Fatalln("mockRemoveLabel not implemented")
-	}
-	mockAddLabel = func(issueUrl string, labelName string) {
-		log.Fatalln("mockAddLabel not implemented")
-	}
-	mockFindIssues = func(repoName string) []Interfaces.Issue {
-		log.Fatalln("mockFindIssues not implemented")
-		return nil
-	}
+func TestGithubOperator(t *testing.T) {
+    RegisterFailHandler(Fail)
+    RunSpecs(t, "GithubOperator")
 }
 
-func TestGithubOperator(t *testing.T) {
-	t.Run("triages an empty list", func(t *testing.T) {
-		beforeEach()
+var _ = Describe("GithubOperator", func() {
+	BeforeEach(func() {
+		mockFindRepos = func() []string {
+			log.Fatalln("mockFindRepos not implemented")
+			return nil
+		}
+		mockFindLabels = func(repoName string) []Interfaces.Label {
+			log.Fatalln("mockFindLabels not implemented")
+			return nil
+		}
+		mockDeleteLabel = func(repoName string, labelName string) {
+			log.Fatalln("mockDeleteLabel not implemented")
+		}
+		mockCreateLabel = func(repoName string, label Interfaces.Label) {
+			log.Fatalln("mockCreateLabel not implemented")
+		}
+		mockRemoveLabel = func(issueUrl string, labelName string) {
+			log.Fatalln("mockRemoveLabel not implemented")
+		}
+		mockAddLabel = func(issueUrl string, labelName string) {
+			log.Fatalln("mockAddLabel not implemented")
+		}
+		mockFindIssues = func(repoName string) []Interfaces.Issue {
+			log.Fatalln("mockFindIssues not implemented")
+			return nil
+		}
+	})
+
+	It("triages an empty list", func() {
 		repoNames := []string{}
 		answeringLabels := []Interfaces.Label{
 			Interfaces.Label{Name: "label-1", Color: "color-1"},
@@ -90,8 +95,7 @@ func TestGithubOperator(t *testing.T) {
 		githubOperator.UpdateRepos(repoNames)
 	})
 
-	t.Run("creates labels", func(t *testing.T) {
-		beforeEach()
+	It("creates labels", func() {
 		mockCreateLabelsParams := []interface{}{}
 		repoNames := []string{
 			"repo-1",
@@ -122,7 +126,7 @@ func TestGithubOperator(t *testing.T) {
 
 		githubOperator.UpdateRepos(repoNames)
 
-		assert.Equal(t, mockCreateLabelsParams, []interface{}{
+		Expect(mockCreateLabelsParams).To(Equal([]interface{}{
 			[]interface{}{"repo-1", Interfaces.Label{Name: "label-1", Color: "color-1"}},
 			[]interface{}{"repo-1", Interfaces.Label{Name: "label-2", Color: "color-2"}},
 			[]interface{}{"repo-1", Interfaces.Label{Name: "label-3", Color: "color-3"}},
@@ -132,11 +136,10 @@ func TestGithubOperator(t *testing.T) {
 			[]interface{}{"repo-3", Interfaces.Label{Name: "label-1", Color: "color-1"}},
 			[]interface{}{"repo-3", Interfaces.Label{Name: "label-2", Color: "color-2"}},
 			[]interface{}{"repo-3", Interfaces.Label{Name: "label-3", Color: "color-3"}},
-		})
+		}))
 	})
 
-	t.Run("does not create already created labels", func(t *testing.T) {
-		beforeEach()
+	It("does not create already created labels", func() {
 		mockCreateLabelsParams := []interface{}{}
 		repoNames := []string{
 			"repo-1",
@@ -185,15 +188,14 @@ func TestGithubOperator(t *testing.T) {
 
 		githubOperator.UpdateRepos(repoNames)
 
-		assert.Equal(t, mockCreateLabelsParams, []interface{}{
+		Expect(mockCreateLabelsParams).To(Equal([]interface{}{
 			[]interface{}{"repo-1", Interfaces.Label{Name: "label-3", Color: "color-3"}},
 			[]interface{}{"repo-2", Interfaces.Label{Name: "label-2", Color: "color-2"}},
 			[]interface{}{"repo-2", Interfaces.Label{Name: "label-3", Color: "color-3"}},
-		})
+		}))
 	})
 
-	t.Run("deletes invalid labels", func(t *testing.T) {
-		beforeEach()
+	It("deletes invalid labels", func() {
 		mockDeleteLabelsParams := []interface{}{}
 		repoNames := []string{
 			"repo-1",
@@ -245,10 +247,10 @@ func TestGithubOperator(t *testing.T) {
 
 		githubOperator.UpdateRepos(repoNames)
 
-		assert.Equal(t, mockDeleteLabelsParams, []interface{}{
+		Expect(mockDeleteLabelsParams).To(Equal([]interface{}{
 			[]interface{}{"repo-1", "label-1"},
 			[]interface{}{"repo-3", "label-2"},
 			[]interface{}{"repo-3", "label-3"},
-		})
+		}))
 	})
-}
+})
