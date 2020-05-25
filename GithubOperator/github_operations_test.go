@@ -2,8 +2,8 @@ package GithubOperator
 
 import (
 	"../Interfaces"
-	"log"
 	"github.com/stretchr/testify/assert"
+	"log"
 	"testing"
 )
 
