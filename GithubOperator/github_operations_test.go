@@ -2,6 +2,7 @@ package GithubOperator
 
 import (
 	"../Interfaces"
+	"log"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
@@ -46,8 +47,36 @@ func (githubClient MockGithubClient) FindIssues(repoName string) []Interfaces.Is
 	return mockFindIssues(repoName)
 }
 
+func beforeEach() {
+	mockFindRepos = func() []string {
+		log.Fatalln("mockFindRepos not implemented")
+		return nil
+	}
+	mockFindLabels = func(repoName string) []Interfaces.Label {
+		log.Fatalln("mockFindLabels not implemented")
+		return nil
+	}
+	mockDeleteLabel = func(repoName string, labelName string) {
+		log.Fatalln("mockDeleteLabel not implemented")
+	}
+	mockCreateLabel = func(repoName string, label Interfaces.Label) {
+		log.Fatalln("mockCreateLabel not implemented")
+	}
+	mockRemoveLabel = func(issueUrl string, labelName string) {
+		log.Fatalln("mockRemoveLabel not implemented")
+	}
+	mockAddLabel = func(issueUrl string, labelName string) {
+		log.Fatalln("mockAddLabel not implemented")
+	}
+	mockFindIssues = func(repoName string) []Interfaces.Issue {
+		log.Fatalln("mockFindIssues not implemented")
+		return nil
+	}
+}
+
 func TestGithubOperator(t *testing.T) {
 	t.Run("triages an empty list", func(t *testing.T) {
+		beforeEach()
 		repoNames := []string{}
 		answeringLabels := []Interfaces.Label{
 			Interfaces.Label{Name: "label-1", Color: "color-1"},
@@ -62,6 +91,7 @@ func TestGithubOperator(t *testing.T) {
 	})
 
 	t.Run("creates labels", func(t *testing.T) {
+		beforeEach()
 		mockCreateLabelsParams := []interface{}{}
 		repoNames := []string{
 			"repo-1",
@@ -106,6 +136,7 @@ func TestGithubOperator(t *testing.T) {
 	})
 
 	t.Run("does not create already created labels", func(t *testing.T) {
+		beforeEach()
 		mockCreateLabelsParams := []interface{}{}
 		repoNames := []string{
 			"repo-1",
@@ -162,6 +193,7 @@ func TestGithubOperator(t *testing.T) {
 	})
 
 	t.Run("deletes invalid labels", func(t *testing.T) {
+		beforeEach()
 		mockDeleteLabelsParams := []interface{}{}
 		repoNames := []string{
 			"repo-1",
