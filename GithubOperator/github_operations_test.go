@@ -4,7 +4,6 @@ import (
 	"../Interfaces"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"log"
 	"testing"
 )
 
@@ -56,27 +55,27 @@ func TestGithubOperator(t *testing.T) {
 var _ = Describe("GithubOperator", func() {
 	BeforeEach(func() {
 		mockFindRepos = func() []string {
-			log.Fatalln("mockFindRepos not implemented")
+			Fail("mockFindRepos not implemented")
 			return nil
 		}
 		mockFindLabels = func(repoName string) []Interfaces.Label {
-			log.Fatalln("mockFindLabels not implemented")
+			Fail("mockFindLabels not implemented")
 			return nil
 		}
 		mockDeleteLabel = func(repoName string, labelName string) {
-			log.Fatalln("mockDeleteLabel not implemented")
+			Fail("mockDeleteLabel not implemented")
 		}
 		mockCreateLabel = func(repoName string, label Interfaces.Label) {
-			log.Fatalln("mockCreateLabel not implemented")
+			Fail("mockCreateLabel not implemented")
 		}
 		mockRemoveLabel = func(issueUrl string, labelName string) {
-			log.Fatalln("mockRemoveLabel not implemented")
+			Fail("mockRemoveLabel not implemented")
 		}
 		mockAddLabel = func(issueUrl string, labelName string) {
-			log.Fatalln("mockAddLabel not implemented")
+			Fail("mockAddLabel not implemented")
 		}
 		mockFindIssues = func(repoName string) []Interfaces.Issue {
-			log.Fatalln("mockFindIssues not implemented")
+			Fail("mockFindIssues not implemented")
 			return nil
 		}
 	})
@@ -251,6 +250,73 @@ var _ = Describe("GithubOperator", func() {
 			[]interface{}{"repo-1", "label-1"},
 			[]interface{}{"repo-3", "label-2"},
 			[]interface{}{"repo-3", "label-3"},
+		}))
+	})
+
+	It("adds missing labels", func() {
+		mockAddLabelParams := []interface{}{}
+		repoNames := []string{
+			"repo-1",
+			"repo-2",
+			"repo-3",
+		}
+		answeringLabels := []Interfaces.Label{
+			Interfaces.Label{Name: "label-1", Color: "color-1"},
+			Interfaces.Label{Name: "label-2", Color: "color-2"},
+			Interfaces.Label{Name: "label-3", Color: "color-3"},
+		}
+
+		mockTriageManyIssues = func(issues []Interfaces.Issue) ([]Interfaces.Issue, []Interfaces.Issue, []Interfaces.Issue) {
+			return []Interfaces.Issue{
+					Interfaces.Issue{Url: "url-1"},
+					Interfaces.Issue{Url: "url-2"},
+				},
+				[]Interfaces.Issue{
+					Interfaces.Issue{Url: "url-3"},
+					Interfaces.Issue{Url: "url-4"},
+				},
+				[]Interfaces.Issue{
+					Interfaces.Issue{Url: "url-5"},
+					Interfaces.Issue{Url: "url-6"},
+				}
+		}
+		mockFindLabels = func(repoName string) []Interfaces.Label {
+			return []Interfaces.Label{}
+		}
+		mockCreateLabel = func(repoName string, label Interfaces.Label) {
+		}
+		mockFindIssues = func(repoName string) []Interfaces.Issue {
+			return []Interfaces.Issue{}
+		}
+		mockAddLabel = func(issueUrl string, labelName string) {
+			mockAddLabelParams = append(mockAddLabelParams, []interface{}{issueUrl, labelName})
+		}
+		githubClient := MockGithubClient{}
+		issuesTriage := MockIssuesTriage{}
+		githubOperator := InitGithubOperator(githubClient, issuesTriage, answeringLabels, "by-ours", "answered", "not-answered")
+
+		githubOperator.UpdateRepos(repoNames)
+
+		// TODO investigate this behavior (the same params multiple times)
+		Expect(mockAddLabelParams).To(Equal([]interface{}{
+			[]interface{}{"url-1", "by-ours"},
+			[]interface{}{"url-2", "by-ours"},
+			[]interface{}{"url-3", "answered"},
+			[]interface{}{"url-4", "answered"},
+			[]interface{}{"url-5", "not-answered"},
+			[]interface{}{"url-6", "not-answered"},
+			[]interface{}{"url-1", "by-ours"},
+			[]interface{}{"url-2", "by-ours"},
+			[]interface{}{"url-3", "answered"},
+			[]interface{}{"url-4", "answered"},
+			[]interface{}{"url-5", "not-answered"},
+			[]interface{}{"url-6", "not-answered"},
+			[]interface{}{"url-1", "by-ours"},
+			[]interface{}{"url-2", "by-ours"},
+			[]interface{}{"url-3", "answered"},
+			[]interface{}{"url-4", "answered"},
+			[]interface{}{"url-5", "not-answered"},
+			[]interface{}{"url-6", "not-answered"},
 		}))
 	})
 })
