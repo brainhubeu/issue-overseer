@@ -319,4 +319,64 @@ var _ = Describe("GithubOperator", func() {
 			[]interface{}{"url-6", "not-answered"},
 		}))
 	})
+
+	It("removes labels", func() {
+		mockRemoveLabelParams := []interface{}{}
+		repoNames := []string{
+			"repo-1",
+			"repo-2",
+			"repo-3",
+		}
+		answeringLabels := []Interfaces.Label{
+			Interfaces.Label{Name: "by-ours", Color: "color-1"},
+			Interfaces.Label{Name: "answered", Color: "color-2"},
+			Interfaces.Label{Name: "not-answered", Color: "color-3"},
+		}
+
+		mockTriageManyIssues = func(issues []Interfaces.Issue) ([]Interfaces.Issue, []Interfaces.Issue, []Interfaces.Issue) {
+			return []Interfaces.Issue{
+					Interfaces.Issue{Url: "url-1", Labels: []Interfaces.Label{Interfaces.Label{Name: "by-ours"}}},
+					Interfaces.Issue{Url: "url-2", Labels: []Interfaces.Label{Interfaces.Label{Name: "not-answered"}}},
+				},
+				[]Interfaces.Issue{
+					Interfaces.Issue{Url: "url-3", Labels: []Interfaces.Label{Interfaces.Label{Name: "answered"}}},
+					Interfaces.Issue{Url: "url-4", Labels: []Interfaces.Label{Interfaces.Label{Name: "not-answered"}}},
+				},
+				[]Interfaces.Issue{
+					Interfaces.Issue{Url: "url-5", Labels: []Interfaces.Label{Interfaces.Label{Name: "answered"}}},
+					Interfaces.Issue{Url: "url-6", Labels: []Interfaces.Label{Interfaces.Label{Name: "not-answered"}}},
+				}
+		}
+		mockFindLabels = func(repoName string) []Interfaces.Label {
+			return []Interfaces.Label{}
+		}
+		mockCreateLabel = func(repoName string, label Interfaces.Label) {
+		}
+		mockFindIssues = func(repoName string) []Interfaces.Issue {
+			return []Interfaces.Issue{}
+		}
+		mockAddLabel = func(issueUrl string, labelName string) {
+		}
+		mockRemoveLabel = func(issueUrl string, labelName string) {
+			mockRemoveLabelParams = append(mockRemoveLabelParams, []interface{}{issueUrl, labelName})
+		}
+		githubClient := MockGithubClient{}
+		issuesTriage := MockIssuesTriage{}
+		githubOperator := InitGithubOperator(githubClient, issuesTriage, answeringLabels, "by-ours", "answered", "not-answered")
+
+		githubOperator.UpdateRepos(repoNames)
+
+		// TODO investigate this behavior (the same params multiple times)
+		Expect(mockRemoveLabelParams).To(Equal([]interface{}{
+			[]interface{}{"url-2", "not-answered"},
+			[]interface{}{"url-4", "not-answered"},
+			[]interface{}{"url-5", "answered"},
+			[]interface{}{"url-2", "not-answered"},
+			[]interface{}{"url-4", "not-answered"},
+			[]interface{}{"url-5", "answered"},
+			[]interface{}{"url-2", "not-answered"},
+			[]interface{}{"url-4", "not-answered"},
+			[]interface{}{"url-5", "answered"},
+		}))
+	})
 })
