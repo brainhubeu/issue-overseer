@@ -2,8 +2,10 @@ package GithubOperator
 
 import (
 	"../Interfaces"
+	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"os"
 	"testing"
 )
 
@@ -45,6 +47,18 @@ func (githubClient MockGithubClient) AddLabel(issueUrl string, labelName string)
 }
 func (githubClient MockGithubClient) FindIssues(repoName string) []Interfaces.Issue {
 	return mockFindIssues(repoName)
+}
+
+func TestMain(m *testing.M) {
+	status := m.Run()
+	if status == 0 && testing.CoverMode() != "" {
+		coverage := testing.Coverage()
+		requiredCoverage := 1.0
+		if coverage < requiredCoverage {
+			fmt.Println("too low tests coverage:", coverage, ", should be at least", requiredCoverage)
+			os.Exit(1)
+		}
+	}
 }
 
 func TestGithubOperator(t *testing.T) {

@@ -2,10 +2,24 @@ package IssuesTriage
 
 import (
 	"../Interfaces"
+	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"os"
 	"testing"
 )
+
+func TestMain(m *testing.M) {
+	status := m.Run()
+	if status == 0 && testing.CoverMode() != "" {
+		coverage := testing.Coverage()
+		requiredCoverage := 1.0
+		if coverage < requiredCoverage {
+			fmt.Println("too low tests coverage:", coverage, ", should be at least", requiredCoverage)
+			os.Exit(1)
+		}
+	}
+}
 
 func TestTriageManyIssues(t *testing.T) {
 	RegisterFailHandler(Fail)
