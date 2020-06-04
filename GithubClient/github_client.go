@@ -100,7 +100,7 @@ func InitGithubClient(organization string, token string) *GithubClient {
 
 func (githubClient *GithubClient) incrementRequestNumber() {
 	githubClient.RequestsNumber++
-	fmt.Println("(v 1.0.6) request to GitHub #", githubClient.RequestsNumber)
+	fmt.Println("(v 1.0.7) request to GitHub #", githubClient.RequestsNumber)
 }
 
 func (githubClient *GithubClient) FindRepos() []string {
@@ -196,8 +196,9 @@ func (githubClient *GithubClient) DeleteLabel(repoName string, labelName string)
 }
 
 func (githubClient *GithubClient) CreateLabel(repoName string, label Interfaces.Label) {
+	labelToCreate := Label{Name: label.Name, Color: label.Color}
 	client := &http.Client{}
-	jsonValue, err := json.Marshal(label)
+	jsonValue, err := json.Marshal(labelToCreate)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -248,7 +249,6 @@ func (githubClient *GithubClient) RemoveLabel(issueUrl string, labelName string)
 
 func (githubClient *GithubClient) AddLabel(issueUrl string, labelName string) {
 	client := &http.Client{}
-	fmt.Println("labelName", labelName)
 	requestBody := AddLabelRequestBody{Labels: []string{labelName}}
 	jsonValue, err := json.Marshal(requestBody)
 	if err != nil {
