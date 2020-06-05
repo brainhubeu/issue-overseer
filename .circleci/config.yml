@@ -23,9 +23,9 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - run: docker build -t brainhubeu/issue-label-bot:latest .
+      - run: docker build -t brainhubeu/issue-overseer:latest .
       - run: docker login --username $DOCKER_HUB_USER --password $DOCKER_HUB_TOKEN
-      - run: docker push brainhubeu/issue-label-bot:latest
+      - run: docker push brainhubeu/issue-overseer:latest
   deploy_rancher:
     working_directory: ~/app
     docker:
@@ -35,7 +35,7 @@ jobs:
           curl -i --fail "$RANCHER_URL/v1/projects/$RANCHER_PROJECT_ID/services/$RANCHER_SERVICE_ID/?action=upgrade" \
             -H 'content-type: application/json' \
             -u "$RANCHER_ACCESS_KEY:$RANCHER_SECRET_KEY" \
-            --data-binary '{"inServiceStrategy":{"launchConfig":{"environment":{"GITHUB_TOKEN":"'"$GITHUB_TOKEN"'","GITHUB_ORGANIZATION":"'"$GITHUB_ORGANIZATION"'"},"imageUuid":"docker:brainhubeu/issue-label-bot:latest","labels":{"io.rancher.container.pull_image":"always"}}}}' \
+            --data-binary '{"inServiceStrategy":{"launchConfig":{"environment":{"GITHUB_TOKEN":"'"$GITHUB_TOKEN"'","GITHUB_ORGANIZATION":"'"$GITHUB_ORGANIZATION"'"},"imageUuid":"docker:brainhubeu/issue-overseer:latest","labels":{"io.rancher.container.pull_image":"always"}}}}' \
             --compressed
           sleep 60
           curl -i --fail "$RANCHER_URL/v1/projects/$RANCHER_PROJECT_ID/services/$RANCHER_SERVICE_ID/?action=finishupgrade" \
