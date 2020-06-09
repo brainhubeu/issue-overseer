@@ -1,9 +1,12 @@
-version: 2
-jobs:
-  test:
+version: 2.1
+executors:
+  go-executor:
     docker:
       - image: golangci/golangci-lint:v1.26.0
     working_directory: ~/app
+jobs:
+  test:
+    executor: go-executor
     steps:
       - checkout
       - run: go get github.com/onsi/ginkgo/ginkgo
@@ -16,6 +19,18 @@ jobs:
             exit 1
           fi
       - run: go test -v -coverprofile cover.html ./...
+      - persist_to_workspace:
+          root: ~/app
+          paths:
+            - .git
+            - cover.html
+  upload_coverage:
+    executor: go-executor
+    steps:
+      - attach_workspace:
+          at: ~/app
+      - run: git checkout .
+      - run: bash <(curl -s https://codecov.io/bash) -t "$CODECOV_TOKEN" -f cover.html
   deploy_docker:
     docker:
       - image: docker:17.05.0-ce-git
@@ -50,6 +65,13 @@ workflows:
   test_and_deploy:
     jobs:
       - test
+      - upload_coverage:
+          requires:
+            - test
+          filters:
+            branches:
+              only:
+                - master
       - deploy_docker:
           requires:
             - test
