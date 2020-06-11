@@ -18,6 +18,7 @@
   [![license](https://img.shields.io/badge/License-MIT-green)](https://github.com/brainhubeu/issue-overseer/blob/master/LICENSE.md)
   [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
 
+  [![codecov](https://codecov.io/gh/brainhubeu/issue-overseer/branch/master/graph/badge.svg)](https://codecov.io/gh/brainhubeu/issue-overseer)
   [![Activity](https://img.shields.io/github/commit-activity/m/brainhubeu/issue-overseer.svg)](https://github.com/brainhubeu/issue-overseer/commits/master)
 </div>
 
