@@ -1,6 +1,6 @@
 <br/>
 <h1 align="center">
-  issue-label-bot
+  issue-overseer
 </h1>
 
 <p align="center">
@@ -13,12 +13,13 @@
 
 <div align="center">
 
-  [![CircleCI](https://img.shields.io/circleci/project/github/brainhubeu/issue-label-bot.svg)](https://circleci.com/gh/brainhubeu/issue-label-bot)
-  [![Last commit](https://img.shields.io/github/last-commit/brainhubeu/issue-label-bot.svg)](https://github.com/brainhubeu/issue-label-bot/commits/master)
-  [![license](https://img.shields.io/badge/License-MIT-green)](https://github.com/brainhubeu/issue-label-bot/blob/master/LICENSE.md)
+  [![CircleCI](https://img.shields.io/circleci/project/github/brainhubeu/issue-overseer.svg)](https://circleci.com/gh/brainhubeu/issue-overseer)
+  [![Last commit](https://img.shields.io/github/last-commit/brainhubeu/issue-overseer.svg)](https://github.com/brainhubeu/issue-overseer/commits/master)
+  [![license](https://img.shields.io/badge/License-MIT-green)](https://github.com/brainhubeu/issue-overseer/blob/master/LICENSE.md)
   [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
 
-  [![Activity](https://img.shields.io/github/commit-activity/m/brainhubeu/issue-label-bot.svg)](https://github.com/brainhubeu/issue-label-bot/commits/master)
+  [![codecov](https://codecov.io/gh/brainhubeu/issue-overseer/branch/master/graph/badge.svg)](https://codecov.io/gh/brainhubeu/issue-overseer)
+  [![Activity](https://img.shields.io/github/commit-activity/m/brainhubeu/issue-overseer.svg)](https://github.com/brainhubeu/issue-overseer/commits/master)
 </div>
 
 Let's assume `__organization_name__` is your GitHub organization name.

@@ -2,6 +2,6 @@
 
 while true
 do
-  time ./issue-label-bot $1
+  time ./issue-overseer $1
   sleep 120
 done
