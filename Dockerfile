@@ -1,4 +1,4 @@
-FROM golang:alpine
+FROM golang:1.14.4-alpine3.12
 
 RUN mkdir /app /temp-build
 ADD . /temp-build
