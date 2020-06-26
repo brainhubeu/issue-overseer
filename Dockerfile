@@ -1,11 +1,11 @@
-FROM golang:1.14.4-alpine3.12
+FROM golang:1.14.4-alpine3.12 AS builder
 
-RUN mkdir /app /temp-build
-ADD . /temp-build
-WORKDIR /temp-build
-RUN go build -o issue-overseer
-RUN mv issue-overseer ../app
-RUN mv watch.sh ../app
+ADD . /app
 WORKDIR /app
-RUN rm -rf ../temp-build
+RUN go build -o issue-overseer
+
+FROM alpine:3.12.0
+WORKDIR /root
+COPY --from=builder /app/issue-overseer .
+COPY --from=builder  /app/watch.sh .
 CMD sh watch.sh $GITHUB_ORGANIZATION
