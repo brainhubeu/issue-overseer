@@ -1,4 +1,4 @@
-package IssuesTriage
+package issuestriage
 
 import (
 	"../Interfaces"

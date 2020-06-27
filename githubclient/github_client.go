@@ -1,4 +1,4 @@
-package GithubClient
+package githubclient
 
 import (
 	"../Interfaces"

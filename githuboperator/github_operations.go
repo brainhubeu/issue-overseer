@@ -1,4 +1,4 @@
-package GithubOperator
+package githuboperator
 
 import (
 	"../Interfaces"

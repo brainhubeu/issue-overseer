@@ -1,4 +1,4 @@
-package Interfaces
+package interfaces
 
 import (
 	. "github.com/onsi/ginkgo"
