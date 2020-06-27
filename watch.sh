@@ -3,5 +3,5 @@
 while true
 do
   time ./issue-overseer $GITHUB_ORGANIZATION
-  sleep 120
+  sleep $SLEEP_IN_SECONDS
 done
