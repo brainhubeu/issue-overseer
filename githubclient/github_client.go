@@ -1,7 +1,7 @@
 package githubclient
 
 import (
-	"../Interfaces"
+	"../interfaces"
 	"bytes"
 	"encoding/json"
 	"fmt"

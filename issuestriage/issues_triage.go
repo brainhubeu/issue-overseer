@@ -1,7 +1,7 @@
 package issuestriage
 
 import (
-	"../Interfaces"
+	"../interfaces"
 )
 
 type IssuesTriage struct {

@@ -1,10 +1,10 @@
 package main
 
 import (
-	"./GithubClient"
-	"./GithubOperator"
-	"./Interfaces"
-	"./IssuesTriage"
+	"./githubclient"
+	"./githuboperator"
+	"./interfaces"
+	"./issuestriage"
 	"fmt"
 	"os"
 )

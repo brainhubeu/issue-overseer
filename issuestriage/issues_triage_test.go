@@ -1,7 +1,7 @@
 package issuestriage
 
 import (
-	"../Interfaces"
+	"../interfaces"
 	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

@@ -1,7 +1,7 @@
 package githuboperator
 
 import (
-	"../Interfaces"
+	"../interfaces"
 	"fmt"
 )
 
