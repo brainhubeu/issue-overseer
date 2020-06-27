@@ -19,18 +19,14 @@ jobs:
             exit 1
           fi
       - run: go test -v -coverprofile cover.html ./...
+      - run: apt-get update
+      - run: apt-get install shellcheck
+      - run: shellcheck *.sh
       - persist_to_workspace:
           root: ~/app
           paths:
             - .git
             - cover.html
-  check_bash:
-    working_directory: ~/app
-    docker:
-      - image: koalaman/shellcheck:0.7.1
-    steps:
-      - checkout
-      - run: shellcheck *.sh
   upload_coverage:
     executor: go-executor
     steps:
@@ -72,11 +68,9 @@ workflows:
   test_and_deploy:
     jobs:
       - test
-      - check_bash
       - upload_coverage:
           requires:
             - test
-            - check_bash
           filters:
             branches:
               only:
