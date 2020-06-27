@@ -72,9 +72,11 @@ workflows:
   test_and_deploy:
     jobs:
       - test
+      - check_bash
       - upload_coverage:
           requires:
             - test
+            - check_bash
           filters:
             branches:
               only:
