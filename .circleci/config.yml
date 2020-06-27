@@ -24,6 +24,13 @@ jobs:
           paths:
             - .git
             - cover.html
+  check_bash:
+    working_directory: ~/app
+    docker:
+      - image: koalaman/shellcheck:0.7.1
+    steps:
+      - checkout
+      - run: shellcheck *.sh
   upload_coverage:
     executor: go-executor
     steps:
