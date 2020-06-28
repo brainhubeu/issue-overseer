@@ -31,7 +31,31 @@ For each open issue (among the comments, it excludes the ones made by **issuehun
 - removes the remaining answering labels because they are exclusive
 
 ## run
+
+Regardless of the way, you choose, you need to export the `GITHUB_TOKEN` environmental variable:
+
+in bash:
+```
+export GITHUB_TOKEN=my-gh-token
+```
+
+in fish:
 ```
 export set GITHUB_TOKEN=my-gh-token
+```
+
+### dynamically with go
+```
 go run . my-acme-org
+```
+
+### compile and run an executable file
+```
+go build -o issue-overseer
+./issue-overseer my-acme-org
+```
+
+### run with Docker
+```
+docker-compose up
 ```
