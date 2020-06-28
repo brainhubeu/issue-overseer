@@ -2,9 +2,9 @@ package githuboperator
 
 import (
 	"../interfaces"
-	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"log"
 	"os"
 	"testing"
 )
@@ -55,7 +55,7 @@ func TestMain(m *testing.M) {
 		coverage := testing.Coverage()
 		requiredCoverage := 1.0
 		if coverage < requiredCoverage {
-			fmt.Println("too low tests coverage:", coverage, ", should be at least", requiredCoverage)
+			log.Println("too low tests coverage:", coverage, ", should be at least", requiredCoverage)
 			os.Exit(1)
 		}
 	}

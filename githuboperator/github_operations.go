@@ -2,7 +2,7 @@ package githuboperator
 
 import (
 	"../interfaces"
-	"fmt"
+	"log"
 )
 
 type githuboperator struct {
@@ -45,8 +45,8 @@ func (githubOperator githuboperator) createOrUpdateRepoLabels(repoName string) {
 			labelsToCreate = append(labelsToCreate, label)
 		}
 	}
-	fmt.Println(repoName, "labelsToDelete", labelsToDelete)
-	fmt.Println(repoName, "labelsToCreate", labelsToCreate)
+	log.Println(repoName, "labelsToDelete", labelsToDelete)
+	log.Println(repoName, "labelsToCreate", labelsToCreate)
 	for i := 0; i < len(labelsToDelete); i++ {
 		githubOperator.githubclient.DeleteLabel(repoName, labelsToDelete[i].Name)
 	}
@@ -68,7 +68,7 @@ func (githubOperator githuboperator) updateIssueLabels(issueUrl string, allIssue
 			labelsToRemove = append(labelsToRemove, allIssueLabels[i])
 		}
 	}
-	fmt.Println(issueUrl, "labelsToRemove", labelsToRemove)
+	log.Println(issueUrl, "labelsToRemove", labelsToRemove)
 	for i := 0; i < len(labelsToRemove); i++ {
 		githubOperator.githubclient.RemoveLabel(issueUrl, labelsToRemove[i].Name)
 	}
@@ -81,9 +81,9 @@ func (githubOperator githuboperator) UpdateRepos(repoNames []string) {
 		githubOperator.createOrUpdateRepoLabels(repoName)
 		issues := githubOperator.githubclient.FindIssues(repoName)
 		ourIssues, answeredIssues, notAnsweredIssues := githubOperator.issuestriage.TriageManyIssues(issues)
-		fmt.Println(repoName, "ourIssues", ourIssues)
-		fmt.Println(repoName, "answeredIssues", answeredIssues)
-		fmt.Println(repoName, "notAnsweredIssues", notAnsweredIssues)
+		log.Println(repoName, "ourIssues", ourIssues)
+		log.Println(repoName, "answeredIssues", answeredIssues)
+		log.Println(repoName, "notAnsweredIssues", notAnsweredIssues)
 		for j := 0; j < len(ourIssues); j++ {
 			githubOperator.updateIssueLabels(ourIssues[j].Url, ourIssues[j].Labels, githubOperator.OUR_LABEL_TEXT)
 		}

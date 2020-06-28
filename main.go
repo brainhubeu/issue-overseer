@@ -5,7 +5,7 @@ import (
 	"./githuboperator"
 	"./interfaces"
 	"./issuestriage"
-	"fmt"
+	"log"
 	"os"
 )
 
@@ -21,12 +21,12 @@ func main() {
 		interfaces.Label{Name: NOT_ANSWERED_LABEL_TEXT, Color: "a00000"},
 	}
 
-	fmt.Println(token, OUR_LABEL_TEXT, ANSWERED_LABEL_TEXT, NOT_ANSWERED_LABEL_TEXT)
+	log.Println(token, OUR_LABEL_TEXT, ANSWERED_LABEL_TEXT, NOT_ANSWERED_LABEL_TEXT)
 
 	githubClient := githubclient.Initgithubclient(organization, token)
 	issuesTriage := issuestriage.Initissuestriage()
 	githubOperator := githuboperator.Initgithuboperator(githubClient, issuesTriage, answeringLabels, OUR_LABEL_TEXT, ANSWERED_LABEL_TEXT, NOT_ANSWERED_LABEL_TEXT)
 	repoNames := githubClient.FindRepos()
-	fmt.Println("repoNames", repoNames)
+	log.Println("repoNames", repoNames)
 	githubOperator.UpdateRepos(repoNames)
 }

@@ -4,7 +4,6 @@ import (
 	"../interfaces"
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -100,7 +99,7 @@ func Initgithubclient(organization string, token string) *githubclient {
 
 func (githubClient *githubclient) incrementRequestNumber() {
 	githubClient.RequestsNumber++
-	fmt.Println("(v 1.0.7) request to GitHub #", githubClient.RequestsNumber)
+	log.Println("(v 1.0.7) request to GitHub #", githubClient.RequestsNumber)
 }
 
 func (githubClient *githubclient) FindRepos() []string {
@@ -225,7 +224,7 @@ func (githubClient *githubclient) CreateLabel(repoName string, label interfaces.
 func (githubClient *githubclient) RemoveLabel(issueUrl string, labelName string) {
 	client := &http.Client{}
 	url := strings.Replace(issueUrl, "https://github.com", "https://api.github.com/repos", 1) + "/labels/" + labelName
-	fmt.Println("to remove", issueUrl, url, labelName)
+	log.Println("to remove", issueUrl, url, labelName)
 	githubClient.incrementRequestNumber()
 	req, err := http.NewRequest("DELETE", url, nil)
 	if err != nil {
@@ -244,7 +243,7 @@ func (githubClient *githubclient) RemoveLabel(issueUrl string, labelName string)
 	if resp.StatusCode != 200 && resp.StatusCode != 404 {
 		log.Fatalln(resp.Status, string(body))
 	}
-	fmt.Println("removed", issueUrl, labelName, resp.StatusCode)
+	log.Println("removed", issueUrl, labelName, resp.StatusCode)
 }
 
 func (githubClient *githubclient) AddLabel(issueUrl string, labelName string) {
@@ -255,7 +254,7 @@ func (githubClient *githubclient) AddLabel(issueUrl string, labelName string) {
 		log.Fatalln(err)
 	}
 	url := strings.Replace(issueUrl, "https://github.com", "https://api.github.com/repos", 1) + "/labels"
-	fmt.Println("to add", issueUrl, url, labelName)
+	log.Println("to add", issueUrl, url, labelName)
 	githubClient.incrementRequestNumber()
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonValue))
 	if err != nil {
@@ -274,7 +273,7 @@ func (githubClient *githubclient) AddLabel(issueUrl string, labelName string) {
 	if resp.StatusCode != 200 {
 		log.Fatalln(resp.Status, string(body))
 	}
-	fmt.Println("added", issueUrl, labelName, resp.StatusCode)
+	log.Println("added", issueUrl, labelName, resp.StatusCode)
 }
 
 func transformDataIntoIssue(issueData Issue) interfaces.Issue {
