@@ -58,12 +58,12 @@ func (issuesTriage issuestriage) TriageManyIssues(issues []interfaces.Issue) ([]
 	notAnsweredIssues := []interfaces.Issue{}
 	for i := 0; i < len(issues); i++ {
 		issue := issues[i]
-		issueType := issuesTriage.TriageOneIssue(issue)
-		if issueType == interfaces.IssueTypeEnum.OURS {
+		switch issueType := issuesTriage.TriageOneIssue(issue); issueType {
+		case interfaces.IssueTypeEnum.OURS:
 			ourIssues = append(ourIssues, issue)
-		} else if issueType == interfaces.IssueTypeEnum.ANSWERED {
+		case interfaces.IssueTypeEnum.ANSWERED:
 			answeredIssues = append(answeredIssues, issue)
-		} else {
+		default:
 			notAnsweredIssues = append(notAnsweredIssues, issue)
 		}
 	}
