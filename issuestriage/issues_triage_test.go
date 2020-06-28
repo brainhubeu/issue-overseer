@@ -30,7 +30,7 @@ var _ = Describe("issuestriage", func() {
 	It("triages an empty list", func() {
 		issues := []interfaces.Issue{}
 
-		issuesTriage := Initissuestriage()
+		issuesTriage := New()
 		ourIssues, answeredIssues, notAnsweredIssues := issuesTriage.TriageManyIssues(issues)
 
 		Expect(ourIssues).To(Equal([]interfaces.Issue{}))
@@ -57,7 +57,7 @@ var _ = Describe("issuestriage", func() {
 			interfaces.Issue{Title: "title", Url: "url", Number: 127, AuthorAssociation: "NONE", Labels: []interfaces.Label{}, Comments: []interfaces.Comment{}},
 		}
 
-		issuesTriage := Initissuestriage()
+		issuesTriage := New()
 		ourIssues, answeredIssues, notAnsweredIssues := issuesTriage.TriageManyIssues(issues)
 
 		Expect(ourIssues).To(Equal([]interfaces.Issue{
@@ -86,7 +86,7 @@ var _ = Describe("issuestriage", func() {
 	It("returns OURS for an issue created by a member with no comments", func() {
 		issue := interfaces.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "MEMBER", Labels: []interfaces.Label{}, Comments: []interfaces.Comment{}}
 
-		issuesTriage := Initissuestriage()
+		issuesTriage := New()
 		issueType := issuesTriage.TriageOneIssue(issue)
 
 		Expect(issueType).To(Equal(interfaces.IssueTypeEnum.OURS))
@@ -97,7 +97,7 @@ var _ = Describe("issuestriage", func() {
 			interfaces.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "user"},
 		}}
 
-		issuesTriage := Initissuestriage()
+		issuesTriage := New()
 		issueType := issuesTriage.TriageOneIssue(issue)
 
 		Expect(issueType).To(Equal(interfaces.IssueTypeEnum.OURS))
@@ -108,7 +108,7 @@ var _ = Describe("issuestriage", func() {
 			interfaces.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
 		}}
 
-		issuesTriage := Initissuestriage()
+		issuesTriage := New()
 		issueType := issuesTriage.TriageOneIssue(issue)
 
 		Expect(issueType).To(Equal(interfaces.IssueTypeEnum.NOT_ANSWERED))
@@ -120,7 +120,7 @@ var _ = Describe("issuestriage", func() {
 			interfaces.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "user"},
 		}}
 
-		issuesTriage := Initissuestriage()
+		issuesTriage := New()
 		issueType := issuesTriage.TriageOneIssue(issue)
 
 		Expect(issueType).To(Equal(interfaces.IssueTypeEnum.ANSWERED))
@@ -132,7 +132,7 @@ var _ = Describe("issuestriage", func() {
 			interfaces.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
 		}}
 
-		issuesTriage := Initissuestriage()
+		issuesTriage := New()
 		issueType := issuesTriage.TriageOneIssue(issue)
 
 		Expect(issueType).To(Equal(interfaces.IssueTypeEnum.NOT_ANSWERED))
@@ -141,7 +141,7 @@ var _ = Describe("issuestriage", func() {
 	It("returns NOT_ANSWERED for an issue created by a non-member with no comments", func() {
 		issue := interfaces.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "NONE", Labels: []interfaces.Label{}, Comments: []interfaces.Comment{}}
 
-		issuesTriage := Initissuestriage()
+		issuesTriage := New()
 		issueType := issuesTriage.TriageOneIssue(issue)
 
 		Expect(issueType).To(Equal(interfaces.IssueTypeEnum.NOT_ANSWERED))
@@ -152,7 +152,7 @@ var _ = Describe("issuestriage", func() {
 			interfaces.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "user"},
 		}}
 
-		issuesTriage := Initissuestriage()
+		issuesTriage := New()
 		issueType := issuesTriage.TriageOneIssue(issue)
 
 		Expect(issueType).To(Equal(interfaces.IssueTypeEnum.ANSWERED))
@@ -163,7 +163,7 @@ var _ = Describe("issuestriage", func() {
 			interfaces.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
 		}}
 
-		issuesTriage := Initissuestriage()
+		issuesTriage := New()
 		issueType := issuesTriage.TriageOneIssue(issue)
 
 		Expect(issueType).To(Equal(interfaces.IssueTypeEnum.NOT_ANSWERED))
@@ -175,7 +175,7 @@ var _ = Describe("issuestriage", func() {
 			interfaces.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "user"},
 		}}
 
-		issuesTriage := Initissuestriage()
+		issuesTriage := New()
 		issueType := issuesTriage.TriageOneIssue(issue)
 
 		Expect(issueType).To(Equal(interfaces.IssueTypeEnum.ANSWERED))
@@ -187,7 +187,7 @@ var _ = Describe("issuestriage", func() {
 			interfaces.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
 		}}
 
-		issuesTriage := Initissuestriage()
+		issuesTriage := New()
 		issueType := issuesTriage.TriageOneIssue(issue)
 
 		Expect(issueType).To(Equal(interfaces.IssueTypeEnum.NOT_ANSWERED))
@@ -198,7 +198,7 @@ var _ = Describe("issuestriage", func() {
 			interfaces.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "issuehunt-app"},
 		}}
 
-		issuesTriage := Initissuestriage()
+		issuesTriage := New()
 		issueType := issuesTriage.TriageOneIssue(issue)
 
 		Expect(issueType).To(Equal(interfaces.IssueTypeEnum.OURS))
@@ -209,7 +209,7 @@ var _ = Describe("issuestriage", func() {
 			interfaces.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "issuehunt-app"},
 		}}
 
-		issuesTriage := Initissuestriage()
+		issuesTriage := New()
 		issueType := issuesTriage.TriageOneIssue(issue)
 
 		Expect(issueType).To(Equal(interfaces.IssueTypeEnum.NOT_ANSWERED))
@@ -221,7 +221,7 @@ var _ = Describe("issuestriage", func() {
 			interfaces.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "issuehunt-app"},
 		}}
 
-		issuesTriage := Initissuestriage()
+		issuesTriage := New()
 		issueType := issuesTriage.TriageOneIssue(issue)
 
 		Expect(issueType).To(Equal(interfaces.IssueTypeEnum.ANSWERED))
@@ -233,7 +233,7 @@ var _ = Describe("issuestriage", func() {
 			interfaces.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "issuehunt-app"},
 		}}
 
-		issuesTriage := Initissuestriage()
+		issuesTriage := New()
 		issueType := issuesTriage.TriageOneIssue(issue)
 
 		Expect(issueType).To(Equal(interfaces.IssueTypeEnum.NOT_ANSWERED))
@@ -248,7 +248,7 @@ var _ = Describe("issuestriage", func() {
 			interfaces.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "user"},
 		}}
 
-		issuesTriage := Initissuestriage()
+		issuesTriage := New()
 		issueType := issuesTriage.TriageOneIssue(issue)
 
 		Expect(issueType).To(Equal(interfaces.IssueTypeEnum.ANSWERED))
@@ -264,7 +264,7 @@ var _ = Describe("issuestriage", func() {
 			interfaces.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
 		}}
 
-		issuesTriage := Initissuestriage()
+		issuesTriage := New()
 		issueType := issuesTriage.TriageOneIssue(issue)
 
 		Expect(issueType).To(Equal(interfaces.IssueTypeEnum.NOT_ANSWERED))
@@ -280,7 +280,7 @@ var _ = Describe("issuestriage", func() {
 			interfaces.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "issuehunt-app"},
 		}}
 
-		issuesTriage := Initissuestriage()
+		issuesTriage := New()
 		issueType := issuesTriage.TriageOneIssue(issue)
 
 		Expect(issueType).To(Equal(interfaces.IssueTypeEnum.ANSWERED))
@@ -297,7 +297,7 @@ var _ = Describe("issuestriage", func() {
 			interfaces.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "issuehunt-app"},
 		}}
 
-		issuesTriage := Initissuestriage()
+		issuesTriage := New()
 		issueType := issuesTriage.TriageOneIssue(issue)
 
 		Expect(issueType).To(Equal(interfaces.IssueTypeEnum.NOT_ANSWERED))

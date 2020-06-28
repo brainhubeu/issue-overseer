@@ -14,7 +14,7 @@ type githuboperator struct {
 	NOT_ANSWERED_LABEL_TEXT string
 }
 
-func Initgithuboperator(githubClient interfaces.GithubClient, issuesTriage interfaces.IssuesTriage, answeringLabels []interfaces.Label, OUR_LABEL_TEXT string, ANSWERED_LABEL_TEXT string, NOT_ANSWERED_LABEL_TEXT string) *githuboperator {
+func New(githubClient interfaces.GithubClient, issuesTriage interfaces.IssuesTriage, answeringLabels []interfaces.Label, OUR_LABEL_TEXT string, ANSWERED_LABEL_TEXT string, NOT_ANSWERED_LABEL_TEXT string) *githuboperator {
 	githubOperator := &githuboperator{githubClient, issuesTriage, answeringLabels, OUR_LABEL_TEXT, ANSWERED_LABEL_TEXT, NOT_ANSWERED_LABEL_TEXT}
 	return githubOperator
 }

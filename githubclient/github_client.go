@@ -93,7 +93,7 @@ type AddLabelRequestBody struct {
 	Labels []string `json:"labels"`
 }
 
-func Initgithubclient(organization string, token string) *githubclient {
+func New(organization string, token string) *githubclient {
 	githubClient := &githubclient{organization, token, 0}
 	return githubClient
 }

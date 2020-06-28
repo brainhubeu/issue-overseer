@@ -23,9 +23,9 @@ func main() {
 
 	log.Println(token, OUR_LABEL_TEXT, ANSWERED_LABEL_TEXT, NOT_ANSWERED_LABEL_TEXT)
 
-	githubClient := githubclient.Initgithubclient(organization, token)
-	issuesTriage := issuestriage.Initissuestriage()
-	githubOperator := githuboperator.Initgithuboperator(githubClient, issuesTriage, answeringLabels, OUR_LABEL_TEXT, ANSWERED_LABEL_TEXT, NOT_ANSWERED_LABEL_TEXT)
+	githubClient := githubclient.New(organization, token)
+	issuesTriage := issuestriage.New()
+	githubOperator := githuboperator.New(githubClient, issuesTriage, answeringLabels, OUR_LABEL_TEXT, ANSWERED_LABEL_TEXT, NOT_ANSWERED_LABEL_TEXT)
 	repoNames := githubClient.FindRepos()
 	log.Println("repoNames", repoNames)
 	githubOperator.UpdateRepos(repoNames)
