@@ -5,23 +5,23 @@ import (
 	"fmt"
 )
 
-type GithubOperator struct {
-	GithubClient            Interfaces.GithubClient
-	IssuesTriage            Interfaces.IssuesTriage
-	AnsweringLabels         []Interfaces.Label
+type githuboperator struct {
+	githubclient            interfaces.GithubClient
+	issuestriage            interfaces.IssuesTriage
+	AnsweringLabels         []interfaces.Label
 	OUR_LABEL_TEXT          string
 	ANSWERED_LABEL_TEXT     string
 	NOT_ANSWERED_LABEL_TEXT string
 }
 
-func InitGithubOperator(githubClient Interfaces.GithubClient, issuesTriage Interfaces.IssuesTriage, answeringLabels []Interfaces.Label, OUR_LABEL_TEXT string, ANSWERED_LABEL_TEXT string, NOT_ANSWERED_LABEL_TEXT string) *GithubOperator {
-	githubOperator := &GithubOperator{githubClient, issuesTriage, answeringLabels, OUR_LABEL_TEXT, ANSWERED_LABEL_TEXT, NOT_ANSWERED_LABEL_TEXT}
+func Initgithuboperator(githubClient interfaces.GithubClient, issuesTriage interfaces.IssuesTriage, answeringLabels []interfaces.Label, OUR_LABEL_TEXT string, ANSWERED_LABEL_TEXT string, NOT_ANSWERED_LABEL_TEXT string) *githuboperator {
+	githubOperator := &githuboperator{githubClient, issuesTriage, answeringLabels, OUR_LABEL_TEXT, ANSWERED_LABEL_TEXT, NOT_ANSWERED_LABEL_TEXT}
 	return githubOperator
 }
 
-func (githubOperator GithubOperator) createOrUpdateRepoLabels(repoName string) {
-	allLabels := githubOperator.GithubClient.FindLabels(repoName)
-	labelsToDelete := []Interfaces.Label{}
+func (githubOperator githuboperator) createOrUpdateRepoLabels(repoName string) {
+	allLabels := githubOperator.githubclient.FindLabels(repoName)
+	labelsToDelete := []interfaces.Label{}
 	for i := 0; i < len(githubOperator.AnsweringLabels); i++ {
 		label := githubOperator.AnsweringLabels[i]
 		for j := 0; j < len(allLabels); j++ {
@@ -31,7 +31,7 @@ func (githubOperator GithubOperator) createOrUpdateRepoLabels(repoName string) {
 			}
 		}
 	}
-	labelsToCreate := append([]Interfaces.Label{}, labelsToDelete...)
+	labelsToCreate := append([]interfaces.Label{}, labelsToDelete...)
 	for i := 0; i < len(githubOperator.AnsweringLabels); i++ {
 		label := githubOperator.AnsweringLabels[i]
 		j := 0
@@ -48,15 +48,15 @@ func (githubOperator GithubOperator) createOrUpdateRepoLabels(repoName string) {
 	fmt.Println(repoName, "labelsToDelete", labelsToDelete)
 	fmt.Println(repoName, "labelsToCreate", labelsToCreate)
 	for i := 0; i < len(labelsToDelete); i++ {
-		githubOperator.GithubClient.DeleteLabel(repoName, labelsToDelete[i].Name)
+		githubOperator.githubclient.DeleteLabel(repoName, labelsToDelete[i].Name)
 	}
 	for i := 0; i < len(labelsToCreate); i++ {
-		githubOperator.GithubClient.CreateLabel(repoName, labelsToCreate[i])
+		githubOperator.githubclient.CreateLabel(repoName, labelsToCreate[i])
 	}
 }
 
-func (githubOperator GithubOperator) updateIssueLabels(issueUrl string, allIssueLabels []Interfaces.Label, labelNameToAdd string) {
-	labelsToRemove := []Interfaces.Label{}
+func (githubOperator githuboperator) updateIssueLabels(issueUrl string, allIssueLabels []interfaces.Label, labelNameToAdd string) {
+	labelsToRemove := []interfaces.Label{}
 	for i := 0; i < len(allIssueLabels); i++ {
 		j := 0
 		for ; j < len(githubOperator.AnsweringLabels); j++ {
@@ -70,17 +70,17 @@ func (githubOperator GithubOperator) updateIssueLabels(issueUrl string, allIssue
 	}
 	fmt.Println(issueUrl, "labelsToRemove", labelsToRemove)
 	for i := 0; i < len(labelsToRemove); i++ {
-		githubOperator.GithubClient.RemoveLabel(issueUrl, labelsToRemove[i].Name)
+		githubOperator.githubclient.RemoveLabel(issueUrl, labelsToRemove[i].Name)
 	}
-	githubOperator.GithubClient.AddLabel(issueUrl, labelNameToAdd)
+	githubOperator.githubclient.AddLabel(issueUrl, labelNameToAdd)
 }
 
-func (githubOperator GithubOperator) UpdateRepos(repoNames []string) {
+func (githubOperator githuboperator) UpdateRepos(repoNames []string) {
 	for i := 0; i < len(repoNames); i++ {
 		repoName := repoNames[i]
 		githubOperator.createOrUpdateRepoLabels(repoName)
-		issues := githubOperator.GithubClient.FindIssues(repoName)
-		ourIssues, answeredIssues, notAnsweredIssues := githubOperator.IssuesTriage.TriageManyIssues(issues)
+		issues := githubOperator.githubclient.FindIssues(repoName)
+		ourIssues, answeredIssues, notAnsweredIssues := githubOperator.issuestriage.TriageManyIssues(issues)
 		fmt.Println(repoName, "ourIssues", ourIssues)
 		fmt.Println(repoName, "answeredIssues", answeredIssues)
 		fmt.Println(repoName, "notAnsweredIssues", notAnsweredIssues)

@@ -13,7 +13,7 @@ import (
 	"strings"
 )
 
-type GithubClient struct {
+type githubclient struct {
 	Organization   string
 	Token          string
 	RequestsNumber int
@@ -93,17 +93,17 @@ type AddLabelRequestBody struct {
 	Labels []string `json:"labels"`
 }
 
-func InitGithubClient(organization string, token string) *GithubClient {
-	githubClient := &GithubClient{organization, token, 0}
+func Initgithubclient(organization string, token string) *githubclient {
+	githubClient := &githubclient{organization, token, 0}
 	return githubClient
 }
 
-func (githubClient *GithubClient) incrementRequestNumber() {
+func (githubClient *githubclient) incrementRequestNumber() {
 	githubClient.RequestsNumber++
 	fmt.Println("(v 1.0.7) request to GitHub #", githubClient.RequestsNumber)
 }
 
-func (githubClient *GithubClient) FindRepos() []string {
+func (githubClient *githubclient) FindRepos() []string {
 	repoNames := []string{}
 	client := &http.Client{}
 	for page := 1; ; page += 1 {
@@ -125,7 +125,7 @@ func (githubClient *GithubClient) FindRepos() []string {
 		if resp.StatusCode != 200 {
 			log.Fatalln(resp.Status, string(body))
 		}
-		repositories := []Interfaces.Repository{}
+		repositories := []interfaces.Repository{}
 		err = json.Unmarshal([]byte(string(body)), &repositories)
 		if err != nil {
 			log.Fatalln(err)
@@ -145,7 +145,7 @@ func (githubClient *GithubClient) FindRepos() []string {
 	return repoNames
 }
 
-func (githubClient *GithubClient) FindLabels(repoName string) []Interfaces.Label {
+func (githubClient *githubclient) FindLabels(repoName string) []interfaces.Label {
 	client := &http.Client{}
 	githubClient.incrementRequestNumber()
 	req, err := http.NewRequest("GET", "https://api.github.com/repos/"+githubClient.Organization+"/"+repoName+"/labels", nil)
@@ -165,7 +165,7 @@ func (githubClient *GithubClient) FindLabels(repoName string) []Interfaces.Label
 	if resp.StatusCode != 200 {
 		log.Fatalln(resp.Status, string(body))
 	}
-	labels := []Interfaces.Label{}
+	labels := []interfaces.Label{}
 	err = json.Unmarshal([]byte(string(body)), &labels)
 	if err != nil {
 		log.Fatalln(err)
@@ -173,7 +173,7 @@ func (githubClient *GithubClient) FindLabels(repoName string) []Interfaces.Label
 	return labels
 }
 
-func (githubClient *GithubClient) DeleteLabel(repoName string, labelName string) {
+func (githubClient *githubclient) DeleteLabel(repoName string, labelName string) {
 	client := &http.Client{}
 	githubClient.incrementRequestNumber()
 	req, err := http.NewRequest("DELETE", "https://api.github.com/repos/"+githubClient.Organization+"/"+repoName+"/labels/"+labelName, nil)
@@ -195,7 +195,7 @@ func (githubClient *GithubClient) DeleteLabel(repoName string, labelName string)
 	}
 }
 
-func (githubClient *GithubClient) CreateLabel(repoName string, label Interfaces.Label) {
+func (githubClient *githubclient) CreateLabel(repoName string, label interfaces.Label) {
 	labelToCreate := Label{Name: label.Name, Color: label.Color}
 	client := &http.Client{}
 	jsonValue, err := json.Marshal(labelToCreate)
@@ -222,7 +222,7 @@ func (githubClient *GithubClient) CreateLabel(repoName string, label Interfaces.
 	}
 }
 
-func (githubClient *GithubClient) RemoveLabel(issueUrl string, labelName string) {
+func (githubClient *githubclient) RemoveLabel(issueUrl string, labelName string) {
 	client := &http.Client{}
 	url := strings.Replace(issueUrl, "https://github.com", "https://api.github.com/repos", 1) + "/labels/" + labelName
 	fmt.Println("to remove", issueUrl, url, labelName)
@@ -247,7 +247,7 @@ func (githubClient *GithubClient) RemoveLabel(issueUrl string, labelName string)
 	fmt.Println("removed", issueUrl, labelName, resp.StatusCode)
 }
 
-func (githubClient *GithubClient) AddLabel(issueUrl string, labelName string) {
+func (githubClient *githubclient) AddLabel(issueUrl string, labelName string) {
 	client := &http.Client{}
 	requestBody := AddLabelRequestBody{Labels: []string{labelName}}
 	jsonValue, err := json.Marshal(requestBody)
@@ -277,27 +277,27 @@ func (githubClient *GithubClient) AddLabel(issueUrl string, labelName string) {
 	fmt.Println("added", issueUrl, labelName, resp.StatusCode)
 }
 
-func transformDataIntoIssue(issueData Issue) Interfaces.Issue {
+func transformDataIntoIssue(issueData Issue) interfaces.Issue {
 	labelsCount := len(issueData.Labels.Edges)
 	commentsCount := len(issueData.Comments.Edges)
-	labels := make([]Interfaces.Label, labelsCount)
-	comments := make([]Interfaces.Comment, commentsCount)
+	labels := make([]interfaces.Label, labelsCount)
+	comments := make([]interfaces.Comment, commentsCount)
 	for i := 0; i < labelsCount; i++ {
 		labelData := issueData.Labels.Edges[i].Node
-		labels[i] = Interfaces.Label{
+		labels[i] = interfaces.Label{
 			Name:  labelData.Name,
 			Color: labelData.Color,
 		}
 	}
 	for i := 0; i < commentsCount; i++ {
 		commentData := issueData.Comments.Edges[i].Node
-		comments[i] = Interfaces.Comment{
+		comments[i] = interfaces.Comment{
 			AuthorAssociation: commentData.AuthorAssociation,
 			AuthorLogin:       commentData.Author.Login,
 		}
 	}
 
-	return Interfaces.Issue{
+	return interfaces.Issue{
 		Title:             issueData.Title,
 		Url:               issueData.Url,
 		Number:            issueData.Number,
@@ -307,10 +307,10 @@ func transformDataIntoIssue(issueData Issue) Interfaces.Issue {
 	}
 }
 
-func (githubClient *GithubClient) FindIssues(repoName string) []Interfaces.Issue {
+func (githubClient *githubclient) FindIssues(repoName string) []interfaces.Issue {
 	client := &http.Client{}
 	cursor := (*string)(nil)
-	result := []Interfaces.Issue{}
+	result := []interfaces.Issue{}
 	for {
 		query := `query ($organization: String!, $repoName: String!, $cursor: String) {
 	  repository(owner: $organization, name: $repoName) {

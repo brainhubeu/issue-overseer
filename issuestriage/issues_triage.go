@@ -4,15 +4,15 @@ import (
 	"../interfaces"
 )
 
-type IssuesTriage struct {
+type issuestriage struct {
 }
 
-func InitIssuesTriage() *IssuesTriage {
-	issuesTriage := &IssuesTriage{}
+func Initissuestriage() *issuestriage {
+	issuesTriage := &issuestriage{}
 	return issuesTriage
 }
 
-func (issuesTriage IssuesTriage) TriageOneIssue(issue Interfaces.Issue) int {
+func (issuesTriage issuestriage) TriageOneIssue(issue interfaces.Issue) int {
 	comments := issue.Comments
 	if issue.AuthorAssociation == "MEMBER" {
 		j := len(comments) - 1
@@ -27,12 +27,12 @@ func (issuesTriage IssuesTriage) TriageOneIssue(issue Interfaces.Issue) int {
 			}
 		}
 		if j == -1 {
-			return Interfaces.IssueTypeEnum.OURS
+			return interfaces.IssueTypeEnum.OURS
 		} else {
 			if lastAuthorAssociation == "MEMBER" {
-				return Interfaces.IssueTypeEnum.ANSWERED
+				return interfaces.IssueTypeEnum.ANSWERED
 			} else {
-				return Interfaces.IssueTypeEnum.NOT_ANSWERED
+				return interfaces.IssueTypeEnum.NOT_ANSWERED
 			}
 		}
 	} else {
@@ -43,25 +43,25 @@ func (issuesTriage IssuesTriage) TriageOneIssue(issue Interfaces.Issue) int {
 			}
 		}
 		if j == -1 {
-			return Interfaces.IssueTypeEnum.NOT_ANSWERED
+			return interfaces.IssueTypeEnum.NOT_ANSWERED
 		} else if comments[j].AuthorAssociation == "MEMBER" {
-			return Interfaces.IssueTypeEnum.ANSWERED
+			return interfaces.IssueTypeEnum.ANSWERED
 		} else {
-			return Interfaces.IssueTypeEnum.NOT_ANSWERED
+			return interfaces.IssueTypeEnum.NOT_ANSWERED
 		}
 	}
 }
 
-func (issuesTriage IssuesTriage) TriageManyIssues(issues []Interfaces.Issue) ([]Interfaces.Issue, []Interfaces.Issue, []Interfaces.Issue) {
-	ourIssues := []Interfaces.Issue{}
-	answeredIssues := []Interfaces.Issue{}
-	notAnsweredIssues := []Interfaces.Issue{}
+func (issuesTriage issuestriage) TriageManyIssues(issues []interfaces.Issue) ([]interfaces.Issue, []interfaces.Issue, []interfaces.Issue) {
+	ourIssues := []interfaces.Issue{}
+	answeredIssues := []interfaces.Issue{}
+	notAnsweredIssues := []interfaces.Issue{}
 	for i := 0; i < len(issues); i++ {
 		issue := issues[i]
 		issueType := issuesTriage.TriageOneIssue(issue)
-		if issueType == Interfaces.IssueTypeEnum.OURS {
+		if issueType == interfaces.IssueTypeEnum.OURS {
 			ourIssues = append(ourIssues, issue)
-		} else if issueType == Interfaces.IssueTypeEnum.ANSWERED {
+		} else if issueType == interfaces.IssueTypeEnum.ANSWERED {
 			answeredIssues = append(answeredIssues, issue)
 		} else {
 			notAnsweredIssues = append(notAnsweredIssues, issue)

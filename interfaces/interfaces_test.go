@@ -8,7 +8,7 @@ import (
 
 func TestInterfaces(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Interfaces")
+	RunSpecs(t, "interfaces")
 }
 
 /*
