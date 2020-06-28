@@ -1,9 +1,9 @@
 package githubclient
 
 import (
-	"../interfaces"
 	"bytes"
 	"encoding/json"
+	"github.com/brainhubeu/issue-overseer/interfaces"
 	"io"
 	"io/ioutil"
 	"log"

@@ -1,7 +1,7 @@
 package issuestriage
 
 import (
-	"../interfaces"
+	"github.com/brainhubeu/issue-overseer/interfaces"
 )
 
 type issuestriage struct {

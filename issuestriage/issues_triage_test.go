@@ -1,7 +1,7 @@
 package issuestriage
 
 import (
-	"../interfaces"
+	"github.com/brainhubeu/issue-overseer/interfaces"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"log"

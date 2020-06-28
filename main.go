@@ -1,10 +1,10 @@
 package main
 
 import (
-	"./githubclient"
-	"./githuboperator"
-	"./interfaces"
-	"./issuestriage"
+	"github.com/brainhubeu/issue-overseer/githubclient"
+	"github.com/brainhubeu/issue-overseer/githuboperator"
+	"github.com/brainhubeu/issue-overseer/interfaces"
+	"github.com/brainhubeu/issue-overseer/issuestriage"
 	"log"
 	"os"
 )

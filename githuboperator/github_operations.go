@@ -1,7 +1,7 @@
 package githuboperator
 
 import (
-	"../interfaces"
+	"github.com/brainhubeu/issue-overseer/interfaces"
 	"log"
 )
 
