@@ -4,6 +4,7 @@ import (
 	"../interfaces"
 	"bytes"
 	"encoding/json"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -102,33 +103,59 @@ func (githubClient *githubclient) incrementRequestNumber() {
 	log.Println("(v 1.0.7) request to GitHub #", githubClient.RequestsNumber)
 }
 
+func createJson(data interface{}) io.Reader {
+	if data == nil {
+		return nil
+	}
+	jsonValue, err := json.Marshal(data)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	return bytes.NewBuffer(jsonValue)
+}
+
+func isStatusOK(actual int, expectedValues []int) bool {
+	for i := 0; i < len(expectedValues); i++ {
+		if actual == expectedValues[i] {
+			return true
+		}
+	}
+	return false
+}
+
+func (githubClient *githubclient) request(method string, url string, source interface{}, expectedStatuses []int, requestBody interface{}) {
+	log.Println("request", method, url)
+	client := &http.Client{}
+	githubClient.incrementRequestNumber()
+	jsonReader := createJson(requestBody)
+	req, err := http.NewRequest(method, url, jsonReader)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	req.Header.Add("Authorization", "token "+githubClient.Token)
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	if !isStatusOK(resp.StatusCode, expectedStatuses) {
+		log.Fatalln(resp.Status, string(body))
+	}
+	err = json.Unmarshal([]byte(string(body)), &source)
+	if err != nil {
+		log.Fatalln(err)
+	}
+}
+
 func (githubClient *githubclient) FindRepos() []string {
 	repoNames := []string{}
-	client := &http.Client{}
 	for page := 1; ; page += 1 {
-		githubClient.incrementRequestNumber()
-		req, err := http.NewRequest(http.MethodGet, "https://api.github.com/orgs/"+githubClient.Organization+"/repos?page="+strconv.Itoa(page), nil)
-		if err != nil {
-			log.Fatalln(err)
-		}
-		req.Header.Add("Authorization", "token "+githubClient.Token)
-		resp, err := client.Do(req)
-		if err != nil {
-			log.Fatalln(err)
-		}
-		defer resp.Body.Close()
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			log.Fatalln(err)
-		}
-		if resp.StatusCode != 200 {
-			log.Fatalln(resp.Status, string(body))
-		}
 		repositories := []interfaces.Repository{}
-		err = json.Unmarshal([]byte(string(body)), &repositories)
-		if err != nil {
-			log.Fatalln(err)
-		}
+		githubClient.request(http.MethodGet, "https://api.github.com/orgs/"+githubClient.Organization+"/repos?page="+strconv.Itoa(page), &repositories, []int{200}, nil)
 		if len(repositories) == 0 {
 			break
 		}
@@ -145,135 +172,29 @@ func (githubClient *githubclient) FindRepos() []string {
 }
 
 func (githubClient *githubclient) FindLabels(repoName string) []interfaces.Label {
-	client := &http.Client{}
-	githubClient.incrementRequestNumber()
-	req, err := http.NewRequest(http.MethodGet, "https://api.github.com/repos/"+githubClient.Organization+"/"+repoName+"/labels", nil)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	req.Header.Add("Authorization", "token "+githubClient.Token)
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	if resp.StatusCode != 200 {
-		log.Fatalln(resp.Status, string(body))
-	}
 	labels := []interfaces.Label{}
-	err = json.Unmarshal([]byte(string(body)), &labels)
-	if err != nil {
-		log.Fatalln(err)
-	}
+	githubClient.request(http.MethodGet, "https://api.github.com/repos/"+githubClient.Organization+"/"+repoName+"/labels", &labels, []int{200}, nil)
 	return labels
 }
 
 func (githubClient *githubclient) DeleteLabel(repoName string, labelName string) {
-	client := &http.Client{}
-	githubClient.incrementRequestNumber()
-	req, err := http.NewRequest(http.MethodDelete, "https://api.github.com/repos/"+githubClient.Organization+"/"+repoName+"/labels/"+labelName, nil)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	req.Header.Add("Authorization", "token "+githubClient.Token)
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	if resp.StatusCode != 204 {
-		log.Fatalln(resp.Status, string(body))
-	}
+	githubClient.request(http.MethodDelete, "https://api.github.com/repos/"+githubClient.Organization+"/"+repoName+"/labels/"+labelName, nil, []int{204}, nil)
 }
 
 func (githubClient *githubclient) CreateLabel(repoName string, label interfaces.Label) {
 	labelToCreate := Label{Name: label.Name, Color: label.Color}
-	client := &http.Client{}
-	jsonValue, err := json.Marshal(labelToCreate)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	githubClient.incrementRequestNumber()
-	req, err := http.NewRequest(http.MethodPost, "https://api.github.com/repos/"+githubClient.Organization+"/"+repoName+"/labels", bytes.NewBuffer(jsonValue))
-	if err != nil {
-		log.Fatalln(err)
-	}
-	req.Header.Add("Authorization", "token "+githubClient.Token)
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	if resp.StatusCode != 201 {
-		log.Fatalln(resp.Status, string(body))
-	}
+	githubClient.request(http.MethodPost, "https://api.github.com/repos/"+githubClient.Organization+"/"+repoName+"/labels", nil, []int{201}, labelToCreate)
 }
 
 func (githubClient *githubclient) RemoveLabel(issueUrl string, labelName string) {
-	client := &http.Client{}
 	url := strings.Replace(issueUrl, "https://github.com", "https://api.github.com/repos", 1) + "/labels/" + labelName
-	log.Println("to remove", issueUrl, url, labelName)
-	githubClient.incrementRequestNumber()
-	req, err := http.NewRequest(http.MethodDelete, url, nil)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	req.Header.Add("Authorization", "token "+githubClient.Token)
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	if resp.StatusCode != 200 && resp.StatusCode != 404 {
-		log.Fatalln(resp.Status, string(body))
-	}
-	log.Println("removed", issueUrl, labelName, resp.StatusCode)
+	githubClient.request(http.MethodDelete, url, nil, []int{200, 404}, nil)
 }
 
 func (githubClient *githubclient) AddLabel(issueUrl string, labelName string) {
-	client := &http.Client{}
 	requestBody := AddLabelRequestBody{Labels: []string{labelName}}
-	jsonValue, err := json.Marshal(requestBody)
-	if err != nil {
-		log.Fatalln(err)
-	}
 	url := strings.Replace(issueUrl, "https://github.com", "https://api.github.com/repos", 1) + "/labels"
-	log.Println("to add", issueUrl, url, labelName)
-	githubClient.incrementRequestNumber()
-	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonValue))
-	if err != nil {
-		log.Fatalln(err)
-	}
-	req.Header.Add("Authorization", "token "+githubClient.Token)
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	if resp.StatusCode != 200 {
-		log.Fatalln(resp.Status, string(body))
-	}
-	log.Println("added", issueUrl, labelName, resp.StatusCode)
+	githubClient.request(http.MethodPost, url, nil, []int{200}, requestBody)
 }
 
 func transformDataIntoIssue(issueData Issue) interfaces.Issue {
@@ -307,7 +228,6 @@ func transformDataIntoIssue(issueData Issue) interfaces.Issue {
 }
 
 func (githubClient *githubclient) FindIssues(repoName string) []interfaces.Issue {
-	client := &http.Client{}
 	cursor := (*string)(nil)
 	result := []interfaces.Issue{}
 	for {
@@ -346,33 +266,8 @@ func (githubClient *githubclient) FindIssues(repoName string) []interfaces.Issue
 	}`
 		graphqlVariables := GraphqlVariables{Organization: githubClient.Organization, RepoName: repoName, Cursor: cursor}
 		graphqlRequestBody := GraphqlRequestBody{Variables: graphqlVariables, Query: query}
-		jsonValue, err := json.Marshal(graphqlRequestBody)
-		if err != nil {
-			log.Fatalln(err)
-		}
-		githubClient.incrementRequestNumber()
-		req, err := http.NewRequest(http.MethodPost, "https://api.github.com/graphql", bytes.NewBuffer(jsonValue))
-		if err != nil {
-			log.Fatalln(err)
-		}
-		req.Header.Add("Authorization", "token "+githubClient.Token)
-		resp, err := client.Do(req)
-		if err != nil {
-			log.Fatalln(err)
-		}
-		defer resp.Body.Close()
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			log.Fatalln(err)
-		}
-		if resp.StatusCode != 200 {
-			log.Fatalln(resp.Status, string(body))
-		}
 		issuesData := Issues{}
-		err = json.Unmarshal([]byte(string(body)), &issuesData)
-		if err != nil {
-			log.Fatalln(err)
-		}
+		githubClient.request(http.MethodPost, "https://api.github.com/graphql", &issuesData, []int{200}, graphqlRequestBody)
 		edges := issuesData.Data.Repository.Issues.Edges
 		if len(edges) == 0 {
 			break
