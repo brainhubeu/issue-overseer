@@ -107,7 +107,7 @@ func (githubClient *githubclient) FindRepos() []string {
 	client := &http.Client{}
 	for page := 1; ; page += 1 {
 		githubClient.incrementRequestNumber()
-		req, err := http.NewRequest("GET", "https://api.github.com/orgs/"+githubClient.Organization+"/repos?page="+strconv.Itoa(page), nil)
+		req, err := http.NewRequest(http.MethodGet, "https://api.github.com/orgs/"+githubClient.Organization+"/repos?page="+strconv.Itoa(page), nil)
 		if err != nil {
 			log.Fatalln(err)
 		}
@@ -147,7 +147,7 @@ func (githubClient *githubclient) FindRepos() []string {
 func (githubClient *githubclient) FindLabels(repoName string) []interfaces.Label {
 	client := &http.Client{}
 	githubClient.incrementRequestNumber()
-	req, err := http.NewRequest("GET", "https://api.github.com/repos/"+githubClient.Organization+"/"+repoName+"/labels", nil)
+	req, err := http.NewRequest(http.MethodGet, "https://api.github.com/repos/"+githubClient.Organization+"/"+repoName+"/labels", nil)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -175,7 +175,7 @@ func (githubClient *githubclient) FindLabels(repoName string) []interfaces.Label
 func (githubClient *githubclient) DeleteLabel(repoName string, labelName string) {
 	client := &http.Client{}
 	githubClient.incrementRequestNumber()
-	req, err := http.NewRequest("DELETE", "https://api.github.com/repos/"+githubClient.Organization+"/"+repoName+"/labels/"+labelName, nil)
+	req, err := http.NewRequest(http.MethodDelete, "https://api.github.com/repos/"+githubClient.Organization+"/"+repoName+"/labels/"+labelName, nil)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -202,7 +202,7 @@ func (githubClient *githubclient) CreateLabel(repoName string, label interfaces.
 		log.Fatalln(err)
 	}
 	githubClient.incrementRequestNumber()
-	req, err := http.NewRequest("POST", "https://api.github.com/repos/"+githubClient.Organization+"/"+repoName+"/labels", bytes.NewBuffer(jsonValue))
+	req, err := http.NewRequest(http.MethodPost, "https://api.github.com/repos/"+githubClient.Organization+"/"+repoName+"/labels", bytes.NewBuffer(jsonValue))
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -226,7 +226,7 @@ func (githubClient *githubclient) RemoveLabel(issueUrl string, labelName string)
 	url := strings.Replace(issueUrl, "https://github.com", "https://api.github.com/repos", 1) + "/labels/" + labelName
 	log.Println("to remove", issueUrl, url, labelName)
 	githubClient.incrementRequestNumber()
-	req, err := http.NewRequest("DELETE", url, nil)
+	req, err := http.NewRequest(http.MethodDelete, url, nil)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -256,7 +256,7 @@ func (githubClient *githubclient) AddLabel(issueUrl string, labelName string) {
 	url := strings.Replace(issueUrl, "https://github.com", "https://api.github.com/repos", 1) + "/labels"
 	log.Println("to add", issueUrl, url, labelName)
 	githubClient.incrementRequestNumber()
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonValue))
+	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonValue))
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -351,7 +351,7 @@ func (githubClient *githubclient) FindIssues(repoName string) []interfaces.Issue
 			log.Fatalln(err)
 		}
 		githubClient.incrementRequestNumber()
-		req, err := http.NewRequest("POST", "https://api.github.com/graphql", bytes.NewBuffer(jsonValue))
+		req, err := http.NewRequest(http.MethodPost, "https://api.github.com/graphql", bytes.NewBuffer(jsonValue))
 		if err != nil {
 			log.Fatalln(err)
 		}
