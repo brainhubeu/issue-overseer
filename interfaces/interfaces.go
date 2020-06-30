@@ -12,11 +12,6 @@ var IssueTypeEnum = &issueTypeEnum{
 	NOT_ANSWERED: 3,
 }
 
-type Repository struct {
-	Archived bool
-	Name     string
-}
-
 type Label struct {
 	Name  string
 	Color string
