@@ -3,7 +3,7 @@ package githubclient
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/brainhubeu/issue-overseer/interfaces"
+	"github.com/brainhubeu/issue-overseer/githubstructures"
 	"io"
 	"io/ioutil"
 	"log"
@@ -171,8 +171,8 @@ func (githubClient *githubclient) FindRepos() []string {
 	return repoNames
 }
 
-func (githubClient *githubclient) FindLabels(repoName string) []interfaces.Label {
-	labels := []interfaces.Label{}
+func (githubClient *githubclient) FindLabels(repoName string) []githubstructures.Label {
+	labels := []githubstructures.Label{}
 	githubClient.request(http.MethodGet, "https://api.github.com/repos/"+githubClient.Organization+"/"+repoName+"/labels", &labels, []int{200}, nil)
 	return labels
 }
@@ -181,7 +181,7 @@ func (githubClient *githubclient) DeleteLabel(repoName string, labelName string)
 	githubClient.request(http.MethodDelete, "https://api.github.com/repos/"+githubClient.Organization+"/"+repoName+"/labels/"+labelName, nil, []int{204}, nil)
 }
 
-func (githubClient *githubclient) CreateLabel(repoName string, label interfaces.Label) {
+func (githubClient *githubclient) CreateLabel(repoName string, label githubstructures.Label) {
 	labelToCreate := Label{Name: label.Name, Color: label.Color}
 	githubClient.request(http.MethodPost, "https://api.github.com/repos/"+githubClient.Organization+"/"+repoName+"/labels", nil, []int{201}, labelToCreate)
 }
@@ -197,27 +197,27 @@ func (githubClient *githubclient) AddLabel(issueUrl string, labelName string) {
 	githubClient.request(http.MethodPost, url, nil, []int{200}, requestBody)
 }
 
-func transformDataIntoIssue(issueData Issue) interfaces.Issue {
+func transformDataIntoIssue(issueData Issue) githubstructures.Issue {
 	labelsCount := len(issueData.Labels.Edges)
 	commentsCount := len(issueData.Comments.Edges)
-	labels := make([]interfaces.Label, labelsCount)
-	comments := make([]interfaces.Comment, commentsCount)
+	labels := make([]githubstructures.Label, labelsCount)
+	comments := make([]githubstructures.Comment, commentsCount)
 	for i := 0; i < labelsCount; i++ {
 		labelData := issueData.Labels.Edges[i].Node
-		labels[i] = interfaces.Label{
+		labels[i] = githubstructures.Label{
 			Name:  labelData.Name,
 			Color: labelData.Color,
 		}
 	}
 	for i := 0; i < commentsCount; i++ {
 		commentData := issueData.Comments.Edges[i].Node
-		comments[i] = interfaces.Comment{
+		comments[i] = githubstructures.Comment{
 			AuthorAssociation: commentData.AuthorAssociation,
 			AuthorLogin:       commentData.Author.Login,
 		}
 	}
 
-	return interfaces.Issue{
+	return githubstructures.Issue{
 		Title:             issueData.Title,
 		Url:               issueData.Url,
 		Number:            issueData.Number,
@@ -227,9 +227,9 @@ func transformDataIntoIssue(issueData Issue) interfaces.Issue {
 	}
 }
 
-func (githubClient *githubclient) FindIssues(repoName string) []interfaces.Issue {
+func (githubClient *githubclient) FindIssues(repoName string) []githubstructures.Issue {
 	cursor := (*string)(nil)
-	result := []interfaces.Issue{}
+	result := []githubstructures.Issue{}
 	for {
 		query := `query ($organization: String!, $repoName: String!, $cursor: String) {
 	  repository(owner: $organization, name: $repoName) {

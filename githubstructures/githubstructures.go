@@ -1,4 +1,4 @@
-package interfaces
+package githubstructures
 
 type issueTypeEnum struct {
 	OURS         int

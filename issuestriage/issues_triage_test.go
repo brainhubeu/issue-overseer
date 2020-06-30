@@ -1,7 +1,7 @@
 package issuestriage
 
 import (
-	"github.com/brainhubeu/issue-overseer/interfaces"
+	"github.com/brainhubeu/issue-overseer/githubstructures"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"log"
@@ -28,278 +28,278 @@ func TestTriageManyIssues(t *testing.T) {
 
 var _ = Describe("issuestriage", func() {
 	It("triages an empty list", func() {
-		issues := []interfaces.Issue{}
+		issues := []githubstructures.Issue{}
 
 		issuesTriage := New()
 		ourIssues, answeredIssues, notAnsweredIssues := issuesTriage.TriageManyIssues(issues)
 
-		Expect(ourIssues).To(Equal([]interfaces.Issue{}))
-		Expect(answeredIssues).To(Equal([]interfaces.Issue{}))
-		Expect(notAnsweredIssues).To(Equal([]interfaces.Issue{}))
+		Expect(ourIssues).To(Equal([]githubstructures.Issue{}))
+		Expect(answeredIssues).To(Equal([]githubstructures.Issue{}))
+		Expect(notAnsweredIssues).To(Equal([]githubstructures.Issue{}))
 	})
 
 	It("triages a non-empty list", func() {
-		issues := []interfaces.Issue{
-			interfaces.Issue{Title: "title", Url: "url", Number: 122, AuthorAssociation: "MEMBER", Labels: []interfaces.Label{}, Comments: []interfaces.Comment{}},
-			interfaces.Issue{Title: "title", Url: "url", Number: 123, AuthorAssociation: "MEMBER", Labels: []interfaces.Label{}, Comments: []interfaces.Comment{
-				interfaces.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "user"},
+		issues := []githubstructures.Issue{
+			githubstructures.Issue{Title: "title", Url: "url", Number: 122, AuthorAssociation: "MEMBER", Labels: []githubstructures.Label{}, Comments: []githubstructures.Comment{}},
+			githubstructures.Issue{Title: "title", Url: "url", Number: 123, AuthorAssociation: "MEMBER", Labels: []githubstructures.Label{}, Comments: []githubstructures.Comment{
+				githubstructures.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "user"},
 			}},
-			interfaces.Issue{Title: "title", Url: "url", Number: 124, AuthorAssociation: "MEMBER", Labels: []interfaces.Label{}, Comments: []interfaces.Comment{
-				interfaces.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
+			githubstructures.Issue{Title: "title", Url: "url", Number: 124, AuthorAssociation: "MEMBER", Labels: []githubstructures.Label{}, Comments: []githubstructures.Comment{
+				githubstructures.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
 			}},
-			interfaces.Issue{Title: "title", Url: "url", Number: 125, AuthorAssociation: "MEMBER", Labels: []interfaces.Label{}, Comments: []interfaces.Comment{
-				interfaces.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
-				interfaces.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "user"},
+			githubstructures.Issue{Title: "title", Url: "url", Number: 125, AuthorAssociation: "MEMBER", Labels: []githubstructures.Label{}, Comments: []githubstructures.Comment{
+				githubstructures.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
+				githubstructures.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "user"},
 			}},
-			interfaces.Issue{Title: "title", Url: "url", Number: 126, AuthorAssociation: "NONE", Labels: []interfaces.Label{}, Comments: []interfaces.Comment{
-				interfaces.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "user"},
+			githubstructures.Issue{Title: "title", Url: "url", Number: 126, AuthorAssociation: "NONE", Labels: []githubstructures.Label{}, Comments: []githubstructures.Comment{
+				githubstructures.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "user"},
 			}},
-			interfaces.Issue{Title: "title", Url: "url", Number: 127, AuthorAssociation: "NONE", Labels: []interfaces.Label{}, Comments: []interfaces.Comment{}},
+			githubstructures.Issue{Title: "title", Url: "url", Number: 127, AuthorAssociation: "NONE", Labels: []githubstructures.Label{}, Comments: []githubstructures.Comment{}},
 		}
 
 		issuesTriage := New()
 		ourIssues, answeredIssues, notAnsweredIssues := issuesTriage.TriageManyIssues(issues)
 
-		Expect(ourIssues).To(Equal([]interfaces.Issue{
-			interfaces.Issue{Title: "title", Url: "url", Number: 122, AuthorAssociation: "MEMBER", Labels: []interfaces.Label{}, Comments: []interfaces.Comment{}},
-			interfaces.Issue{Title: "title", Url: "url", Number: 123, AuthorAssociation: "MEMBER", Labels: []interfaces.Label{}, Comments: []interfaces.Comment{
-				interfaces.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "user"},
+		Expect(ourIssues).To(Equal([]githubstructures.Issue{
+			githubstructures.Issue{Title: "title", Url: "url", Number: 122, AuthorAssociation: "MEMBER", Labels: []githubstructures.Label{}, Comments: []githubstructures.Comment{}},
+			githubstructures.Issue{Title: "title", Url: "url", Number: 123, AuthorAssociation: "MEMBER", Labels: []githubstructures.Label{}, Comments: []githubstructures.Comment{
+				githubstructures.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "user"},
 			}},
 		}))
-		Expect(answeredIssues).To(Equal([]interfaces.Issue{
-			interfaces.Issue{Title: "title", Url: "url", Number: 125, AuthorAssociation: "MEMBER", Labels: []interfaces.Label{}, Comments: []interfaces.Comment{
-				interfaces.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
-				interfaces.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "user"},
+		Expect(answeredIssues).To(Equal([]githubstructures.Issue{
+			githubstructures.Issue{Title: "title", Url: "url", Number: 125, AuthorAssociation: "MEMBER", Labels: []githubstructures.Label{}, Comments: []githubstructures.Comment{
+				githubstructures.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
+				githubstructures.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "user"},
 			}},
-			interfaces.Issue{Title: "title", Url: "url", Number: 126, AuthorAssociation: "NONE", Labels: []interfaces.Label{}, Comments: []interfaces.Comment{
-				interfaces.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "user"},
+			githubstructures.Issue{Title: "title", Url: "url", Number: 126, AuthorAssociation: "NONE", Labels: []githubstructures.Label{}, Comments: []githubstructures.Comment{
+				githubstructures.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "user"},
 			}},
 		}))
-		Expect(notAnsweredIssues).To(Equal([]interfaces.Issue{
-			interfaces.Issue{Title: "title", Url: "url", Number: 124, AuthorAssociation: "MEMBER", Labels: []interfaces.Label{}, Comments: []interfaces.Comment{
-				interfaces.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
+		Expect(notAnsweredIssues).To(Equal([]githubstructures.Issue{
+			githubstructures.Issue{Title: "title", Url: "url", Number: 124, AuthorAssociation: "MEMBER", Labels: []githubstructures.Label{}, Comments: []githubstructures.Comment{
+				githubstructures.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
 			}},
-			interfaces.Issue{Title: "title", Url: "url", Number: 127, AuthorAssociation: "NONE", Labels: []interfaces.Label{}, Comments: []interfaces.Comment{}},
+			githubstructures.Issue{Title: "title", Url: "url", Number: 127, AuthorAssociation: "NONE", Labels: []githubstructures.Label{}, Comments: []githubstructures.Comment{}},
 		}))
 	})
 
 	It("returns OURS for an issue created by a member with no comments", func() {
-		issue := interfaces.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "MEMBER", Labels: []interfaces.Label{}, Comments: []interfaces.Comment{}}
+		issue := githubstructures.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "MEMBER", Labels: []githubstructures.Label{}, Comments: []githubstructures.Comment{}}
 
 		issuesTriage := New()
 		issueType := issuesTriage.TriageOneIssue(issue)
 
-		Expect(issueType).To(Equal(interfaces.IssueTypeEnum.OURS))
+		Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.OURS))
 	})
 
 	It("returns OURS for an issue created by a member with a member comment", func() {
-		issue := interfaces.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "MEMBER", Labels: []interfaces.Label{}, Comments: []interfaces.Comment{
-			interfaces.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "user"},
+		issue := githubstructures.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "MEMBER", Labels: []githubstructures.Label{}, Comments: []githubstructures.Comment{
+			githubstructures.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "user"},
 		}}
 
 		issuesTriage := New()
 		issueType := issuesTriage.TriageOneIssue(issue)
 
-		Expect(issueType).To(Equal(interfaces.IssueTypeEnum.OURS))
+		Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.OURS))
 	})
 
 	It("returns NOT_ANSWERED for an issue created by a member with an external comment", func() {
-		issue := interfaces.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "MEMBER", Labels: []interfaces.Label{}, Comments: []interfaces.Comment{
-			interfaces.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
+		issue := githubstructures.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "MEMBER", Labels: []githubstructures.Label{}, Comments: []githubstructures.Comment{
+			githubstructures.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
 		}}
 
 		issuesTriage := New()
 		issueType := issuesTriage.TriageOneIssue(issue)
 
-		Expect(issueType).To(Equal(interfaces.IssueTypeEnum.NOT_ANSWERED))
+		Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.NOT_ANSWERED))
 	})
 
 	It("returns ANSWERED for an issue created by a member with an external comment followed by a member comment", func() {
-		issue := interfaces.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "MEMBER", Labels: []interfaces.Label{}, Comments: []interfaces.Comment{
-			interfaces.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
-			interfaces.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "user"},
+		issue := githubstructures.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "MEMBER", Labels: []githubstructures.Label{}, Comments: []githubstructures.Comment{
+			githubstructures.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
+			githubstructures.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "user"},
 		}}
 
 		issuesTriage := New()
 		issueType := issuesTriage.TriageOneIssue(issue)
 
-		Expect(issueType).To(Equal(interfaces.IssueTypeEnum.ANSWERED))
+		Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.ANSWERED))
 	})
 
 	It("returns NOT_ANSWERED for an issue created by a member with a member comment followed by an external comment", func() {
-		issue := interfaces.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "MEMBER", Labels: []interfaces.Label{}, Comments: []interfaces.Comment{
-			interfaces.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "user"},
-			interfaces.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
+		issue := githubstructures.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "MEMBER", Labels: []githubstructures.Label{}, Comments: []githubstructures.Comment{
+			githubstructures.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "user"},
+			githubstructures.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
 		}}
 
 		issuesTriage := New()
 		issueType := issuesTriage.TriageOneIssue(issue)
 
-		Expect(issueType).To(Equal(interfaces.IssueTypeEnum.NOT_ANSWERED))
+		Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.NOT_ANSWERED))
 	})
 
 	It("returns NOT_ANSWERED for an issue created by a non-member with no comments", func() {
-		issue := interfaces.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "NONE", Labels: []interfaces.Label{}, Comments: []interfaces.Comment{}}
+		issue := githubstructures.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "NONE", Labels: []githubstructures.Label{}, Comments: []githubstructures.Comment{}}
 
 		issuesTriage := New()
 		issueType := issuesTriage.TriageOneIssue(issue)
 
-		Expect(issueType).To(Equal(interfaces.IssueTypeEnum.NOT_ANSWERED))
+		Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.NOT_ANSWERED))
 	})
 
 	It("returns ANSWERED for an issue created by a non-member with a member comment", func() {
-		issue := interfaces.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "NONE", Labels: []interfaces.Label{}, Comments: []interfaces.Comment{
-			interfaces.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "user"},
+		issue := githubstructures.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "NONE", Labels: []githubstructures.Label{}, Comments: []githubstructures.Comment{
+			githubstructures.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "user"},
 		}}
 
 		issuesTriage := New()
 		issueType := issuesTriage.TriageOneIssue(issue)
 
-		Expect(issueType).To(Equal(interfaces.IssueTypeEnum.ANSWERED))
+		Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.ANSWERED))
 	})
 
 	It("returns NOT_ANSWERED for an issue created by a non-member with an external comment", func() {
-		issue := interfaces.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "NONE", Labels: []interfaces.Label{}, Comments: []interfaces.Comment{
-			interfaces.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
+		issue := githubstructures.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "NONE", Labels: []githubstructures.Label{}, Comments: []githubstructures.Comment{
+			githubstructures.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
 		}}
 
 		issuesTriage := New()
 		issueType := issuesTriage.TriageOneIssue(issue)
 
-		Expect(issueType).To(Equal(interfaces.IssueTypeEnum.NOT_ANSWERED))
+		Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.NOT_ANSWERED))
 	})
 
 	It("returns ANSWERED for an issue created by a non-member with an external comment followed by a non-member comment", func() {
-		issue := interfaces.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "NONE", Labels: []interfaces.Label{}, Comments: []interfaces.Comment{
-			interfaces.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
-			interfaces.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "user"},
+		issue := githubstructures.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "NONE", Labels: []githubstructures.Label{}, Comments: []githubstructures.Comment{
+			githubstructures.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
+			githubstructures.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "user"},
 		}}
 
 		issuesTriage := New()
 		issueType := issuesTriage.TriageOneIssue(issue)
 
-		Expect(issueType).To(Equal(interfaces.IssueTypeEnum.ANSWERED))
+		Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.ANSWERED))
 	})
 
 	It("returns NOT_ANSWERED for an issue created by a non-member with a member comment followed by an external comment", func() {
-		issue := interfaces.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "NONE", Labels: []interfaces.Label{}, Comments: []interfaces.Comment{
-			interfaces.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "user"},
-			interfaces.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
+		issue := githubstructures.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "NONE", Labels: []githubstructures.Label{}, Comments: []githubstructures.Comment{
+			githubstructures.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "user"},
+			githubstructures.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
 		}}
 
 		issuesTriage := New()
 		issueType := issuesTriage.TriageOneIssue(issue)
 
-		Expect(issueType).To(Equal(interfaces.IssueTypeEnum.NOT_ANSWERED))
+		Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.NOT_ANSWERED))
 	})
 
 	It("excludes an issuehunt-app comment for our issue when there are no other comments", func() {
-		issue := interfaces.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "MEMBER", Labels: []interfaces.Label{}, Comments: []interfaces.Comment{
-			interfaces.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "issuehunt-app"},
+		issue := githubstructures.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "MEMBER", Labels: []githubstructures.Label{}, Comments: []githubstructures.Comment{
+			githubstructures.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "issuehunt-app"},
 		}}
 
 		issuesTriage := New()
 		issueType := issuesTriage.TriageOneIssue(issue)
 
-		Expect(issueType).To(Equal(interfaces.IssueTypeEnum.OURS))
+		Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.OURS))
 	})
 
 	It("excludes an issuehunt-app comment for an external issue when there are no other comments", func() {
-		issue := interfaces.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "NONE", Labels: []interfaces.Label{}, Comments: []interfaces.Comment{
-			interfaces.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "issuehunt-app"},
+		issue := githubstructures.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "NONE", Labels: []githubstructures.Label{}, Comments: []githubstructures.Comment{
+			githubstructures.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "issuehunt-app"},
 		}}
 
 		issuesTriage := New()
 		issueType := issuesTriage.TriageOneIssue(issue)
 
-		Expect(issueType).To(Equal(interfaces.IssueTypeEnum.NOT_ANSWERED))
+		Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.NOT_ANSWERED))
 	})
 
 	It("excludes an issuehunt-app comment when the last comment is ours", func() {
-		issue := interfaces.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "NONE", Labels: []interfaces.Label{}, Comments: []interfaces.Comment{
-			interfaces.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "user"},
-			interfaces.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "issuehunt-app"},
+		issue := githubstructures.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "NONE", Labels: []githubstructures.Label{}, Comments: []githubstructures.Comment{
+			githubstructures.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "user"},
+			githubstructures.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "issuehunt-app"},
 		}}
 
 		issuesTriage := New()
 		issueType := issuesTriage.TriageOneIssue(issue)
 
-		Expect(issueType).To(Equal(interfaces.IssueTypeEnum.ANSWERED))
+		Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.ANSWERED))
 	})
 
 	It("excludes an issuehunt-app comment when the last comment isn't ours", func() {
-		issue := interfaces.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "NONE", Labels: []interfaces.Label{}, Comments: []interfaces.Comment{
-			interfaces.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
-			interfaces.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "issuehunt-app"},
+		issue := githubstructures.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "NONE", Labels: []githubstructures.Label{}, Comments: []githubstructures.Comment{
+			githubstructures.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
+			githubstructures.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "issuehunt-app"},
 		}}
 
 		issuesTriage := New()
 		issueType := issuesTriage.TriageOneIssue(issue)
 
-		Expect(issueType).To(Equal(interfaces.IssueTypeEnum.NOT_ANSWERED))
+		Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.NOT_ANSWERED))
 	})
 
 	It("works correctly with many comments when the last comment is ours", func() {
-		issue := interfaces.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "NONE", Labels: []interfaces.Label{}, Comments: []interfaces.Comment{
-			interfaces.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
-			interfaces.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "user"},
-			interfaces.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
-			interfaces.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
-			interfaces.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "user"},
+		issue := githubstructures.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "NONE", Labels: []githubstructures.Label{}, Comments: []githubstructures.Comment{
+			githubstructures.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
+			githubstructures.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "user"},
+			githubstructures.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
+			githubstructures.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
+			githubstructures.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "user"},
 		}}
 
 		issuesTriage := New()
 		issueType := issuesTriage.TriageOneIssue(issue)
 
-		Expect(issueType).To(Equal(interfaces.IssueTypeEnum.ANSWERED))
+		Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.ANSWERED))
 	})
 
 	It("works correctly with many comments when the last comment isn't ours", func() {
-		issue := interfaces.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "NONE", Labels: []interfaces.Label{}, Comments: []interfaces.Comment{
-			interfaces.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
-			interfaces.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "user"},
-			interfaces.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
-			interfaces.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
-			interfaces.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "user"},
-			interfaces.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
+		issue := githubstructures.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "NONE", Labels: []githubstructures.Label{}, Comments: []githubstructures.Comment{
+			githubstructures.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
+			githubstructures.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "user"},
+			githubstructures.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
+			githubstructures.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
+			githubstructures.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "user"},
+			githubstructures.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
 		}}
 
 		issuesTriage := New()
 		issueType := issuesTriage.TriageOneIssue(issue)
 
-		Expect(issueType).To(Equal(interfaces.IssueTypeEnum.NOT_ANSWERED))
+		Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.NOT_ANSWERED))
 	})
 
 	It("works correctly with many comments when the last comment is by issuehunt-app and before it there's our comment", func() {
-		issue := interfaces.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "NONE", Labels: []interfaces.Label{}, Comments: []interfaces.Comment{
-			interfaces.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
-			interfaces.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "user"},
-			interfaces.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
-			interfaces.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
-			interfaces.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "user"},
-			interfaces.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "issuehunt-app"},
+		issue := githubstructures.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "NONE", Labels: []githubstructures.Label{}, Comments: []githubstructures.Comment{
+			githubstructures.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
+			githubstructures.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "user"},
+			githubstructures.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
+			githubstructures.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
+			githubstructures.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "user"},
+			githubstructures.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "issuehunt-app"},
 		}}
 
 		issuesTriage := New()
 		issueType := issuesTriage.TriageOneIssue(issue)
 
-		Expect(issueType).To(Equal(interfaces.IssueTypeEnum.ANSWERED))
+		Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.ANSWERED))
 	})
 
 	It("works correctly with many comments when the last comment is by issuehunt-app and before it there's an external comment", func() {
-		issue := interfaces.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "NONE", Labels: []interfaces.Label{}, Comments: []interfaces.Comment{
-			interfaces.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
-			interfaces.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "user"},
-			interfaces.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
-			interfaces.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
-			interfaces.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "user"},
-			interfaces.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
-			interfaces.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "issuehunt-app"},
+		issue := githubstructures.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "NONE", Labels: []githubstructures.Label{}, Comments: []githubstructures.Comment{
+			githubstructures.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
+			githubstructures.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "user"},
+			githubstructures.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
+			githubstructures.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
+			githubstructures.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "user"},
+			githubstructures.Comment{AuthorAssociation: "NONE", AuthorLogin: "user"},
+			githubstructures.Comment{AuthorAssociation: "MEMBER", AuthorLogin: "issuehunt-app"},
 		}}
 
 		issuesTriage := New()
 		issueType := issuesTriage.TriageOneIssue(issue)
 
-		Expect(issueType).To(Equal(interfaces.IssueTypeEnum.NOT_ANSWERED))
+		Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.NOT_ANSWERED))
 	})
 })

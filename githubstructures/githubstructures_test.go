@@ -1,4 +1,4 @@
-package interfaces
+package githubstructures
 
 import (
 	. "github.com/onsi/ginkgo"
@@ -8,7 +8,7 @@ import (
 
 func TestInterfaces(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "interfaces")
+	RunSpecs(t, "githubstructures")
 }
 
 /*
