@@ -17,10 +17,6 @@ type Label struct {
 	Color string
 }
 
-type CommentAuthor struct {
-	Login string
-}
-
 type Comment struct {
 	AuthorAssociation string
 	AuthorLogin       string
