@@ -154,7 +154,7 @@ func (githubClient *githubclient) request(method string, url string, source inte
 func (githubClient *githubclient) FindRepos() []string {
 	repoNames := []string{}
 	for page := 1; ; page += 1 {
-		repositories := []interfaces.Repository{}
+		repositories := []Repository{}
 		githubClient.request(http.MethodGet, "https://api.github.com/orgs/"+githubClient.Organization+"/repos?page="+strconv.Itoa(page), &repositories, []int{200}, nil)
 		if len(repositories) == 0 {
 			break

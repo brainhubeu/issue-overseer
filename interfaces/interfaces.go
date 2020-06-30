@@ -1,19 +1,5 @@
 package interfaces
 
-type GithubClient interface {
-	FindRepos() []string
-	FindLabels(repoName string) []Label
-	DeleteLabel(repoName string, labelName string)
-	CreateLabel(repoName string, label Label)
-	RemoveLabel(issueUrl string, labelName string)
-	AddLabel(issueUrl string, labelName string)
-	FindIssues(repoName string) []Issue
-}
-
-type IssuesTriage interface {
-	TriageManyIssues(issues []Issue) ([]Issue, []Issue, []Issue)
-}
-
 type issueTypeEnum struct {
 	OURS         int
 	ANSWERED     int

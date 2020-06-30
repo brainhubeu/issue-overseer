@@ -5,16 +5,30 @@ import (
 	"log"
 )
 
+type GithubClient interface {
+	FindRepos() []string
+	FindLabels(repoName string) []interfaces.Label
+	DeleteLabel(repoName string, labelName string)
+	CreateLabel(repoName string, label interfaces.Label)
+	RemoveLabel(issueUrl string, labelName string)
+	AddLabel(issueUrl string, labelName string)
+	FindIssues(repoName string) []interfaces.Issue
+}
+
+type IssuesTriage interface {
+	TriageManyIssues(issues []interfaces.Issue) ([]interfaces.Issue, []interfaces.Issue, []interfaces.Issue)
+}
+
 type githuboperator struct {
-	githubclient            interfaces.GithubClient
-	issuestriage            interfaces.IssuesTriage
+	githubclient            GithubClient
+	issuestriage            IssuesTriage
 	AnsweringLabels         []interfaces.Label
 	OUR_LABEL_TEXT          string
 	ANSWERED_LABEL_TEXT     string
 	NOT_ANSWERED_LABEL_TEXT string
 }
 
-func New(githubClient interfaces.GithubClient, issuesTriage interfaces.IssuesTriage, answeringLabels []interfaces.Label, OUR_LABEL_TEXT string, ANSWERED_LABEL_TEXT string, NOT_ANSWERED_LABEL_TEXT string) *githuboperator {
+func New(githubClient GithubClient, issuesTriage IssuesTriage, answeringLabels []interfaces.Label, OUR_LABEL_TEXT string, ANSWERED_LABEL_TEXT string, NOT_ANSWERED_LABEL_TEXT string) *githuboperator {
 	githubOperator := &githuboperator{githubClient, issuesTriage, answeringLabels, OUR_LABEL_TEXT, ANSWERED_LABEL_TEXT, NOT_ANSWERED_LABEL_TEXT}
 	return githubOperator
 }
