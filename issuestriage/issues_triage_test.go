@@ -21,7 +21,7 @@ func TestMain(m *testing.M) {
 	}
 }
 
-func TestTriageManyIssues(t *testing.T) {
+func TestGroupByAnswering(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "issuestriage")
 }
@@ -31,7 +31,7 @@ var _ = Describe("issuestriage", func() {
 		issues := []githubstructures.Issue{}
 
 		issuesTriage := New()
-		ourIssues, answeredIssues, notAnsweredIssues := issuesTriage.TriageManyIssues(issues)
+		ourIssues, answeredIssues, notAnsweredIssues := issuesTriage.GroupByAnswering(issues)
 
 		Expect(ourIssues).To(Equal([]githubstructures.Issue{}))
 		Expect(answeredIssues).To(Equal([]githubstructures.Issue{}))
@@ -58,7 +58,7 @@ var _ = Describe("issuestriage", func() {
 		}
 
 		issuesTriage := New()
-		ourIssues, answeredIssues, notAnsweredIssues := issuesTriage.TriageManyIssues(issues)
+		ourIssues, answeredIssues, notAnsweredIssues := issuesTriage.GroupByAnswering(issues)
 
 		Expect(ourIssues).To(Equal([]githubstructures.Issue{
 			githubstructures.Issue{Title: "title", Url: "url", Number: 122, AuthorAssociation: "MEMBER", Labels: []githubstructures.Label{}, Comments: []githubstructures.Comment{}},

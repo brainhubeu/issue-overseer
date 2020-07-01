@@ -52,7 +52,7 @@ func (issuesTriage issuestriage) TriageOneIssue(issue githubstructures.Issue) in
 	}
 }
 
-func (issuesTriage issuestriage) TriageManyIssues(issues []githubstructures.Issue) ([]githubstructures.Issue, []githubstructures.Issue, []githubstructures.Issue) {
+func (issuesTriage issuestriage) GroupByAnswering(issues []githubstructures.Issue) ([]githubstructures.Issue, []githubstructures.Issue, []githubstructures.Issue) {
 	ourIssues := []githubstructures.Issue{}
 	answeredIssues := []githubstructures.Issue{}
 	notAnsweredIssues := []githubstructures.Issue{}

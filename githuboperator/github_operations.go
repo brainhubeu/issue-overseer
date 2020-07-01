@@ -17,7 +17,7 @@ type GithubClient interface {
 }
 
 type IssuesTriage interface {
-	TriageManyIssues(issues []githubstructures.Issue) ([]githubstructures.Issue, []githubstructures.Issue, []githubstructures.Issue)
+	GroupByAnswering(issues []githubstructures.Issue) ([]githubstructures.Issue, []githubstructures.Issue, []githubstructures.Issue)
 }
 
 type githuboperator struct {
@@ -96,7 +96,7 @@ func (githubOperator githuboperator) UpdateRepos(repoNames []string) {
 		repoName := repoNames[i]
 		githubOperator.createOrUpdateRepoLabels(repoName)
 		issues := githubOperator.githubclient.FindIssues(repoName)
-		ourIssues, answeredIssues, notAnsweredIssues := githubOperator.issuestriage.TriageManyIssues(issues)
+		ourIssues, answeredIssues, notAnsweredIssues := githubOperator.issuestriage.GroupByAnswering(issues)
 		log.Println(repoName, "ourIssues", ourIssues)
 		log.Println(repoName, "answeredIssues", answeredIssues)
 		log.Println(repoName, "notAnsweredIssues", notAnsweredIssues)

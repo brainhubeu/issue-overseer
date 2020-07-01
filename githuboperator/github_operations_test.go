@@ -11,10 +11,10 @@ import (
 
 type Mockissuestriage struct{}
 
-var mockTriageManyIssues func(issues []githubstructures.Issue) ([]githubstructures.Issue, []githubstructures.Issue, []githubstructures.Issue)
+var mockGroupByAnswering func(issues []githubstructures.Issue) ([]githubstructures.Issue, []githubstructures.Issue, []githubstructures.Issue)
 
-func (issuesTriage Mockissuestriage) TriageManyIssues(issues []githubstructures.Issue) ([]githubstructures.Issue, []githubstructures.Issue, []githubstructures.Issue) {
-	return mockTriageManyIssues(issues)
+func (issuesTriage Mockissuestriage) GroupByAnswering(issues []githubstructures.Issue) ([]githubstructures.Issue, []githubstructures.Issue, []githubstructures.Issue) {
+	return mockGroupByAnswering(issues)
 }
 
 type Mockgithubclient struct{}
@@ -121,7 +121,7 @@ var _ = Describe("githuboperator", func() {
 			githubstructures.Label{Name: "label-3", Color: "color-3"},
 		}
 
-		mockTriageManyIssues = func(issues []githubstructures.Issue) ([]githubstructures.Issue, []githubstructures.Issue, []githubstructures.Issue) {
+		mockGroupByAnswering = func(issues []githubstructures.Issue) ([]githubstructures.Issue, []githubstructures.Issue, []githubstructures.Issue) {
 			return []githubstructures.Issue{}, []githubstructures.Issue{}, []githubstructures.Issue{}
 		}
 		mockFindLabels = func(repoName string) []githubstructures.Label {
@@ -165,7 +165,7 @@ var _ = Describe("githuboperator", func() {
 			githubstructures.Label{Name: "label-3", Color: "color-3"},
 		}
 
-		mockTriageManyIssues = func(issues []githubstructures.Issue) ([]githubstructures.Issue, []githubstructures.Issue, []githubstructures.Issue) {
+		mockGroupByAnswering = func(issues []githubstructures.Issue) ([]githubstructures.Issue, []githubstructures.Issue, []githubstructures.Issue) {
 			return []githubstructures.Issue{}, []githubstructures.Issue{}, []githubstructures.Issue{}
 		}
 		mockFindLabels = func(repoName string) []githubstructures.Label {
@@ -221,7 +221,7 @@ var _ = Describe("githuboperator", func() {
 			githubstructures.Label{Name: "label-3", Color: "color-3"},
 		}
 
-		mockTriageManyIssues = func(issues []githubstructures.Issue) ([]githubstructures.Issue, []githubstructures.Issue, []githubstructures.Issue) {
+		mockGroupByAnswering = func(issues []githubstructures.Issue) ([]githubstructures.Issue, []githubstructures.Issue, []githubstructures.Issue) {
 			return []githubstructures.Issue{}, []githubstructures.Issue{}, []githubstructures.Issue{}
 		}
 		mockFindLabels = func(repoName string) []githubstructures.Label {
@@ -280,7 +280,7 @@ var _ = Describe("githuboperator", func() {
 			githubstructures.Label{Name: "label-3", Color: "color-3"},
 		}
 
-		mockTriageManyIssues = func(issues []githubstructures.Issue) ([]githubstructures.Issue, []githubstructures.Issue, []githubstructures.Issue) {
+		mockGroupByAnswering = func(issues []githubstructures.Issue) ([]githubstructures.Issue, []githubstructures.Issue, []githubstructures.Issue) {
 			return []githubstructures.Issue{
 					githubstructures.Issue{Url: "url-1"},
 					githubstructures.Issue{Url: "url-2"},
@@ -347,7 +347,7 @@ var _ = Describe("githuboperator", func() {
 			githubstructures.Label{Name: "not-answered", Color: "color-3"},
 		}
 
-		mockTriageManyIssues = func(issues []githubstructures.Issue) ([]githubstructures.Issue, []githubstructures.Issue, []githubstructures.Issue) {
+		mockGroupByAnswering = func(issues []githubstructures.Issue) ([]githubstructures.Issue, []githubstructures.Issue, []githubstructures.Issue) {
 			return []githubstructures.Issue{
 					githubstructures.Issue{Url: "url-1", Labels: []githubstructures.Label{githubstructures.Label{Name: "by-ours"}}},
 					githubstructures.Issue{Url: "url-2", Labels: []githubstructures.Label{githubstructures.Label{Name: "not-answered"}}},
