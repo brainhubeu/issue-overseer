@@ -124,7 +124,7 @@ func isStatusOK(actual int, expectedValues []int) bool {
 }
 
 func (githubClient *githubclient) request(method string, url string, source interface{}, expectedStatuses []int, requestBody interface{}) {
-	log.Println("request", method, url)
+	log.Println("request", method, url, requestBody)
 	client := &http.Client{}
 	githubClient.incrementRequestNumber()
 	jsonReader := createJson(requestBody)
@@ -145,9 +145,11 @@ func (githubClient *githubclient) request(method string, url string, source inte
 	if !isStatusOK(resp.StatusCode, expectedStatuses) {
 		log.Fatalln(resp.Status, string(body))
 	}
-	err = json.Unmarshal([]byte(string(body)), &source)
-	if err != nil {
-		log.Fatalln(err)
+	if source != nil {
+		err = json.Unmarshal([]byte(string(body)), &source)
+		if err != nil {
+			log.Fatalln(err)
+		}
 	}
 }
 

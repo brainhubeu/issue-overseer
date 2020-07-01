@@ -21,11 +21,30 @@ func main() {
 		githubstructures.Label{Name: NOT_ANSWERED_LABEL_TEXT, Color: "a00000"},
 	}
 
+	defaultLabels := append([]githubstructures.Label{
+		githubstructures.Label{Name: "WIP", Color: "a0a000"},
+		githubstructures.Label{Name: "blocked", Color: "000000"},
+		githubstructures.Label{Name: "hacktoberfest", Color: "202c99"},
+		githubstructures.Label{Name: "in code review", Color: "ccfeff"},
+		githubstructures.Label{Name: "needs discussion", Color: "dbf259"},
+		githubstructures.Label{Name: "needs testing", Color: "dfdf00"},
+		githubstructures.Label{Name: "no reproduction details", Color: "c91eb8"},
+		githubstructures.Label{Name: "proposed issuehunt", Color: "2803ba"},
+		githubstructures.Label{Name: "severity: blocked", Color: "000000"},
+		githubstructures.Label{Name: "severity: critical", Color: "800000"},
+		githubstructures.Label{Name: "severity: major", Color: "d00000"},
+		githubstructures.Label{Name: "severity: medium", Color: "a0a000"},
+		githubstructures.Label{Name: "severity: minor", Color: "40a000"},
+		githubstructures.Label{Name: "severity: trivial", Color: "40ff40"},
+		githubstructures.Label{Name: "tested & fails", Color: "ff4040"},
+		githubstructures.Label{Name: "tested & works", Color: "40ff40"},
+	}, answeringLabels...)
+
 	log.Println(token, OUR_LABEL_TEXT, ANSWERED_LABEL_TEXT, NOT_ANSWERED_LABEL_TEXT)
 
 	githubClient := githubclient.New(organization, token)
 	issuesTriage := issuestriage.New()
-	githubOperator := githuboperator.New(githubClient, issuesTriage, answeringLabels, OUR_LABEL_TEXT, ANSWERED_LABEL_TEXT, NOT_ANSWERED_LABEL_TEXT)
+	githubOperator := githuboperator.New(githubClient, issuesTriage, answeringLabels, OUR_LABEL_TEXT, ANSWERED_LABEL_TEXT, NOT_ANSWERED_LABEL_TEXT, defaultLabels)
 	repoNames := githubClient.FindRepos()
 	log.Println("repoNames", repoNames)
 	githubOperator.UpdateRepos(repoNames)

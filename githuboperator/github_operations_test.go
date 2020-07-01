@@ -104,7 +104,7 @@ var _ = Describe("githuboperator", func() {
 
 		githubClient := Mockgithubclient{}
 		issuesTriage := Mockissuestriage{}
-		githubOperator := New(githubClient, issuesTriage, answeringLabels, "label-1", "label-2", "label-3")
+		githubOperator := New(githubClient, issuesTriage, answeringLabels, "label-1", "label-2", "label-3", answeringLabels)
 		githubOperator.UpdateRepos(repoNames)
 	})
 
@@ -135,7 +135,7 @@ var _ = Describe("githuboperator", func() {
 		}
 		githubClient := Mockgithubclient{}
 		issuesTriage := Mockissuestriage{}
-		githubOperator := New(githubClient, issuesTriage, answeringLabels, "label-1", "label-2", "label-3")
+		githubOperator := New(githubClient, issuesTriage, answeringLabels, "label-1", "label-2", "label-3", answeringLabels)
 
 		githubOperator.UpdateRepos(repoNames)
 
@@ -197,7 +197,7 @@ var _ = Describe("githuboperator", func() {
 		}
 		githubClient := Mockgithubclient{}
 		issuesTriage := Mockissuestriage{}
-		githubOperator := New(githubClient, issuesTriage, answeringLabels, "label-1", "label-2", "label-3")
+		githubOperator := New(githubClient, issuesTriage, answeringLabels, "label-1", "label-2", "label-3", answeringLabels)
 
 		githubOperator.UpdateRepos(repoNames)
 
@@ -256,7 +256,7 @@ var _ = Describe("githuboperator", func() {
 		}
 		githubClient := Mockgithubclient{}
 		issuesTriage := Mockissuestriage{}
-		githubOperator := New(githubClient, issuesTriage, answeringLabels, "label-1", "label-2", "label-3")
+		githubOperator := New(githubClient, issuesTriage, answeringLabels, "label-1", "label-2", "label-3", answeringLabels)
 
 		githubOperator.UpdateRepos(repoNames)
 
@@ -307,7 +307,7 @@ var _ = Describe("githuboperator", func() {
 		}
 		githubClient := Mockgithubclient{}
 		issuesTriage := Mockissuestriage{}
-		githubOperator := New(githubClient, issuesTriage, answeringLabels, "by-ours", "answered", "not-answered")
+		githubOperator := New(githubClient, issuesTriage, answeringLabels, "by-ours", "answered", "not-answered", answeringLabels)
 
 		githubOperator.UpdateRepos(repoNames)
 
@@ -376,7 +376,7 @@ var _ = Describe("githuboperator", func() {
 		}
 		githubClient := Mockgithubclient{}
 		issuesTriage := Mockissuestriage{}
-		githubOperator := New(githubClient, issuesTriage, answeringLabels, "by-ours", "answered", "not-answered")
+		githubOperator := New(githubClient, issuesTriage, answeringLabels, "by-ours", "answered", "not-answered", answeringLabels)
 
 		githubOperator.UpdateRepos(repoNames)
 

@@ -3,6 +3,7 @@ package githuboperator
 import (
 	"github.com/brainhubeu/issue-overseer/githubstructures"
 	"log"
+	"strings"
 )
 
 type GithubClient interface {
@@ -26,32 +27,33 @@ type githuboperator struct {
 	OUR_LABEL_TEXT          string
 	ANSWERED_LABEL_TEXT     string
 	NOT_ANSWERED_LABEL_TEXT string
+	DefaultLabels           []githubstructures.Label
 }
 
-func New(githubClient GithubClient, issuesTriage IssuesTriage, answeringLabels []githubstructures.Label, OUR_LABEL_TEXT string, ANSWERED_LABEL_TEXT string, NOT_ANSWERED_LABEL_TEXT string) *githuboperator {
-	githubOperator := &githuboperator{githubClient, issuesTriage, answeringLabels, OUR_LABEL_TEXT, ANSWERED_LABEL_TEXT, NOT_ANSWERED_LABEL_TEXT}
+func New(githubClient GithubClient, issuesTriage IssuesTriage, answeringLabels []githubstructures.Label, OUR_LABEL_TEXT string, ANSWERED_LABEL_TEXT string, NOT_ANSWERED_LABEL_TEXT string, defaultLabels []githubstructures.Label) *githuboperator {
+	githubOperator := &githuboperator{githubClient, issuesTriage, answeringLabels, OUR_LABEL_TEXT, ANSWERED_LABEL_TEXT, NOT_ANSWERED_LABEL_TEXT, defaultLabels}
 	return githubOperator
 }
 
 func (githubOperator githuboperator) createOrUpdateRepoLabels(repoName string) {
 	allLabels := githubOperator.githubclient.FindLabels(repoName)
 	labelsToDelete := []githubstructures.Label{}
-	for i := 0; i < len(githubOperator.AnsweringLabels); i++ {
-		label := githubOperator.AnsweringLabels[i]
+	for i := 0; i < len(githubOperator.DefaultLabels); i++ {
+		label := githubOperator.DefaultLabels[i]
 		for j := 0; j < len(allLabels); j++ {
 			anyLabel := allLabels[j]
-			if label.Name == anyLabel.Name && label.Color != anyLabel.Color {
+			if strings.EqualFold(label.Name, anyLabel.Name) && label.Color != anyLabel.Color {
 				labelsToDelete = append(labelsToDelete, label)
 			}
 		}
 	}
 	labelsToCreate := append([]githubstructures.Label{}, labelsToDelete...)
-	for i := 0; i < len(githubOperator.AnsweringLabels); i++ {
-		label := githubOperator.AnsweringLabels[i]
+	for i := 0; i < len(githubOperator.DefaultLabels); i++ {
+		label := githubOperator.DefaultLabels[i]
 		j := 0
 		for ; j < len(allLabels); j++ {
 			anyLabel := allLabels[j]
-			if label.Name == anyLabel.Name {
+			if strings.EqualFold(label.Name, anyLabel.Name) {
 				break
 			}
 		}
