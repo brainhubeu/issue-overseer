@@ -87,7 +87,7 @@ var _ = Describe("issuestriage", func() {
 		issue := githubstructures.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "MEMBER", Labels: []githubstructures.Label{}, Comments: []githubstructures.Comment{}}
 
 		issuesTriage := New()
-		issueType := issuesTriage.TriageOneIssue(issue)
+		issueType := issuesTriage.TriageOneIssueByAnswering(issue)
 
 		Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.OURS))
 	})
@@ -98,7 +98,7 @@ var _ = Describe("issuestriage", func() {
 		}}
 
 		issuesTriage := New()
-		issueType := issuesTriage.TriageOneIssue(issue)
+		issueType := issuesTriage.TriageOneIssueByAnswering(issue)
 
 		Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.OURS))
 	})
@@ -109,7 +109,7 @@ var _ = Describe("issuestriage", func() {
 		}}
 
 		issuesTriage := New()
-		issueType := issuesTriage.TriageOneIssue(issue)
+		issueType := issuesTriage.TriageOneIssueByAnswering(issue)
 
 		Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.NOT_ANSWERED))
 	})
@@ -121,7 +121,7 @@ var _ = Describe("issuestriage", func() {
 		}}
 
 		issuesTriage := New()
-		issueType := issuesTriage.TriageOneIssue(issue)
+		issueType := issuesTriage.TriageOneIssueByAnswering(issue)
 
 		Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.ANSWERED))
 	})
@@ -133,7 +133,7 @@ var _ = Describe("issuestriage", func() {
 		}}
 
 		issuesTriage := New()
-		issueType := issuesTriage.TriageOneIssue(issue)
+		issueType := issuesTriage.TriageOneIssueByAnswering(issue)
 
 		Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.NOT_ANSWERED))
 	})
@@ -142,7 +142,7 @@ var _ = Describe("issuestriage", func() {
 		issue := githubstructures.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "NONE", Labels: []githubstructures.Label{}, Comments: []githubstructures.Comment{}}
 
 		issuesTriage := New()
-		issueType := issuesTriage.TriageOneIssue(issue)
+		issueType := issuesTriage.TriageOneIssueByAnswering(issue)
 
 		Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.NOT_ANSWERED))
 	})
@@ -153,7 +153,7 @@ var _ = Describe("issuestriage", func() {
 		}}
 
 		issuesTriage := New()
-		issueType := issuesTriage.TriageOneIssue(issue)
+		issueType := issuesTriage.TriageOneIssueByAnswering(issue)
 
 		Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.ANSWERED))
 	})
@@ -164,7 +164,7 @@ var _ = Describe("issuestriage", func() {
 		}}
 
 		issuesTriage := New()
-		issueType := issuesTriage.TriageOneIssue(issue)
+		issueType := issuesTriage.TriageOneIssueByAnswering(issue)
 
 		Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.NOT_ANSWERED))
 	})
@@ -176,7 +176,7 @@ var _ = Describe("issuestriage", func() {
 		}}
 
 		issuesTriage := New()
-		issueType := issuesTriage.TriageOneIssue(issue)
+		issueType := issuesTriage.TriageOneIssueByAnswering(issue)
 
 		Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.ANSWERED))
 	})
@@ -188,7 +188,7 @@ var _ = Describe("issuestriage", func() {
 		}}
 
 		issuesTriage := New()
-		issueType := issuesTriage.TriageOneIssue(issue)
+		issueType := issuesTriage.TriageOneIssueByAnswering(issue)
 
 		Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.NOT_ANSWERED))
 	})
@@ -199,7 +199,7 @@ var _ = Describe("issuestriage", func() {
 		}}
 
 		issuesTriage := New()
-		issueType := issuesTriage.TriageOneIssue(issue)
+		issueType := issuesTriage.TriageOneIssueByAnswering(issue)
 
 		Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.OURS))
 	})
@@ -210,7 +210,7 @@ var _ = Describe("issuestriage", func() {
 		}}
 
 		issuesTriage := New()
-		issueType := issuesTriage.TriageOneIssue(issue)
+		issueType := issuesTriage.TriageOneIssueByAnswering(issue)
 
 		Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.NOT_ANSWERED))
 	})
@@ -222,7 +222,7 @@ var _ = Describe("issuestriage", func() {
 		}}
 
 		issuesTriage := New()
-		issueType := issuesTriage.TriageOneIssue(issue)
+		issueType := issuesTriage.TriageOneIssueByAnswering(issue)
 
 		Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.ANSWERED))
 	})
@@ -234,7 +234,7 @@ var _ = Describe("issuestriage", func() {
 		}}
 
 		issuesTriage := New()
-		issueType := issuesTriage.TriageOneIssue(issue)
+		issueType := issuesTriage.TriageOneIssueByAnswering(issue)
 
 		Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.NOT_ANSWERED))
 	})
@@ -249,7 +249,7 @@ var _ = Describe("issuestriage", func() {
 		}}
 
 		issuesTriage := New()
-		issueType := issuesTriage.TriageOneIssue(issue)
+		issueType := issuesTriage.TriageOneIssueByAnswering(issue)
 
 		Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.ANSWERED))
 	})
@@ -265,7 +265,7 @@ var _ = Describe("issuestriage", func() {
 		}}
 
 		issuesTriage := New()
-		issueType := issuesTriage.TriageOneIssue(issue)
+		issueType := issuesTriage.TriageOneIssueByAnswering(issue)
 
 		Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.NOT_ANSWERED))
 	})
@@ -281,7 +281,7 @@ var _ = Describe("issuestriage", func() {
 		}}
 
 		issuesTriage := New()
-		issueType := issuesTriage.TriageOneIssue(issue)
+		issueType := issuesTriage.TriageOneIssueByAnswering(issue)
 
 		Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.ANSWERED))
 	})
@@ -298,7 +298,7 @@ var _ = Describe("issuestriage", func() {
 		}}
 
 		issuesTriage := New()
-		issueType := issuesTriage.TriageOneIssue(issue)
+		issueType := issuesTriage.TriageOneIssueByAnswering(issue)
 
 		Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.NOT_ANSWERED))
 	})

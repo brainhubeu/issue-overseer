@@ -12,7 +12,7 @@ func New() *issuestriage {
 	return issuesTriage
 }
 
-func (issuesTriage issuestriage) TriageOneIssue(issue githubstructures.Issue) int {
+func (issuesTriage issuestriage) TriageOneIssueByAnswering(issue githubstructures.Issue) int {
 	comments := issue.Comments
 	if issue.AuthorAssociation == "MEMBER" {
 		j := len(comments) - 1
@@ -58,7 +58,7 @@ func (issuesTriage issuestriage) GroupByAnswering(issues []githubstructures.Issu
 	notAnsweredIssues := []githubstructures.Issue{}
 	for i := 0; i < len(issues); i++ {
 		issue := issues[i]
-		switch issueType := issuesTriage.TriageOneIssue(issue); issueType {
+		switch issueType := issuesTriage.TriageOneIssueByAnswering(issue); issueType {
 		case githubstructures.IssueTypeEnum.OURS:
 			ourIssues = append(ourIssues, issue)
 		case githubstructures.IssueTypeEnum.ANSWERED:
