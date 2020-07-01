@@ -5,3 +5,4 @@ services:
     environment:
       - GITHUB_TOKEN
       - GITHUB_ORGANIZATION
+      - SLEEP_IN_SECONDS=120

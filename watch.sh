@@ -1,7 +1,7 @@
-#!/usr/local/bin/bash
+#!/bin/sh
 
 while true
 do
-  time ./issue-overseer $1
-  sleep 120
+  time ./issue-overseer "$GITHUB_ORGANIZATION"
+  sleep "$SLEEP_IN_SECONDS"
 done
