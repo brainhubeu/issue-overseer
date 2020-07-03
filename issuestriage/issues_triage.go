@@ -27,12 +27,12 @@ func (issuesTriage issuestriage) TriageOneIssueByAnswering(issue githubstructure
 			}
 		}
 		if j == -1 {
-			return githubstructures.IssueTypeEnum.OURS
+			return githubstructures.IssueAnsweringTypeEnum.OURS
 		} else {
 			if lastAuthorAssociation == "MEMBER" {
-				return githubstructures.IssueTypeEnum.ANSWERED
+				return githubstructures.IssueAnsweringTypeEnum.ANSWERED
 			} else {
-				return githubstructures.IssueTypeEnum.NOT_ANSWERED
+				return githubstructures.IssueAnsweringTypeEnum.NOT_ANSWERED
 			}
 		}
 	} else {
@@ -43,11 +43,11 @@ func (issuesTriage issuestriage) TriageOneIssueByAnswering(issue githubstructure
 			}
 		}
 		if j == -1 {
-			return githubstructures.IssueTypeEnum.NOT_ANSWERED
+			return githubstructures.IssueAnsweringTypeEnum.NOT_ANSWERED
 		} else if comments[j].AuthorAssociation == "MEMBER" {
-			return githubstructures.IssueTypeEnum.ANSWERED
+			return githubstructures.IssueAnsweringTypeEnum.ANSWERED
 		} else {
-			return githubstructures.IssueTypeEnum.NOT_ANSWERED
+			return githubstructures.IssueAnsweringTypeEnum.NOT_ANSWERED
 		}
 	}
 }
@@ -59,9 +59,9 @@ func (issuesTriage issuestriage) GroupByAnswering(issues []githubstructures.Issu
 	for i := 0; i < len(issues); i++ {
 		issue := issues[i]
 		switch issueType := issuesTriage.TriageOneIssueByAnswering(issue); issueType {
-		case githubstructures.IssueTypeEnum.OURS:
+		case githubstructures.IssueAnsweringTypeEnum.OURS:
 			ourIssues = append(ourIssues, issue)
-		case githubstructures.IssueTypeEnum.ANSWERED:
+		case githubstructures.IssueAnsweringTypeEnum.ANSWERED:
 			answeredIssues = append(answeredIssues, issue)
 		default:
 			notAnsweredIssues = append(notAnsweredIssues, issue)

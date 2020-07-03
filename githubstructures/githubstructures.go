@@ -1,12 +1,12 @@
 package githubstructures
 
-type issueTypeEnum struct {
+type issueAnsweringTypeEnum struct {
 	OURS         int
 	ANSWERED     int
 	NOT_ANSWERED int
 }
 
-var IssueTypeEnum = &issueTypeEnum{
+var IssueAnsweringTypeEnum = &issueAnsweringTypeEnum{
 	OURS:         1,
 	ANSWERED:     2,
 	NOT_ANSWERED: 3,

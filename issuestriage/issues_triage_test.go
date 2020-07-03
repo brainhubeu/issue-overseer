@@ -92,7 +92,7 @@ var _ = Describe("issuestriage", func() {
 			issuesTriage := New()
 			issueType := issuesTriage.TriageOneIssueByAnswering(issue)
 
-			Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.OURS))
+			Expect(issueType).To(Equal(githubstructures.IssueAnsweringTypeEnum.OURS))
 		})
 
 		It("returns OURS for an issue created by a member with a member comment", func() {
@@ -103,7 +103,7 @@ var _ = Describe("issuestriage", func() {
 			issuesTriage := New()
 			issueType := issuesTriage.TriageOneIssueByAnswering(issue)
 
-			Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.OURS))
+			Expect(issueType).To(Equal(githubstructures.IssueAnsweringTypeEnum.OURS))
 		})
 
 		It("returns NOT_ANSWERED for an issue created by a member with an external comment", func() {
@@ -114,7 +114,7 @@ var _ = Describe("issuestriage", func() {
 			issuesTriage := New()
 			issueType := issuesTriage.TriageOneIssueByAnswering(issue)
 
-			Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.NOT_ANSWERED))
+			Expect(issueType).To(Equal(githubstructures.IssueAnsweringTypeEnum.NOT_ANSWERED))
 		})
 
 		It("returns ANSWERED for an issue created by a member with an external comment followed by a member comment", func() {
@@ -126,7 +126,7 @@ var _ = Describe("issuestriage", func() {
 			issuesTriage := New()
 			issueType := issuesTriage.TriageOneIssueByAnswering(issue)
 
-			Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.ANSWERED))
+			Expect(issueType).To(Equal(githubstructures.IssueAnsweringTypeEnum.ANSWERED))
 		})
 
 		It("returns NOT_ANSWERED for an issue created by a member with a member comment followed by an external comment", func() {
@@ -138,7 +138,7 @@ var _ = Describe("issuestriage", func() {
 			issuesTriage := New()
 			issueType := issuesTriage.TriageOneIssueByAnswering(issue)
 
-			Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.NOT_ANSWERED))
+			Expect(issueType).To(Equal(githubstructures.IssueAnsweringTypeEnum.NOT_ANSWERED))
 		})
 
 		It("returns NOT_ANSWERED for an issue created by a non-member with no comments", func() {
@@ -147,7 +147,7 @@ var _ = Describe("issuestriage", func() {
 			issuesTriage := New()
 			issueType := issuesTriage.TriageOneIssueByAnswering(issue)
 
-			Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.NOT_ANSWERED))
+			Expect(issueType).To(Equal(githubstructures.IssueAnsweringTypeEnum.NOT_ANSWERED))
 		})
 
 		It("returns ANSWERED for an issue created by a non-member with a member comment", func() {
@@ -158,7 +158,7 @@ var _ = Describe("issuestriage", func() {
 			issuesTriage := New()
 			issueType := issuesTriage.TriageOneIssueByAnswering(issue)
 
-			Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.ANSWERED))
+			Expect(issueType).To(Equal(githubstructures.IssueAnsweringTypeEnum.ANSWERED))
 		})
 
 		It("returns NOT_ANSWERED for an issue created by a non-member with an external comment", func() {
@@ -169,7 +169,7 @@ var _ = Describe("issuestriage", func() {
 			issuesTriage := New()
 			issueType := issuesTriage.TriageOneIssueByAnswering(issue)
 
-			Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.NOT_ANSWERED))
+			Expect(issueType).To(Equal(githubstructures.IssueAnsweringTypeEnum.NOT_ANSWERED))
 		})
 
 		It("returns ANSWERED for an issue created by a non-member with an external comment followed by a non-member comment", func() {
@@ -181,7 +181,7 @@ var _ = Describe("issuestriage", func() {
 			issuesTriage := New()
 			issueType := issuesTriage.TriageOneIssueByAnswering(issue)
 
-			Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.ANSWERED))
+			Expect(issueType).To(Equal(githubstructures.IssueAnsweringTypeEnum.ANSWERED))
 		})
 
 		It("returns NOT_ANSWERED for an issue created by a non-member with a member comment followed by an external comment", func() {
@@ -193,7 +193,7 @@ var _ = Describe("issuestriage", func() {
 			issuesTriage := New()
 			issueType := issuesTriage.TriageOneIssueByAnswering(issue)
 
-			Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.NOT_ANSWERED))
+			Expect(issueType).To(Equal(githubstructures.IssueAnsweringTypeEnum.NOT_ANSWERED))
 		})
 
 		It("excludes an issuehunt-app comment for our issue when there are no other comments", func() {
@@ -204,7 +204,7 @@ var _ = Describe("issuestriage", func() {
 			issuesTriage := New()
 			issueType := issuesTriage.TriageOneIssueByAnswering(issue)
 
-			Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.OURS))
+			Expect(issueType).To(Equal(githubstructures.IssueAnsweringTypeEnum.OURS))
 		})
 
 		It("excludes an issuehunt-app comment for an external issue when there are no other comments", func() {
@@ -215,7 +215,7 @@ var _ = Describe("issuestriage", func() {
 			issuesTriage := New()
 			issueType := issuesTriage.TriageOneIssueByAnswering(issue)
 
-			Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.NOT_ANSWERED))
+			Expect(issueType).To(Equal(githubstructures.IssueAnsweringTypeEnum.NOT_ANSWERED))
 		})
 
 		It("excludes an issuehunt-app comment when the last comment is ours", func() {
@@ -227,7 +227,7 @@ var _ = Describe("issuestriage", func() {
 			issuesTriage := New()
 			issueType := issuesTriage.TriageOneIssueByAnswering(issue)
 
-			Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.ANSWERED))
+			Expect(issueType).To(Equal(githubstructures.IssueAnsweringTypeEnum.ANSWERED))
 		})
 
 		It("excludes an issuehunt-app comment when the last comment isn't ours", func() {
@@ -239,7 +239,7 @@ var _ = Describe("issuestriage", func() {
 			issuesTriage := New()
 			issueType := issuesTriage.TriageOneIssueByAnswering(issue)
 
-			Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.NOT_ANSWERED))
+			Expect(issueType).To(Equal(githubstructures.IssueAnsweringTypeEnum.NOT_ANSWERED))
 		})
 
 		It("works correctly with many comments when the last comment is ours", func() {
@@ -254,7 +254,7 @@ var _ = Describe("issuestriage", func() {
 			issuesTriage := New()
 			issueType := issuesTriage.TriageOneIssueByAnswering(issue)
 
-			Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.ANSWERED))
+			Expect(issueType).To(Equal(githubstructures.IssueAnsweringTypeEnum.ANSWERED))
 		})
 
 		It("works correctly with many comments when the last comment isn't ours", func() {
@@ -270,7 +270,7 @@ var _ = Describe("issuestriage", func() {
 			issuesTriage := New()
 			issueType := issuesTriage.TriageOneIssueByAnswering(issue)
 
-			Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.NOT_ANSWERED))
+			Expect(issueType).To(Equal(githubstructures.IssueAnsweringTypeEnum.NOT_ANSWERED))
 		})
 
 		It("works correctly with many comments when the last comment is by issuehunt-app and before it there's our comment", func() {
@@ -286,7 +286,7 @@ var _ = Describe("issuestriage", func() {
 			issuesTriage := New()
 			issueType := issuesTriage.TriageOneIssueByAnswering(issue)
 
-			Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.ANSWERED))
+			Expect(issueType).To(Equal(githubstructures.IssueAnsweringTypeEnum.ANSWERED))
 		})
 
 		It("works correctly with many comments when the last comment is by issuehunt-app and before it there's an external comment", func() {
@@ -303,7 +303,7 @@ var _ = Describe("issuestriage", func() {
 			issuesTriage := New()
 			issueType := issuesTriage.TriageOneIssueByAnswering(issue)
 
-			Expect(issueType).To(Equal(githubstructures.IssueTypeEnum.NOT_ANSWERED))
+			Expect(issueType).To(Equal(githubstructures.IssueAnsweringTypeEnum.NOT_ANSWERED))
 		})
 	})
 })
