@@ -306,4 +306,63 @@ var _ = Describe("issuestriage", func() {
 			Expect(issueType).To(Equal(githubstructures.IssueAnsweringTypeEnum.NOT_ANSWERED))
 		})
 	})
+
+	_ = Describe("TriageOneIssueByManualLabel", func() {
+		It("returns NON_EXISTENT when there are no labels", func() {
+			issue := githubstructures.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "NONE", Labels: []githubstructures.Label{}, Comments: []githubstructures.Comment{}}
+
+			issuesTriage := New()
+			issueType := issuesTriage.TriageOneIssueByManualLabel(issue, "severity")
+
+			Expect(issueType).To(Equal(githubstructures.IssueManualLabelTypeEnum.NON_EXISTENT))
+		})
+
+		It("returns NON_EXISTENT when there are is one non-matching label", func() {
+			issue := githubstructures.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "NONE", Labels: []githubstructures.Label{
+				githubstructures.Label{Name: "foo", Color: "000000"},
+			}, Comments: []githubstructures.Comment{}}
+
+			issuesTriage := New()
+			issueType := issuesTriage.TriageOneIssueByManualLabel(issue, "severity")
+
+			Expect(issueType).To(Equal(githubstructures.IssueManualLabelTypeEnum.NON_EXISTENT))
+		})
+
+		It("returns NON_EXISTENT when there are many non-matching labels", func() {
+			issue := githubstructures.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "NONE", Labels: []githubstructures.Label{
+				githubstructures.Label{Name: "foo", Color: "000000"},
+				githubstructures.Label{Name: "bar", Color: "000000"},
+				githubstructures.Label{Name: "baz", Color: "000000"},
+			}, Comments: []githubstructures.Comment{}}
+
+			issuesTriage := New()
+			issueType := issuesTriage.TriageOneIssueByManualLabel(issue, "severity")
+
+			Expect(issueType).To(Equal(githubstructures.IssueManualLabelTypeEnum.NON_EXISTENT))
+		})
+
+		It("returns EXISTENT when there is a matching label among many labels", func() {
+			issue := githubstructures.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "NONE", Labels: []githubstructures.Label{
+				githubstructures.Label{Name: "foo", Color: "000000"},
+				githubstructures.Label{Name: "severity: major", Color: "000000"},
+				githubstructures.Label{Name: "baz", Color: "000000"},
+			}, Comments: []githubstructures.Comment{}}
+
+			issuesTriage := New()
+			issueType := issuesTriage.TriageOneIssueByManualLabel(issue, "severity")
+
+			Expect(issueType).To(Equal(githubstructures.IssueManualLabelTypeEnum.EXISTENT))
+		})
+
+		It("returns EXISTENT when there is only one label and it's matching", func() {
+			issue := githubstructures.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "NONE", Labels: []githubstructures.Label{
+				githubstructures.Label{Name: "severity: major", Color: "000000"},
+			}, Comments: []githubstructures.Comment{}}
+
+			issuesTriage := New()
+			issueType := issuesTriage.TriageOneIssueByManualLabel(issue, "severity")
+
+			Expect(issueType).To(Equal(githubstructures.IssueManualLabelTypeEnum.EXISTENT))
+		})
+	})
 })

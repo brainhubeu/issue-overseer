@@ -12,6 +12,16 @@ var IssueAnsweringTypeEnum = &issueAnsweringTypeEnum{
 	NOT_ANSWERED: 3,
 }
 
+type issueManualLabelTypeEnum struct {
+	EXISTENT     int
+	NON_EXISTENT int
+}
+
+var IssueManualLabelTypeEnum = &issueManualLabelTypeEnum{
+	EXISTENT:     1,
+	NON_EXISTENT: 2,
+}
+
 type Label struct {
 	Name  string
 	Color string

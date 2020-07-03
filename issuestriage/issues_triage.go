@@ -2,6 +2,7 @@ package issuestriage
 
 import (
 	"github.com/brainhubeu/issue-overseer/githubstructures"
+	"strings"
 )
 
 type issuestriage struct {
@@ -68,4 +69,15 @@ func (issuesTriage issuestriage) GroupByAnswering(issues []githubstructures.Issu
 		}
 	}
 	return ourIssues, answeredIssues, notAnsweredIssues
+}
+
+func (issuesTriage issuestriage) TriageOneIssueByManualLabel(issue githubstructures.Issue, prefix string) int {
+	labels := issue.Labels
+	for i := 0; i < len(labels); i++ {
+		label := labels[i]
+		if strings.HasPrefix(label.Name, prefix) {
+			return githubstructures.IssueManualLabelTypeEnum.EXISTENT
+		}
+	}
+	return githubstructures.IssueManualLabelTypeEnum.NON_EXISTENT
 }
