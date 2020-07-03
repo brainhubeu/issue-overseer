@@ -12,9 +12,14 @@ import (
 type Mockissuestriage struct{}
 
 var mockGroupByAnswering func(issues []githubstructures.Issue) ([]githubstructures.Issue, []githubstructures.Issue, []githubstructures.Issue)
+var mockGroupByManualLabel func(issues []githubstructures.Issue, prefix string) ([]githubstructures.Issue, []githubstructures.Issue)
 
 func (issuesTriage Mockissuestriage) GroupByAnswering(issues []githubstructures.Issue) ([]githubstructures.Issue, []githubstructures.Issue, []githubstructures.Issue) {
 	return mockGroupByAnswering(issues)
+}
+
+func (issuesTriage Mockissuestriage) GroupByManualLabel(issues []githubstructures.Issue, prefix string) ([]githubstructures.Issue, []githubstructures.Issue) {
+	return mockGroupByManualLabel(issues, prefix)
 }
 
 type Mockgithubclient struct{}

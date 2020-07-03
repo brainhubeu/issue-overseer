@@ -365,4 +365,43 @@ var _ = Describe("issuestriage", func() {
 			Expect(issueType).To(Equal(githubstructures.IssueManualLabelTypeEnum.EXISTENT))
 		})
 	})
+
+	_ = Describe("GroupByManualLabel", func() {
+		It("groups", func() {
+			issues := []githubstructures.Issue{
+				githubstructures.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "NONE", Labels: []githubstructures.Label{
+					githubstructures.Label{Name: "severity: major", Color: "000000"},
+				}, Comments: []githubstructures.Comment{}},
+				githubstructures.Issue{Title: "title", Url: "url", Number: 122, AuthorAssociation: "NONE", Labels: []githubstructures.Label{
+					githubstructures.Label{Name: "foo", Color: "000000"},
+				}, Comments: []githubstructures.Comment{}},
+				githubstructures.Issue{Title: "title", Url: "url", Number: 123, AuthorAssociation: "NONE", Labels: []githubstructures.Label{
+					githubstructures.Label{Name: "severity: minor", Color: "000000"},
+				}, Comments: []githubstructures.Comment{}},
+				githubstructures.Issue{Title: "title", Url: "url", Number: 124, AuthorAssociation: "NONE", Labels: []githubstructures.Label{
+					githubstructures.Label{Name: "bar", Color: "000000"},
+				}, Comments: []githubstructures.Comment{}},
+			}
+
+			issuesTriage := New()
+			issuesWithLabel, issuesWithoutLabel := issuesTriage.GroupByManualLabel(issues, "severity")
+
+			Expect(issuesWithLabel).To(Equal([]githubstructures.Issue{
+				githubstructures.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "NONE", Labels: []githubstructures.Label{
+					githubstructures.Label{Name: "severity: major", Color: "000000"},
+				}, Comments: []githubstructures.Comment{}},
+				githubstructures.Issue{Title: "title", Url: "url", Number: 123, AuthorAssociation: "NONE", Labels: []githubstructures.Label{
+					githubstructures.Label{Name: "severity: minor", Color: "000000"},
+				}, Comments: []githubstructures.Comment{}},
+			}))
+			Expect(issuesWithoutLabel).To(Equal([]githubstructures.Issue{
+				githubstructures.Issue{Title: "title", Url: "url", Number: 122, AuthorAssociation: "NONE", Labels: []githubstructures.Label{
+					githubstructures.Label{Name: "foo", Color: "000000"},
+				}, Comments: []githubstructures.Comment{}},
+				githubstructures.Issue{Title: "title", Url: "url", Number: 124, AuthorAssociation: "NONE", Labels: []githubstructures.Label{
+					githubstructures.Label{Name: "bar", Color: "000000"},
+				}, Comments: []githubstructures.Comment{}},
+			}))
+		})
+	})
 })

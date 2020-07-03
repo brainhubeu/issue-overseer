@@ -18,6 +18,7 @@ type GithubClient interface {
 
 type IssuesTriage interface {
 	GroupByAnswering(issues []githubstructures.Issue) ([]githubstructures.Issue, []githubstructures.Issue, []githubstructures.Issue)
+	GroupByManualLabel(issues []githubstructures.Issue, prefix string) ([]githubstructures.Issue, []githubstructures.Issue)
 }
 
 type githuboperator struct {

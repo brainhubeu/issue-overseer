@@ -81,3 +81,18 @@ func (issuesTriage issuestriage) TriageOneIssueByManualLabel(issue githubstructu
 	}
 	return githubstructures.IssueManualLabelTypeEnum.NON_EXISTENT
 }
+
+func (issuesTriage issuestriage) GroupByManualLabel(issues []githubstructures.Issue, prefix string) ([]githubstructures.Issue, []githubstructures.Issue) {
+	issuesWithLabel := []githubstructures.Issue{}
+	issuesWithoutLabel := []githubstructures.Issue{}
+	for i := 0; i < len(issues); i++ {
+		issue := issues[i]
+		switch issueType := issuesTriage.TriageOneIssueByManualLabel(issue, prefix); issueType {
+		case githubstructures.IssueManualLabelTypeEnum.EXISTENT:
+			issuesWithLabel = append(issuesWithLabel, issue)
+		default:
+			issuesWithoutLabel = append(issuesWithoutLabel, issue)
+		}
+	}
+	return issuesWithLabel, issuesWithoutLabel
+}
