@@ -92,23 +92,27 @@ func (githubOperator githuboperator) updateIssueLabels(issueUrl string, allIssue
 	githubOperator.githubclient.AddLabel(issueUrl, labelNameToAdd)
 }
 
+func (githubOperator githuboperator) updateAnsweringLabelsForRepo(repoName string) {
+	issues := githubOperator.githubclient.FindIssues(repoName)
+	ourIssues, answeredIssues, notAnsweredIssues := githubOperator.issuestriage.GroupByAnswering(issues)
+	log.Println(repoName, "ourIssues", ourIssues)
+	log.Println(repoName, "answeredIssues", answeredIssues)
+	log.Println(repoName, "notAnsweredIssues", notAnsweredIssues)
+	for i := 0; i < len(ourIssues); i++ {
+		githubOperator.updateIssueLabels(ourIssues[i].Url, ourIssues[i].Labels, githubOperator.OUR_LABEL_TEXT)
+	}
+	for i := 0; i < len(answeredIssues); i++ {
+		githubOperator.updateIssueLabels(answeredIssues[i].Url, answeredIssues[i].Labels, githubOperator.ANSWERED_LABEL_TEXT)
+	}
+	for i := 0; i < len(notAnsweredIssues); i++ {
+		githubOperator.updateIssueLabels(notAnsweredIssues[i].Url, notAnsweredIssues[i].Labels, githubOperator.NOT_ANSWERED_LABEL_TEXT)
+	}
+}
+
 func (githubOperator githuboperator) UpdateRepos(repoNames []string) {
 	for i := 0; i < len(repoNames); i++ {
 		repoName := repoNames[i]
 		githubOperator.createOrUpdateRepoLabels(repoName)
-		issues := githubOperator.githubclient.FindIssues(repoName)
-		ourIssues, answeredIssues, notAnsweredIssues := githubOperator.issuestriage.GroupByAnswering(issues)
-		log.Println(repoName, "ourIssues", ourIssues)
-		log.Println(repoName, "answeredIssues", answeredIssues)
-		log.Println(repoName, "notAnsweredIssues", notAnsweredIssues)
-		for j := 0; j < len(ourIssues); j++ {
-			githubOperator.updateIssueLabels(ourIssues[j].Url, ourIssues[j].Labels, githubOperator.OUR_LABEL_TEXT)
-		}
-		for j := 0; j < len(answeredIssues); j++ {
-			githubOperator.updateIssueLabels(answeredIssues[j].Url, answeredIssues[j].Labels, githubOperator.ANSWERED_LABEL_TEXT)
-		}
-		for j := 0; j < len(notAnsweredIssues); j++ {
-			githubOperator.updateIssueLabels(notAnsweredIssues[j].Url, notAnsweredIssues[j].Labels, githubOperator.NOT_ANSWERED_LABEL_TEXT)
-		}
+		githubOperator.updateAnsweringLabelsForRepo(repoName)
 	}
 }
