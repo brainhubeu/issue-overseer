@@ -376,7 +376,7 @@ var _ = Describe("githuboperator", func() {
 		}
 		githubClient := Mockgithubclient{}
 		issuesTriage := Mockissuestriage{}
-		githubOperator := New(githubClient, issuesTriage, answeringLabels, "by-ours", "answered", "not-answered")
+		githubOperator := New(githubClient, issuesTriage, answeringLabels, "by-ours", "answered", "not-answeredo")
 
 		githubOperator.UpdateRepos(repoNames)
 
