@@ -109,7 +109,7 @@ var _ = Describe("githuboperator", func() {
 
 		githubClient := Mockgithubclient{}
 		issuesTriage := Mockissuestriage{}
-		githubOperator := New(githubClient, issuesTriage, answeringLabels, "label-1", "label-2", "label-3", answeringLabels)
+		githubOperator := New(githubClient, issuesTriage, answeringLabels, "label-1", "label-2", "label-3", answeringLabels, []string{})
 		githubOperator.UpdateRepos(repoNames)
 	})
 
@@ -140,7 +140,7 @@ var _ = Describe("githuboperator", func() {
 		}
 		githubClient := Mockgithubclient{}
 		issuesTriage := Mockissuestriage{}
-		githubOperator := New(githubClient, issuesTriage, answeringLabels, "label-1", "label-2", "label-3", answeringLabels)
+		githubOperator := New(githubClient, issuesTriage, answeringLabels, "label-1", "label-2", "label-3", answeringLabels, []string{})
 
 		githubOperator.UpdateRepos(repoNames)
 
@@ -202,7 +202,7 @@ var _ = Describe("githuboperator", func() {
 		}
 		githubClient := Mockgithubclient{}
 		issuesTriage := Mockissuestriage{}
-		githubOperator := New(githubClient, issuesTriage, answeringLabels, "label-1", "label-2", "label-3", answeringLabels)
+		githubOperator := New(githubClient, issuesTriage, answeringLabels, "label-1", "label-2", "label-3", answeringLabels, []string{})
 
 		githubOperator.UpdateRepos(repoNames)
 
@@ -261,7 +261,7 @@ var _ = Describe("githuboperator", func() {
 		}
 		githubClient := Mockgithubclient{}
 		issuesTriage := Mockissuestriage{}
-		githubOperator := New(githubClient, issuesTriage, answeringLabels, "label-1", "label-2", "label-3", answeringLabels)
+		githubOperator := New(githubClient, issuesTriage, answeringLabels, "label-1", "label-2", "label-3", answeringLabels, []string{})
 
 		githubOperator.UpdateRepos(repoNames)
 
@@ -269,6 +269,55 @@ var _ = Describe("githuboperator", func() {
 			[]interface{}{"repo-1", "label-1"},
 			[]interface{}{"repo-3", "label-2"},
 			[]interface{}{"repo-3", "label-3"},
+		}))
+	})
+
+	It("adds missing manual label", func() {
+		mockAddLabelParams := []interface{}{}
+		repoNames := []string{
+			"repo-1",
+		}
+		answeringLabels := []githubstructures.Label{
+			githubstructures.Label{Name: "label-1", Color: "color-1"},
+			githubstructures.Label{Name: "label-2", Color: "color-2"},
+			githubstructures.Label{Name: "label-3", Color: "color-3"},
+		}
+
+		mockGroupByAnswering = func(issues []githubstructures.Issue) ([]githubstructures.Issue, []githubstructures.Issue, []githubstructures.Issue) {
+			return []githubstructures.Issue{},
+				[]githubstructures.Issue{},
+				[]githubstructures.Issue{}
+		}
+		mockGroupByManualLabel = func(issues []githubstructures.Issue, prefix string) ([]githubstructures.Issue, []githubstructures.Issue) {
+			return []githubstructures.Issue{
+					githubstructures.Issue{Url: "url-1"},
+					githubstructures.Issue{Url: "url-2"},
+				},
+				[]githubstructures.Issue{
+					githubstructures.Issue{Url: "url-3"},
+					githubstructures.Issue{Url: "url-4"},
+				}
+		}
+		mockFindLabels = func(repoName string) []githubstructures.Label {
+			return []githubstructures.Label{}
+		}
+		mockCreateLabel = func(repoName string, label githubstructures.Label) {
+		}
+		mockFindIssues = func(repoName string) []githubstructures.Issue {
+			return []githubstructures.Issue{}
+		}
+		mockAddLabel = func(issueUrl string, labelName string) {
+			mockAddLabelParams = append(mockAddLabelParams, []interface{}{issueUrl, labelName})
+		}
+		githubClient := Mockgithubclient{}
+		issuesTriage := Mockissuestriage{}
+		githubOperator := New(githubClient, issuesTriage, answeringLabels, "by-ours", "answered", "not-answered", answeringLabels, []string{"severity: "})
+
+		githubOperator.UpdateRepos(repoNames)
+
+		Expect(mockAddLabelParams).To(Equal([]interface{}{
+			[]interface{}{"url-3", "missing severity: "},
+			[]interface{}{"url-4", "missing severity: "},
 		}))
 	})
 
@@ -312,7 +361,7 @@ var _ = Describe("githuboperator", func() {
 		}
 		githubClient := Mockgithubclient{}
 		issuesTriage := Mockissuestriage{}
-		githubOperator := New(githubClient, issuesTriage, answeringLabels, "by-ours", "answered", "not-answered", answeringLabels)
+		githubOperator := New(githubClient, issuesTriage, answeringLabels, "by-ours", "answered", "not-answered", answeringLabels, []string{})
 
 		githubOperator.UpdateRepos(repoNames)
 
@@ -381,7 +430,7 @@ var _ = Describe("githuboperator", func() {
 		}
 		githubClient := Mockgithubclient{}
 		issuesTriage := Mockissuestriage{}
-		githubOperator := New(githubClient, issuesTriage, answeringLabels, "by-ours", "answered", "not-answered", answeringLabels)
+		githubOperator := New(githubClient, issuesTriage, answeringLabels, "by-ours", "answered", "not-answered", answeringLabels, []string{})
 
 		githubOperator.UpdateRepos(repoNames)
 

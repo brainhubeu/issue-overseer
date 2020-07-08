@@ -39,12 +39,15 @@ func main() {
 		githubstructures.Label{Name: "tested & fails", Color: "ff4040"},
 		githubstructures.Label{Name: "tested & works", Color: "40ff40"},
 	}, answeringLabels...)
+	missingManualLabelPrefixes := []string{
+		"severity: ",
+	}
 
 	log.Println(token, OUR_LABEL_TEXT, ANSWERED_LABEL_TEXT, NOT_ANSWERED_LABEL_TEXT)
 
 	githubClient := githubclient.New(organization, token)
 	issuesTriage := issuestriage.New()
-	githubOperator := githuboperator.New(githubClient, issuesTriage, answeringLabels, OUR_LABEL_TEXT, ANSWERED_LABEL_TEXT, NOT_ANSWERED_LABEL_TEXT, defaultLabels)
+	githubOperator := githuboperator.New(githubClient, issuesTriage, answeringLabels, OUR_LABEL_TEXT, ANSWERED_LABEL_TEXT, NOT_ANSWERED_LABEL_TEXT, defaultLabels, missingManualLabelPrefixes)
 	repoNames := githubClient.FindRepos()
 	log.Println("repoNames", repoNames)
 	githubOperator.UpdateRepos(repoNames)

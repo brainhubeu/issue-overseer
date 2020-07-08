@@ -22,17 +22,18 @@ type IssuesTriage interface {
 }
 
 type githuboperator struct {
-	githubclient            GithubClient
-	issuestriage            IssuesTriage
-	AnsweringLabels         []githubstructures.Label
-	OUR_LABEL_TEXT          string
-	ANSWERED_LABEL_TEXT     string
-	NOT_ANSWERED_LABEL_TEXT string
-	DefaultLabels           []githubstructures.Label
+	githubclient               GithubClient
+	issuestriage               IssuesTriage
+	AnsweringLabels            []githubstructures.Label
+	OUR_LABEL_TEXT             string
+	ANSWERED_LABEL_TEXT        string
+	NOT_ANSWERED_LABEL_TEXT    string
+	DefaultLabels              []githubstructures.Label
+	missingManualLabelPrefixes []string
 }
 
-func New(githubClient GithubClient, issuesTriage IssuesTriage, answeringLabels []githubstructures.Label, OUR_LABEL_TEXT string, ANSWERED_LABEL_TEXT string, NOT_ANSWERED_LABEL_TEXT string, defaultLabels []githubstructures.Label) *githuboperator {
-	githubOperator := &githuboperator{githubClient, issuesTriage, answeringLabels, OUR_LABEL_TEXT, ANSWERED_LABEL_TEXT, NOT_ANSWERED_LABEL_TEXT, defaultLabels}
+func New(githubClient GithubClient, issuesTriage IssuesTriage, answeringLabels []githubstructures.Label, OUR_LABEL_TEXT string, ANSWERED_LABEL_TEXT string, NOT_ANSWERED_LABEL_TEXT string, defaultLabels []githubstructures.Label, missingManualLabelPrefixes []string) *githuboperator {
+	githubOperator := &githuboperator{githubClient, issuesTriage, answeringLabels, OUR_LABEL_TEXT, ANSWERED_LABEL_TEXT, NOT_ANSWERED_LABEL_TEXT, defaultLabels, missingManualLabelPrefixes}
 	return githubOperator
 }
 
@@ -109,10 +110,25 @@ func (githubOperator githuboperator) updateAnsweringLabelsForRepo(repoName strin
 	}
 }
 
+func (githubOperator githuboperator) updateMissingManualLabelsForRepo(repoName string) {
+	prefixes := githubOperator.missingManualLabelPrefixes
+	for i := 0; i < len(prefixes); i++ {
+		prefix := prefixes[i]
+		issues := githubOperator.githubclient.FindIssues(repoName)
+		issuesWithLabel, issuesWithoutLabel := githubOperator.issuestriage.GroupByManualLabel(issues, prefix)
+		log.Println(repoName, "issues with manual label", prefix, issuesWithLabel)
+		log.Println(repoName, "issues without manual label", prefix, issuesWithoutLabel)
+		for j := 0; j < len(issuesWithoutLabel); j++ {
+			githubOperator.githubclient.AddLabel(issuesWithoutLabel[j].Url, "missing "+prefix)
+		}
+	}
+}
+
 func (githubOperator githuboperator) UpdateRepos(repoNames []string) {
 	for i := 0; i < len(repoNames); i++ {
 		repoName := repoNames[i]
 		githubOperator.createOrUpdateRepoLabels(repoName)
 		githubOperator.updateAnsweringLabelsForRepo(repoName)
+		githubOperator.updateMissingManualLabelsForRepo(repoName)
 	}
 }
