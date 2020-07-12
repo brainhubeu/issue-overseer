@@ -73,11 +73,19 @@ func (issuesTriage issuestriage) GroupByAnswering(issues []githubstructures.Issu
 
 func (issuesTriage issuestriage) TriageOneIssueByManualLabel(issue githubstructures.Issue, config githubstructures.ManualLabelConfig) int {
 	labels := issue.Labels
+	hasPrefix := false
+	parentMatches := config.ParentLabelName == ""
 	for i := 0; i < len(labels); i++ {
 		label := labels[i]
 		if strings.HasPrefix(label.Name, config.Prefix+": ") {
-			return githubstructures.IssueManualLabelTypeEnum.EXISTENT
+			hasPrefix = true
 		}
+		if label.Name == config.ParentLabelName {
+			parentMatches = true
+		}
+	}
+	if hasPrefix && parentMatches {
+		return githubstructures.IssueManualLabelTypeEnum.EXISTENT
 	}
 	return githubstructures.IssueManualLabelTypeEnum.NON_EXISTENT
 }

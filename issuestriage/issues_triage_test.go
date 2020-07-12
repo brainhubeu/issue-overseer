@@ -368,6 +368,42 @@ var _ = Describe("issuestriage", func() {
 			Expect(issueType).To(Equal(githubstructures.IssueManualLabelTypeEnum.EXISTENT))
 		})
 
+		It("returns EXISTENT when the parent matches and the parent label is the first one", func() {
+			issue := githubstructures.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "NONE", Labels: []githubstructures.Label{
+				githubstructures.Label{Name: "bug", Color: "000000"},
+				githubstructures.Label{Name: "severity: major", Color: "000000"},
+			}, Comments: []githubstructures.Comment{}}
+
+			issuesTriage := New()
+			issueType := issuesTriage.TriageOneIssueByManualLabel(issue, githubstructures.ManualLabelConfig{Prefix: "severity", ParentLabelName: "bug"})
+
+			Expect(issueType).To(Equal(githubstructures.IssueManualLabelTypeEnum.EXISTENT))
+		})
+
+		It("returns EXISTENT when the parent matches and the parent label is the last one", func() {
+			issue := githubstructures.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "NONE", Labels: []githubstructures.Label{
+				githubstructures.Label{Name: "severity: major", Color: "000000"},
+				githubstructures.Label{Name: "bug", Color: "000000"},
+			}, Comments: []githubstructures.Comment{}}
+
+			issuesTriage := New()
+			issueType := issuesTriage.TriageOneIssueByManualLabel(issue, githubstructures.ManualLabelConfig{Prefix: "severity", ParentLabelName: "bug"})
+
+			Expect(issueType).To(Equal(githubstructures.IssueManualLabelTypeEnum.EXISTENT))
+		})
+
+		It("returns NON_EXISTENT when the parent doesn't match", func() {
+			issue := githubstructures.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "NONE", Labels: []githubstructures.Label{
+				githubstructures.Label{Name: "severity: major", Color: "000000"},
+				githubstructures.Label{Name: "enhancement", Color: "000000"},
+			}, Comments: []githubstructures.Comment{}}
+
+			issuesTriage := New()
+			issueType := issuesTriage.TriageOneIssueByManualLabel(issue, githubstructures.ManualLabelConfig{Prefix: "severity", ParentLabelName: "bug"})
+
+			Expect(issueType).To(Equal(githubstructures.IssueManualLabelTypeEnum.NON_EXISTENT))
+		})
+
 		It("returns NON_EXISTENT for exact name", func() {
 			issue := githubstructures.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "NONE", Labels: []githubstructures.Label{
 				githubstructures.Label{Name: "severity", Color: "000000"},
