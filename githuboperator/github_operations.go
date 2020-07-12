@@ -18,22 +18,22 @@ type GithubClient interface {
 
 type IssuesTriage interface {
 	GroupByAnswering(issues []githubstructures.Issue) ([]githubstructures.Issue, []githubstructures.Issue, []githubstructures.Issue)
-	GroupByManualLabel(issues []githubstructures.Issue, prefix string) ([]githubstructures.Issue, []githubstructures.Issue)
+	GroupByManualLabel(issues []githubstructures.Issue, config githubstructures.ManualLabelConfig) ([]githubstructures.Issue, []githubstructures.Issue)
 }
 
 type githuboperator struct {
-	githubclient               GithubClient
-	issuestriage               IssuesTriage
-	AnsweringLabels            []githubstructures.Label
-	OUR_LABEL_TEXT             string
-	ANSWERED_LABEL_TEXT        string
-	NOT_ANSWERED_LABEL_TEXT    string
-	DefaultLabels              []githubstructures.Label
-	missingManualLabelPrefixes []string
+	githubclient            GithubClient
+	issuestriage            IssuesTriage
+	AnsweringLabels         []githubstructures.Label
+	OUR_LABEL_TEXT          string
+	ANSWERED_LABEL_TEXT     string
+	NOT_ANSWERED_LABEL_TEXT string
+	DefaultLabels           []githubstructures.Label
+	manualLabelConfigs      []githubstructures.ManualLabelConfig
 }
 
-func New(githubClient GithubClient, issuesTriage IssuesTriage, answeringLabels []githubstructures.Label, OUR_LABEL_TEXT string, ANSWERED_LABEL_TEXT string, NOT_ANSWERED_LABEL_TEXT string, defaultLabels []githubstructures.Label, missingManualLabelPrefixes []string) *githuboperator {
-	githubOperator := &githuboperator{githubClient, issuesTriage, answeringLabels, OUR_LABEL_TEXT, ANSWERED_LABEL_TEXT, NOT_ANSWERED_LABEL_TEXT, defaultLabels, missingManualLabelPrefixes}
+func New(githubClient GithubClient, issuesTriage IssuesTriage, answeringLabels []githubstructures.Label, OUR_LABEL_TEXT string, ANSWERED_LABEL_TEXT string, NOT_ANSWERED_LABEL_TEXT string, defaultLabels []githubstructures.Label, manualLabelConfigs []githubstructures.ManualLabelConfig) *githuboperator {
+	githubOperator := &githuboperator{githubClient, issuesTriage, answeringLabels, OUR_LABEL_TEXT, ANSWERED_LABEL_TEXT, NOT_ANSWERED_LABEL_TEXT, defaultLabels, manualLabelConfigs}
 	return githubOperator
 }
 
@@ -111,15 +111,15 @@ func (githubOperator githuboperator) updateAnsweringLabelsForRepo(repoName strin
 }
 
 func (githubOperator githuboperator) updateMissingManualLabelsForRepo(repoName string) {
-	prefixes := githubOperator.missingManualLabelPrefixes
-	for i := 0; i < len(prefixes); i++ {
-		prefix := prefixes[i]
+	configs := githubOperator.manualLabelConfigs
+	for i := 0; i < len(configs); i++ {
+		config := configs[i]
 		issues := githubOperator.githubclient.FindIssues(repoName)
-		issuesWithLabel, issuesWithoutLabel := githubOperator.issuestriage.GroupByManualLabel(issues, prefix)
-		log.Println(repoName, "issues with manual label", prefix, issuesWithLabel)
-		log.Println(repoName, "issues without manual label", prefix, issuesWithoutLabel)
+		issuesWithLabel, issuesWithoutLabel := githubOperator.issuestriage.GroupByManualLabel(issues, config)
+		log.Println(repoName, "issues with manual label", config.Prefix, issuesWithLabel)
+		log.Println(repoName, "issues without manual label", config.Prefix, issuesWithoutLabel)
 		for j := 0; j < len(issuesWithoutLabel); j++ {
-			githubOperator.githubclient.AddLabel(issuesWithoutLabel[j].Url, "missing "+prefix)
+			githubOperator.githubclient.AddLabel(issuesWithoutLabel[j].Url, "missing "+config.Prefix)
 		}
 	}
 }

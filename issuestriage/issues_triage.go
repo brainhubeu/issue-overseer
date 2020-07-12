@@ -71,23 +71,23 @@ func (issuesTriage issuestriage) GroupByAnswering(issues []githubstructures.Issu
 	return ourIssues, answeredIssues, notAnsweredIssues
 }
 
-func (issuesTriage issuestriage) TriageOneIssueByManualLabel(issue githubstructures.Issue, prefix string) int {
+func (issuesTriage issuestriage) TriageOneIssueByManualLabel(issue githubstructures.Issue, config githubstructures.ManualLabelConfig) int {
 	labels := issue.Labels
 	for i := 0; i < len(labels); i++ {
 		label := labels[i]
-		if strings.HasPrefix(label.Name, prefix) {
+		if strings.HasPrefix(label.Name, config.Prefix+": ") {
 			return githubstructures.IssueManualLabelTypeEnum.EXISTENT
 		}
 	}
 	return githubstructures.IssueManualLabelTypeEnum.NON_EXISTENT
 }
 
-func (issuesTriage issuestriage) GroupByManualLabel(issues []githubstructures.Issue, prefix string) ([]githubstructures.Issue, []githubstructures.Issue) {
+func (issuesTriage issuestriage) GroupByManualLabel(issues []githubstructures.Issue, config githubstructures.ManualLabelConfig) ([]githubstructures.Issue, []githubstructures.Issue) {
 	issuesWithLabel := []githubstructures.Issue{}
 	issuesWithoutLabel := []githubstructures.Issue{}
 	for i := 0; i < len(issues); i++ {
 		issue := issues[i]
-		switch issueType := issuesTriage.TriageOneIssueByManualLabel(issue, prefix); issueType {
+		switch issueType := issuesTriage.TriageOneIssueByManualLabel(issue, config); issueType {
 		case githubstructures.IssueManualLabelTypeEnum.EXISTENT:
 			issuesWithLabel = append(issuesWithLabel, issue)
 		default:

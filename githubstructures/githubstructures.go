@@ -40,3 +40,8 @@ type Issue struct {
 	Labels            []Label
 	Comments          []Comment
 }
+
+type ManualLabelConfig struct {
+	Prefix          string
+	ParentLabelName string
+}

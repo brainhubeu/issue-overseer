@@ -39,8 +39,8 @@ func main() {
 		githubstructures.Label{Name: "tested & fails", Color: "ff4040"},
 		githubstructures.Label{Name: "tested & works", Color: "40ff40"},
 	}, answeringLabels...)
-	missingManualLabelPrefixes := []string{
-		"severity: ",
+	missingManualLabelPrefixes := []githubstructures.ManualLabelConfig{
+		githubstructures.ManualLabelConfig{Prefix: "severity", ParentLabelName: "bug"},
 	}
 
 	log.Println(token, OUR_LABEL_TEXT, ANSWERED_LABEL_TEXT, NOT_ANSWERED_LABEL_TEXT)

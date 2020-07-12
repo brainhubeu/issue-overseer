@@ -315,7 +315,7 @@ var _ = Describe("issuestriage", func() {
 			issue := githubstructures.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "NONE", Labels: []githubstructures.Label{}, Comments: []githubstructures.Comment{}}
 
 			issuesTriage := New()
-			issueType := issuesTriage.TriageOneIssueByManualLabel(issue, "severity")
+			issueType := issuesTriage.TriageOneIssueByManualLabel(issue, githubstructures.ManualLabelConfig{Prefix: "severity", ParentLabelName: ""})
 
 			Expect(issueType).To(Equal(githubstructures.IssueManualLabelTypeEnum.NON_EXISTENT))
 		})
@@ -326,7 +326,7 @@ var _ = Describe("issuestriage", func() {
 			}, Comments: []githubstructures.Comment{}}
 
 			issuesTriage := New()
-			issueType := issuesTriage.TriageOneIssueByManualLabel(issue, "severity")
+			issueType := issuesTriage.TriageOneIssueByManualLabel(issue, githubstructures.ManualLabelConfig{Prefix: "severity", ParentLabelName: ""})
 
 			Expect(issueType).To(Equal(githubstructures.IssueManualLabelTypeEnum.NON_EXISTENT))
 		})
@@ -339,7 +339,7 @@ var _ = Describe("issuestriage", func() {
 			}, Comments: []githubstructures.Comment{}}
 
 			issuesTriage := New()
-			issueType := issuesTriage.TriageOneIssueByManualLabel(issue, "severity")
+			issueType := issuesTriage.TriageOneIssueByManualLabel(issue, githubstructures.ManualLabelConfig{Prefix: "severity", ParentLabelName: ""})
 
 			Expect(issueType).To(Equal(githubstructures.IssueManualLabelTypeEnum.NON_EXISTENT))
 		})
@@ -352,7 +352,7 @@ var _ = Describe("issuestriage", func() {
 			}, Comments: []githubstructures.Comment{}}
 
 			issuesTriage := New()
-			issueType := issuesTriage.TriageOneIssueByManualLabel(issue, "severity")
+			issueType := issuesTriage.TriageOneIssueByManualLabel(issue, githubstructures.ManualLabelConfig{Prefix: "severity", ParentLabelName: ""})
 
 			Expect(issueType).To(Equal(githubstructures.IssueManualLabelTypeEnum.EXISTENT))
 		})
@@ -363,9 +363,31 @@ var _ = Describe("issuestriage", func() {
 			}, Comments: []githubstructures.Comment{}}
 
 			issuesTriage := New()
-			issueType := issuesTriage.TriageOneIssueByManualLabel(issue, "severity")
+			issueType := issuesTriage.TriageOneIssueByManualLabel(issue, githubstructures.ManualLabelConfig{Prefix: "severity", ParentLabelName: ""})
 
 			Expect(issueType).To(Equal(githubstructures.IssueManualLabelTypeEnum.EXISTENT))
+		})
+
+		It("returns NON_EXISTENT for exact name", func() {
+			issue := githubstructures.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "NONE", Labels: []githubstructures.Label{
+				githubstructures.Label{Name: "severity", Color: "000000"},
+			}, Comments: []githubstructures.Comment{}}
+
+			issuesTriage := New()
+			issueType := issuesTriage.TriageOneIssueByManualLabel(issue, githubstructures.ManualLabelConfig{Prefix: "severity", ParentLabelName: ""})
+
+			Expect(issueType).To(Equal(githubstructures.IssueManualLabelTypeEnum.NON_EXISTENT))
+		})
+
+		It("returns NON_EXISTENT for the prefix following something else than the semicolon and space", func() {
+			issue := githubstructures.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "NONE", Labels: []githubstructures.Label{
+				githubstructures.Label{Name: "severity-", Color: "000000"},
+			}, Comments: []githubstructures.Comment{}}
+
+			issuesTriage := New()
+			issueType := issuesTriage.TriageOneIssueByManualLabel(issue, githubstructures.ManualLabelConfig{Prefix: "severity", ParentLabelName: ""})
+
+			Expect(issueType).To(Equal(githubstructures.IssueManualLabelTypeEnum.NON_EXISTENT))
 		})
 	})
 
@@ -387,7 +409,7 @@ var _ = Describe("issuestriage", func() {
 			}
 
 			issuesTriage := New()
-			issuesWithLabel, issuesWithoutLabel := issuesTriage.GroupByManualLabel(issues, "severity")
+			issuesWithLabel, issuesWithoutLabel := issuesTriage.GroupByManualLabel(issues, githubstructures.ManualLabelConfig{Prefix: "severity", ParentLabelName: ""})
 
 			Expect(issuesWithLabel).To(Equal([]githubstructures.Issue{
 				githubstructures.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "NONE", Labels: []githubstructures.Label{
