@@ -64,6 +64,9 @@ func TestMain(m *testing.M) {
 			os.Exit(1)
 		}
 	}
+	if status != 0 {
+		os.Exit(status)
+	}
 }
 
 func TestGithubOperator(t *testing.T) {
