@@ -118,6 +118,9 @@ func (githubOperator githuboperator) updateMissingManualLabelsForRepo(repoName s
 		issuesWithLabel, issuesWithoutLabel := githubOperator.issuestriage.GroupByManualLabel(issues, config)
 		log.Println(repoName, "issues with manual label", config.Prefix, issuesWithLabel)
 		log.Println(repoName, "issues without manual label", config.Prefix, issuesWithoutLabel)
+		for j := 0; j < len(issuesWithLabel); j++ {
+			githubOperator.githubclient.RemoveLabel(issuesWithLabel[j].Url, "missing "+config.Prefix)
+		}
 		for j := 0; j < len(issuesWithoutLabel); j++ {
 			githubOperator.githubclient.AddLabel(issuesWithoutLabel[j].Url, "missing "+config.Prefix)
 		}

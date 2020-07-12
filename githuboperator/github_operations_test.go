@@ -275,8 +275,9 @@ var _ = Describe("githuboperator", func() {
 		}))
 	})
 
-	It("adds missing manual label", func() {
+	It("adds and removes missing manual labels", func() {
 		mockAddLabelParams := []interface{}{}
+		mockRemoveLabelParams := []interface{}{}
 		repoNames := []string{
 			"repo-1",
 		}
@@ -306,6 +307,9 @@ var _ = Describe("githuboperator", func() {
 		}
 		mockCreateLabel = func(repoName string, label githubstructures.Label) {
 		}
+		mockRemoveLabel = func(issueUrl string, labelName string) {
+			mockRemoveLabelParams = append(mockRemoveLabelParams, []interface{}{issueUrl, labelName})
+		}
 		mockFindIssues = func(repoName string) []githubstructures.Issue {
 			return []githubstructures.Issue{}
 		}
@@ -327,6 +331,10 @@ var _ = Describe("githuboperator", func() {
 
 		githubOperator.UpdateRepos(repoNames)
 
+		Expect(mockRemoveLabelParams).To(Equal([]interface{}{
+			[]interface{}{"url-1", "missing severity"},
+			[]interface{}{"url-2", "missing severity"},
+		}))
 		Expect(mockAddLabelParams).To(Equal([]interface{}{
 			[]interface{}{"url-3", "missing severity"},
 			[]interface{}{"url-4", "missing severity"},

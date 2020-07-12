@@ -237,7 +237,9 @@ func (githubClient *githubclient) RemoveLabel(issueUrl string, labelName string)
 		http.MethodDelete,
 		url,
 		nil,
-		func(statusCode int, errorBody ErrorResponseBody) bool { return statusCode == 200 || statusCode == 204 },
+		func(statusCode int, errorBody ErrorResponseBody) bool {
+			return statusCode == 200 || statusCode == 204 || statusCode == 404 && errorBody.Message == "Label does not exist"
+		},
 		nil,
 	)
 }

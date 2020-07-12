@@ -392,16 +392,15 @@ var _ = Describe("issuestriage", func() {
 			Expect(issueType).To(Equal(githubstructures.IssueManualLabelTypeEnum.EXISTENT))
 		})
 
-		It("returns NON_EXISTENT when the parent doesn't match", func() {
+		It("returns EXISTENT when the parent doesn't match", func() {
 			issue := githubstructures.Issue{Title: "title", Url: "url", Number: 121, AuthorAssociation: "NONE", Labels: []githubstructures.Label{
-				githubstructures.Label{Name: "severity: major", Color: "000000"},
 				githubstructures.Label{Name: "enhancement", Color: "000000"},
 			}, Comments: []githubstructures.Comment{}}
 
 			issuesTriage := New()
 			issueType := issuesTriage.TriageOneIssueByManualLabel(issue, githubstructures.ManualLabelConfig{Prefix: "severity", ParentLabelName: "bug"})
 
-			Expect(issueType).To(Equal(githubstructures.IssueManualLabelTypeEnum.NON_EXISTENT))
+			Expect(issueType).To(Equal(githubstructures.IssueManualLabelTypeEnum.EXISTENT))
 		})
 
 		It("returns NON_EXISTENT for exact name", func() {
