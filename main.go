@@ -5,12 +5,14 @@ import (
 	"github.com/brainhubeu/issue-overseer/githuboperator"
 	"github.com/brainhubeu/issue-overseer/githubstructures"
 	"github.com/brainhubeu/issue-overseer/issuestriage"
+	"github.com/brainhubeu/issue-overseer/migrations"
 	"log"
 	"os"
 )
 
 func main() {
 	organization := os.Args[1]
+	command := os.Args[2]
 	token := os.Getenv("GITHUB_TOKEN")
 	OUR_LABEL_TEXT := "answering: reported by " + organization
 	const ANSWERED_LABEL_TEXT = "answering: answered"
@@ -40,7 +42,8 @@ func main() {
 		githubstructures.Label{Name: "tested & works", Color: "40ff40"},
 	}, answeringLabels...)
 	missingManualLabelPrefixes := []githubstructures.ManualLabelConfig{
-		githubstructures.ManualLabelConfig{Prefix: "severity", ParentLabelName: "bug"},
+		githubstructures.ManualLabelConfig{Prefix: "type", ParentLabelName: ""},
+		githubstructures.ManualLabelConfig{Prefix: "severity", ParentLabelName: "type: bug"},
 	}
 
 	log.Println(token, OUR_LABEL_TEXT, ANSWERED_LABEL_TEXT, NOT_ANSWERED_LABEL_TEXT)
@@ -50,5 +53,9 @@ func main() {
 	githubOperator := githuboperator.New(githubClient, issuesTriage, answeringLabels, OUR_LABEL_TEXT, ANSWERED_LABEL_TEXT, NOT_ANSWERED_LABEL_TEXT, defaultLabels, missingManualLabelPrefixes)
 	repoNames := githubClient.FindRepos()
 	log.Println("repoNames", repoNames)
-	githubOperator.UpdateRepos(repoNames)
+	if command == "migrations" {
+		migrations.Up(githubOperator, repoNames)
+	} else {
+		githubOperator.UpdateRepos(repoNames)
+	}
 }

@@ -13,6 +13,7 @@ type GithubClient interface {
 	CreateLabel(repoName string, label githubstructures.Label)
 	RemoveLabel(issueUrl string, labelName string)
 	AddLabel(issueUrl string, labelName string)
+	RenameLabel(repoName string, oldLabelName string, newLabelName string)
 	FindIssues(repoName string) []githubstructures.Issue
 }
 
@@ -133,5 +134,12 @@ func (githubOperator githuboperator) UpdateRepos(repoNames []string) {
 		githubOperator.createOrUpdateRepoLabels(repoName)
 		githubOperator.updateAnsweringLabelsForRepo(repoName)
 		githubOperator.updateMissingManualLabelsForRepo(repoName)
+	}
+}
+
+func (githubOperator githuboperator) RenameLabelInEachRepo(repoNames []string, oldLabelName string, newLabelName string) {
+	for i := 0; i < len(repoNames); i++ {
+		repoName := repoNames[i]
+		githubOperator.githubclient.RenameLabel(repoName, oldLabelName, newLabelName)
 	}
 }

@@ -93,6 +93,10 @@ type AddLabelRequestBody struct {
 	Labels []string `json:"labels"`
 }
 
+type LabelRenameRequestBody struct {
+	NewName string `json:"new_name"`
+}
+
 type GithubError struct {
 	Value    string `json:"value"`
 	Resource string `json:"resource"`
@@ -228,6 +232,19 @@ func (githubClient *githubclient) CreateLabel(repoName string, label githubstruc
 			return statusCode == 201 || statusCode == 422 && errorBody.Errors[0].Code == "already_exists"
 		},
 		labelToCreate,
+	)
+}
+
+func (githubClient *githubclient) RenameLabel(repoName string, oldLabelName string, newLabelName string) {
+	requestBody := LabelRenameRequestBody{NewName: newLabelName}
+	githubClient.request(
+		http.MethodPatch,
+		"https://api.github.com/repos/"+githubClient.Organization+"/"+repoName+"/labels/"+oldLabelName,
+		nil,
+		func(statusCode int, errorBody ErrorResponseBody) bool {
+			return statusCode == 200
+		},
+		requestBody,
 	)
 }
 

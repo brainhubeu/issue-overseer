@@ -30,6 +30,7 @@ var mockDeleteLabel func(repoName string, labelName string)
 var mockCreateLabel func(repoName string, label githubstructures.Label)
 var mockRemoveLabel func(issueUrl string, labelName string)
 var mockAddLabel func(issueUrl string, labelName string)
+var mockRenameLabel func(repoName string, oldLabelName string, newLabelName string)
 var mockFindIssues func(repoName string) []githubstructures.Issue
 
 func (githubClient Mockgithubclient) FindRepos() []string {
@@ -49,6 +50,9 @@ func (githubClient Mockgithubclient) RemoveLabel(issueUrl string, labelName stri
 }
 func (githubClient Mockgithubclient) AddLabel(issueUrl string, labelName string) {
 	mockAddLabel(issueUrl, labelName)
+}
+func (githubClient Mockgithubclient) RenameLabel(repoName string, oldLabelName string, newLabelName string) {
+	mockRenameLabel(repoName, oldLabelName, newLabelName)
 }
 func (githubClient Mockgithubclient) FindIssues(repoName string) []githubstructures.Issue {
 	return mockFindIssues(repoName)
@@ -465,6 +469,36 @@ var _ = Describe("githuboperator", func() {
 			[]interface{}{"url-2", "not-answered"},
 			[]interface{}{"url-4", "not-answered"},
 			[]interface{}{"url-5", "answered"},
+		}))
+	})
+
+	It("renames labels", func() {
+		mockRenameLabelParams := []interface{}{}
+		repoNames := []string{
+			"repo-1",
+			"repo-2",
+			"repo-3",
+		}
+		answeringLabels := []githubstructures.Label{
+			githubstructures.Label{Name: "by-ours", Color: "color-1"},
+			githubstructures.Label{Name: "answered", Color: "color-2"},
+			githubstructures.Label{Name: "not-answered", Color: "color-3"},
+		}
+
+		githubClient := Mockgithubclient{}
+		issuesTriage := Mockissuestriage{}
+		githubOperator := New(githubClient, issuesTriage, answeringLabels, "by-ours", "answered", "not-answered", answeringLabels, nil)
+
+		mockRenameLabel = func(repoName string, oldLabelName string, newLabelName string) {
+			mockRenameLabelParams = append(mockRenameLabelParams, []interface{}{repoName, oldLabelName, newLabelName})
+		}
+
+		githubOperator.RenameLabelInEachRepo(repoNames, "old-1", "new-1")
+
+		Expect(mockRenameLabelParams).To(Equal([]interface{}{
+			[]interface{}{"repo-1", "old-1", "new-1"},
+			[]interface{}{"repo-2", "old-1", "new-1"},
+			[]interface{}{"repo-3", "old-1", "new-1"},
 		}))
 	})
 })
