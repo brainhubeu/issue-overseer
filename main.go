@@ -12,7 +12,10 @@ import (
 
 func main() {
 	organization := os.Args[1]
-	command := os.Args[2]
+	command := ""
+	if len(os.Args) > 2 {
+		command = os.Args[2]
+	}
 	token := os.Getenv("GITHUB_TOKEN")
 	OUR_LABEL_TEXT := "answering: reported by " + organization
 	const ANSWERED_LABEL_TEXT = "answering: answered"
