@@ -150,27 +150,26 @@ func (githubClient *githubclient) request(method string, url string, source inte
 	if err != nil {
 		log.Fatalln(err)
 	}
-	stringifiedResponseBody := string(body)
 	if source != nil {
-		err = json.Unmarshal([]byte(stringifiedResponseBody), &source)
+		err = json.Unmarshal(body, &source)
 		if err != nil {
 			log.Fatalln(err)
 		}
 	}
 	errorBody := ErrorResponseBody{}
 	if resp.StatusCode >= 400 {
-		err = json.Unmarshal([]byte(stringifiedResponseBody), &errorBody)
+		err = json.Unmarshal(body, &errorBody)
 		if err != nil {
 			log.Fatalln(err)
 		}
 	} else {
-		err = json.Unmarshal([]byte(stringifiedResponseBody), &source)
+		err = json.Unmarshal(body, &source)
 		if err != nil {
 			log.Fatalln(err)
 		}
 	}
 	if !isValid(resp.StatusCode, errorBody) {
-		log.Fatalln(resp.Status, stringifiedResponseBody)
+		log.Fatalln(resp.Status, string(body))
 	}
 }
 
