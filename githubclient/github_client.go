@@ -93,6 +93,23 @@ type AddLabelRequestBody struct {
 	Labels []string `json:"labels"`
 }
 
+type LabelRenameRequestBody struct {
+	NewName string `json:"new_name"`
+}
+
+type GithubError struct {
+	Value    string `json:"value"`
+	Resource string `json:"resource"`
+	Field    string `json:"field"`
+	Code     string `json:"code"`
+}
+
+type ErrorResponseBody struct {
+	Message          string        `json:"message"`
+	Errors           []GithubError `json:"errors"`
+	DocumentationUrl string        `json:"documentation_url"`
+}
+
 func New(organization string, token string) *githubclient {
 	githubClient := &githubclient{organization, token, 0}
 	return githubClient
@@ -114,17 +131,8 @@ func createJson(data interface{}) io.Reader {
 	return bytes.NewBuffer(jsonValue)
 }
 
-func isStatusOK(actual int, expectedValues []int) bool {
-	for i := 0; i < len(expectedValues); i++ {
-		if actual == expectedValues[i] {
-			return true
-		}
-	}
-	return false
-}
-
-func (githubClient *githubclient) request(method string, url string, source interface{}, expectedStatuses []int, requestBody interface{}) {
-	log.Println("request", method, url)
+func (githubClient *githubclient) request(method string, url string, source interface{}, isValid func(statusCode int, errorBody ErrorResponseBody) bool, requestBody interface{}) {
+	log.Println("request", method, url, requestBody)
 	client := &http.Client{}
 	githubClient.incrementRequestNumber()
 	jsonReader := createJson(requestBody)
@@ -142,12 +150,26 @@ func (githubClient *githubclient) request(method string, url string, source inte
 	if err != nil {
 		log.Fatalln(err)
 	}
-	if !isStatusOK(resp.StatusCode, expectedStatuses) {
-		log.Fatalln(resp.Status, string(body))
+	if source != nil {
+		err = json.Unmarshal(body, &source)
+		if err != nil {
+			log.Fatalln(err)
+		}
 	}
-	err = json.Unmarshal([]byte(string(body)), &source)
-	if err != nil {
-		log.Fatalln(err)
+	errorBody := ErrorResponseBody{}
+	if resp.StatusCode >= 400 {
+		err = json.Unmarshal(body, &errorBody)
+		if err != nil {
+			log.Fatalln(err)
+		}
+	} else {
+		err = json.Unmarshal(body, &source)
+		if err != nil {
+			log.Fatalln(err)
+		}
+	}
+	if !isValid(resp.StatusCode, errorBody) {
+		log.Fatalln(resp.Status, string(body))
 	}
 }
 
@@ -155,7 +177,13 @@ func (githubClient *githubclient) FindRepos() []string {
 	repoNames := []string{}
 	for page := 1; ; page += 1 {
 		repositories := []Repository{}
-		githubClient.request(http.MethodGet, "https://api.github.com/orgs/"+githubClient.Organization+"/repos?page="+strconv.Itoa(page), &repositories, []int{200}, nil)
+		githubClient.request(
+			http.MethodGet,
+			"https://api.github.com/orgs/"+githubClient.Organization+"/repos?page="+strconv.Itoa(page),
+			&repositories,
+			func(statusCode int, errorBody ErrorResponseBody) bool { return statusCode == 200 },
+			nil,
+		)
 		if len(repositories) == 0 {
 			break
 		}
@@ -173,28 +201,77 @@ func (githubClient *githubclient) FindRepos() []string {
 
 func (githubClient *githubclient) FindLabels(repoName string) []githubstructures.Label {
 	labels := []githubstructures.Label{}
-	githubClient.request(http.MethodGet, "https://api.github.com/repos/"+githubClient.Organization+"/"+repoName+"/labels", &labels, []int{200}, nil)
+	githubClient.request(
+		http.MethodGet,
+		"https://api.github.com/repos/"+githubClient.Organization+"/"+repoName+"/labels",
+		&labels,
+		func(statusCode int, errorBody ErrorResponseBody) bool { return statusCode == 200 },
+		nil,
+	)
 	return labels
 }
 
 func (githubClient *githubclient) DeleteLabel(repoName string, labelName string) {
-	githubClient.request(http.MethodDelete, "https://api.github.com/repos/"+githubClient.Organization+"/"+repoName+"/labels/"+labelName, nil, []int{204}, nil)
+	githubClient.request(
+		http.MethodDelete,
+		"https://api.github.com/repos/"+githubClient.Organization+"/"+repoName+"/labels/"+labelName,
+		nil,
+		func(statusCode int, errorBody ErrorResponseBody) bool { return statusCode == 204 },
+		nil,
+	)
 }
 
 func (githubClient *githubclient) CreateLabel(repoName string, label githubstructures.Label) {
 	labelToCreate := Label{Name: label.Name, Color: label.Color}
-	githubClient.request(http.MethodPost, "https://api.github.com/repos/"+githubClient.Organization+"/"+repoName+"/labels", nil, []int{201}, labelToCreate)
+	githubClient.request(
+		http.MethodPost,
+		"https://api.github.com/repos/"+githubClient.Organization+"/"+repoName+"/labels",
+		nil,
+		func(statusCode int, errorBody ErrorResponseBody) bool {
+			return statusCode == 201 || statusCode == 422 && errorBody.Errors[0].Code == "already_exists"
+		},
+		labelToCreate,
+	)
+}
+
+func (githubClient *githubclient) RenameLabel(repoName string, oldLabelName string, newLabelName string) {
+	requestBody := LabelRenameRequestBody{NewName: newLabelName}
+	githubClient.request(
+		http.MethodPatch,
+		"https://api.github.com/repos/"+githubClient.Organization+"/"+repoName+"/labels/"+oldLabelName,
+		nil,
+		func(statusCode int, errorBody ErrorResponseBody) bool {
+			return statusCode == 200
+		},
+		requestBody,
+	)
 }
 
 func (githubClient *githubclient) RemoveLabel(issueUrl string, labelName string) {
 	url := strings.Replace(issueUrl, "https://github.com", "https://api.github.com/repos", 1) + "/labels/" + labelName
-	githubClient.request(http.MethodDelete, url, nil, []int{200, 404}, nil)
+	githubClient.request(
+		http.MethodDelete,
+		url,
+		nil,
+		func(statusCode int, errorBody ErrorResponseBody) bool {
+			return statusCode == 200 || statusCode == 204 || statusCode == 404 && errorBody.Message == "Label does not exist"
+		},
+		nil,
+	)
 }
 
 func (githubClient *githubclient) AddLabel(issueUrl string, labelName string) {
 	requestBody := AddLabelRequestBody{Labels: []string{labelName}}
 	url := strings.Replace(issueUrl, "https://github.com", "https://api.github.com/repos", 1) + "/labels"
-	githubClient.request(http.MethodPost, url, nil, []int{200}, requestBody)
+	githubClient.request(
+		http.MethodPost,
+		url,
+		nil,
+		func(statusCode int, errorBody ErrorResponseBody) bool {
+			return statusCode == 200 || statusCode == 422 && errorBody.Errors[0].Code == "already_exists"
+		},
+		requestBody,
+	)
 }
 
 func transformDataIntoIssue(issueData Issue) githubstructures.Issue {
@@ -267,7 +344,13 @@ func (githubClient *githubclient) FindIssues(repoName string) []githubstructures
 		graphqlVariables := GraphqlVariables{Organization: githubClient.Organization, RepoName: repoName, Cursor: cursor}
 		graphqlRequestBody := GraphqlRequestBody{Variables: graphqlVariables, Query: query}
 		issuesData := Issues{}
-		githubClient.request(http.MethodPost, "https://api.github.com/graphql", &issuesData, []int{200}, graphqlRequestBody)
+		githubClient.request(
+			http.MethodPost,
+			"https://api.github.com/graphql",
+			&issuesData,
+			func(statusCode int, errorBody ErrorResponseBody) bool { return statusCode == 200 },
+			graphqlRequestBody,
+		)
 		edges := issuesData.Data.Repository.Issues.Edges
 		if len(edges) == 0 {
 			break

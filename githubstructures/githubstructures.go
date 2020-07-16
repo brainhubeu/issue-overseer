@@ -1,15 +1,25 @@
 package githubstructures
 
-type issueTypeEnum struct {
+type issueAnsweringTypeEnum struct {
 	OURS         int
 	ANSWERED     int
 	NOT_ANSWERED int
 }
 
-var IssueTypeEnum = &issueTypeEnum{
+var IssueAnsweringTypeEnum = &issueAnsweringTypeEnum{
 	OURS:         1,
 	ANSWERED:     2,
 	NOT_ANSWERED: 3,
+}
+
+type issueManualLabelTypeEnum struct {
+	EXISTENT     int
+	NON_EXISTENT int
+}
+
+var IssueManualLabelTypeEnum = &issueManualLabelTypeEnum{
+	EXISTENT:     1,
+	NON_EXISTENT: 2,
 }
 
 type Label struct {
@@ -29,4 +39,9 @@ type Issue struct {
 	AuthorAssociation string
 	Labels            []Label
 	Comments          []Comment
+}
+
+type ManualLabelConfig struct {
+	Prefix          string
+	ParentLabelName string
 }

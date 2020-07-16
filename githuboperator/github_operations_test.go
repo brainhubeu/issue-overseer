@@ -11,10 +11,15 @@ import (
 
 type Mockissuestriage struct{}
 
-var mockTriageManyIssues func(issues []githubstructures.Issue) ([]githubstructures.Issue, []githubstructures.Issue, []githubstructures.Issue)
+var mockGroupByAnswering func(issues []githubstructures.Issue) ([]githubstructures.Issue, []githubstructures.Issue, []githubstructures.Issue)
+var mockGroupByManualLabel func(issues []githubstructures.Issue, config githubstructures.ManualLabelConfig) ([]githubstructures.Issue, []githubstructures.Issue)
 
-func (issuesTriage Mockissuestriage) TriageManyIssues(issues []githubstructures.Issue) ([]githubstructures.Issue, []githubstructures.Issue, []githubstructures.Issue) {
-	return mockTriageManyIssues(issues)
+func (issuesTriage Mockissuestriage) GroupByAnswering(issues []githubstructures.Issue) ([]githubstructures.Issue, []githubstructures.Issue, []githubstructures.Issue) {
+	return mockGroupByAnswering(issues)
+}
+
+func (issuesTriage Mockissuestriage) GroupByManualLabel(issues []githubstructures.Issue, config githubstructures.ManualLabelConfig) ([]githubstructures.Issue, []githubstructures.Issue) {
+	return mockGroupByManualLabel(issues, config)
 }
 
 type Mockgithubclient struct{}
@@ -25,6 +30,7 @@ var mockDeleteLabel func(repoName string, labelName string)
 var mockCreateLabel func(repoName string, label githubstructures.Label)
 var mockRemoveLabel func(issueUrl string, labelName string)
 var mockAddLabel func(issueUrl string, labelName string)
+var mockRenameLabel func(repoName string, oldLabelName string, newLabelName string)
 var mockFindIssues func(repoName string) []githubstructures.Issue
 
 func (githubClient Mockgithubclient) FindRepos() []string {
@@ -44,6 +50,9 @@ func (githubClient Mockgithubclient) RemoveLabel(issueUrl string, labelName stri
 }
 func (githubClient Mockgithubclient) AddLabel(issueUrl string, labelName string) {
 	mockAddLabel(issueUrl, labelName)
+}
+func (githubClient Mockgithubclient) RenameLabel(repoName string, oldLabelName string, newLabelName string) {
+	mockRenameLabel(repoName, oldLabelName, newLabelName)
 }
 func (githubClient Mockgithubclient) FindIssues(repoName string) []githubstructures.Issue {
 	return mockFindIssues(repoName)
@@ -107,7 +116,7 @@ var _ = Describe("githuboperator", func() {
 
 		githubClient := Mockgithubclient{}
 		issuesTriage := Mockissuestriage{}
-		githubOperator := New(githubClient, issuesTriage, answeringLabels, "label-1", "label-2", "label-3")
+		githubOperator := New(githubClient, issuesTriage, answeringLabels, "label-1", "label-2", "label-3", answeringLabels, nil)
 		githubOperator.UpdateRepos(repoNames)
 	})
 
@@ -124,7 +133,7 @@ var _ = Describe("githuboperator", func() {
 			githubstructures.Label{Name: "label-3", Color: "color-3"},
 		}
 
-		mockTriageManyIssues = func(issues []githubstructures.Issue) ([]githubstructures.Issue, []githubstructures.Issue, []githubstructures.Issue) {
+		mockGroupByAnswering = func(issues []githubstructures.Issue) ([]githubstructures.Issue, []githubstructures.Issue, []githubstructures.Issue) {
 			return []githubstructures.Issue{}, []githubstructures.Issue{}, []githubstructures.Issue{}
 		}
 		mockFindLabels = func(repoName string) []githubstructures.Label {
@@ -138,7 +147,7 @@ var _ = Describe("githuboperator", func() {
 		}
 		githubClient := Mockgithubclient{}
 		issuesTriage := Mockissuestriage{}
-		githubOperator := New(githubClient, issuesTriage, answeringLabels, "label-1", "label-2", "label-3")
+		githubOperator := New(githubClient, issuesTriage, answeringLabels, "label-1", "label-2", "label-3", answeringLabels, nil)
 
 		githubOperator.UpdateRepos(repoNames)
 
@@ -168,7 +177,7 @@ var _ = Describe("githuboperator", func() {
 			githubstructures.Label{Name: "label-3", Color: "color-3"},
 		}
 
-		mockTriageManyIssues = func(issues []githubstructures.Issue) ([]githubstructures.Issue, []githubstructures.Issue, []githubstructures.Issue) {
+		mockGroupByAnswering = func(issues []githubstructures.Issue) ([]githubstructures.Issue, []githubstructures.Issue, []githubstructures.Issue) {
 			return []githubstructures.Issue{}, []githubstructures.Issue{}, []githubstructures.Issue{}
 		}
 		mockFindLabels = func(repoName string) []githubstructures.Label {
@@ -200,7 +209,7 @@ var _ = Describe("githuboperator", func() {
 		}
 		githubClient := Mockgithubclient{}
 		issuesTriage := Mockissuestriage{}
-		githubOperator := New(githubClient, issuesTriage, answeringLabels, "label-1", "label-2", "label-3")
+		githubOperator := New(githubClient, issuesTriage, answeringLabels, "label-1", "label-2", "label-3", answeringLabels, nil)
 
 		githubOperator.UpdateRepos(repoNames)
 
@@ -224,7 +233,7 @@ var _ = Describe("githuboperator", func() {
 			githubstructures.Label{Name: "label-3", Color: "color-3"},
 		}
 
-		mockTriageManyIssues = func(issues []githubstructures.Issue) ([]githubstructures.Issue, []githubstructures.Issue, []githubstructures.Issue) {
+		mockGroupByAnswering = func(issues []githubstructures.Issue) ([]githubstructures.Issue, []githubstructures.Issue, []githubstructures.Issue) {
 			return []githubstructures.Issue{}, []githubstructures.Issue{}, []githubstructures.Issue{}
 		}
 		mockFindLabels = func(repoName string) []githubstructures.Label {
@@ -259,7 +268,7 @@ var _ = Describe("githuboperator", func() {
 		}
 		githubClient := Mockgithubclient{}
 		issuesTriage := Mockissuestriage{}
-		githubOperator := New(githubClient, issuesTriage, answeringLabels, "label-1", "label-2", "label-3")
+		githubOperator := New(githubClient, issuesTriage, answeringLabels, "label-1", "label-2", "label-3", answeringLabels, nil)
 
 		githubOperator.UpdateRepos(repoNames)
 
@@ -267,6 +276,72 @@ var _ = Describe("githuboperator", func() {
 			[]interface{}{"repo-1", "label-1"},
 			[]interface{}{"repo-3", "label-2"},
 			[]interface{}{"repo-3", "label-3"},
+		}))
+	})
+
+	It("adds and removes missing manual labels", func() {
+		mockAddLabelParams := []interface{}{}
+		mockRemoveLabelParams := []interface{}{}
+		repoNames := []string{
+			"repo-1",
+		}
+		answeringLabels := []githubstructures.Label{
+			githubstructures.Label{Name: "label-1", Color: "color-1"},
+			githubstructures.Label{Name: "label-2", Color: "color-2"},
+			githubstructures.Label{Name: "label-3", Color: "color-3"},
+		}
+
+		mockGroupByAnswering = func(issues []githubstructures.Issue) ([]githubstructures.Issue, []githubstructures.Issue, []githubstructures.Issue) {
+			return []githubstructures.Issue{},
+				[]githubstructures.Issue{},
+				[]githubstructures.Issue{}
+		}
+		mockGroupByManualLabel = func(issues []githubstructures.Issue, config githubstructures.ManualLabelConfig) ([]githubstructures.Issue, []githubstructures.Issue) {
+			return []githubstructures.Issue{
+					githubstructures.Issue{Url: "url-1"},
+					githubstructures.Issue{Url: "url-2"},
+				},
+				[]githubstructures.Issue{
+					githubstructures.Issue{Url: "url-3"},
+					githubstructures.Issue{Url: "url-4"},
+				}
+		}
+		mockFindLabels = func(repoName string) []githubstructures.Label {
+			return []githubstructures.Label{}
+		}
+		mockCreateLabel = func(repoName string, label githubstructures.Label) {
+		}
+		mockRemoveLabel = func(issueUrl string, labelName string) {
+			mockRemoveLabelParams = append(mockRemoveLabelParams, []interface{}{issueUrl, labelName})
+		}
+		mockFindIssues = func(repoName string) []githubstructures.Issue {
+			return []githubstructures.Issue{}
+		}
+		mockAddLabel = func(issueUrl string, labelName string) {
+			mockAddLabelParams = append(mockAddLabelParams, []interface{}{issueUrl, labelName})
+		}
+		githubClient := Mockgithubclient{}
+		issuesTriage := Mockissuestriage{}
+		githubOperator := New(
+			githubClient,
+			issuesTriage,
+			answeringLabels,
+			"by-ours",
+			"answered",
+			"not-answered",
+			answeringLabels,
+			[]githubstructures.ManualLabelConfig{githubstructures.ManualLabelConfig{Prefix: "severity", ParentLabelName: ""}},
+		)
+
+		githubOperator.UpdateRepos(repoNames)
+
+		Expect(mockRemoveLabelParams).To(Equal([]interface{}{
+			[]interface{}{"url-1", "missing severity"},
+			[]interface{}{"url-2", "missing severity"},
+		}))
+		Expect(mockAddLabelParams).To(Equal([]interface{}{
+			[]interface{}{"url-3", "missing severity"},
+			[]interface{}{"url-4", "missing severity"},
 		}))
 	})
 
@@ -283,7 +358,7 @@ var _ = Describe("githuboperator", func() {
 			githubstructures.Label{Name: "label-3", Color: "color-3"},
 		}
 
-		mockTriageManyIssues = func(issues []githubstructures.Issue) ([]githubstructures.Issue, []githubstructures.Issue, []githubstructures.Issue) {
+		mockGroupByAnswering = func(issues []githubstructures.Issue) ([]githubstructures.Issue, []githubstructures.Issue, []githubstructures.Issue) {
 			return []githubstructures.Issue{
 					githubstructures.Issue{Url: "url-1"},
 					githubstructures.Issue{Url: "url-2"},
@@ -310,7 +385,7 @@ var _ = Describe("githuboperator", func() {
 		}
 		githubClient := Mockgithubclient{}
 		issuesTriage := Mockissuestriage{}
-		githubOperator := New(githubClient, issuesTriage, answeringLabels, "by-ours", "answered", "not-answered")
+		githubOperator := New(githubClient, issuesTriage, answeringLabels, "by-ours", "answered", "not-answered", answeringLabels, nil)
 
 		githubOperator.UpdateRepos(repoNames)
 
@@ -350,7 +425,7 @@ var _ = Describe("githuboperator", func() {
 			githubstructures.Label{Name: "not-answered", Color: "color-3"},
 		}
 
-		mockTriageManyIssues = func(issues []githubstructures.Issue) ([]githubstructures.Issue, []githubstructures.Issue, []githubstructures.Issue) {
+		mockGroupByAnswering = func(issues []githubstructures.Issue) ([]githubstructures.Issue, []githubstructures.Issue, []githubstructures.Issue) {
 			return []githubstructures.Issue{
 					githubstructures.Issue{Url: "url-1", Labels: []githubstructures.Label{githubstructures.Label{Name: "by-ours"}}},
 					githubstructures.Issue{Url: "url-2", Labels: []githubstructures.Label{githubstructures.Label{Name: "not-answered"}}},
@@ -379,7 +454,7 @@ var _ = Describe("githuboperator", func() {
 		}
 		githubClient := Mockgithubclient{}
 		issuesTriage := Mockissuestriage{}
-		githubOperator := New(githubClient, issuesTriage, answeringLabels, "by-ours", "answered", "not-answered")
+		githubOperator := New(githubClient, issuesTriage, answeringLabels, "by-ours", "answered", "not-answered", answeringLabels, nil)
 
 		githubOperator.UpdateRepos(repoNames)
 
@@ -394,6 +469,36 @@ var _ = Describe("githuboperator", func() {
 			[]interface{}{"url-2", "not-answered"},
 			[]interface{}{"url-4", "not-answered"},
 			[]interface{}{"url-5", "answered"},
+		}))
+	})
+
+	It("renames labels", func() {
+		mockRenameLabelParams := []interface{}{}
+		repoNames := []string{
+			"repo-1",
+			"repo-2",
+			"repo-3",
+		}
+		answeringLabels := []githubstructures.Label{
+			githubstructures.Label{Name: "by-ours", Color: "color-1"},
+			githubstructures.Label{Name: "answered", Color: "color-2"},
+			githubstructures.Label{Name: "not-answered", Color: "color-3"},
+		}
+
+		githubClient := Mockgithubclient{}
+		issuesTriage := Mockissuestriage{}
+		githubOperator := New(githubClient, issuesTriage, answeringLabels, "by-ours", "answered", "not-answered", answeringLabels, nil)
+
+		mockRenameLabel = func(repoName string, oldLabelName string, newLabelName string) {
+			mockRenameLabelParams = append(mockRenameLabelParams, []interface{}{repoName, oldLabelName, newLabelName})
+		}
+
+		githubOperator.RenameLabelInEachRepo(repoNames, "old-1", "new-1")
+
+		Expect(mockRenameLabelParams).To(Equal([]interface{}{
+			[]interface{}{"repo-1", "old-1", "new-1"},
+			[]interface{}{"repo-2", "old-1", "new-1"},
+			[]interface{}{"repo-3", "old-1", "new-1"},
 		}))
 	})
 })
