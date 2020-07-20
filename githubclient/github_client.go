@@ -117,7 +117,7 @@ func New(organization string, token string) *githubclient {
 
 func (githubClient *githubclient) incrementRequestNumber() {
 	githubClient.RequestsNumber++
-	log.Println("(v 1.0.7) request to GitHub #", githubClient.RequestsNumber)
+	log.Println("(v 1.0.8) request to GitHub #", githubClient.RequestsNumber)
 }
 
 func createJson(data interface{}) io.Reader {
